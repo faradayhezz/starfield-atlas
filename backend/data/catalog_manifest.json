@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-08-30",
+  "catalogs": {
+    "openngc": {
+      "file": "openngc.csv",
+      "dataset": "OpenNGC v20260501",
+      "package_snapshot": "PyOngc 1.2.2",
+      "upstream_commit": "36cb178a0f69dba8bfc03a99c10512831edf1c6b",
+      "license": "CC-BY-SA-4.0",
+      "source_url": "https://github.com/mattiaverga/OpenNGC/releases/tag/v20260501",
+      "rows": 14033,
+      "projectable_rows": 14026,
+      "messier_rows": 110,
+      "addendum_rows": 64,
+      "sha256": "bc9109ab9549fc063c2feffaf646c8b1e04a94f59ea47217c88ee6f3198bd816"
+    },
+    "bright_stars": {
+      "file": "bright_stars.csv",
+      "dataset": "Hipparcos/tetra3 bright-star subset enriched with HYG v4.1 and Stellarium Chinese skyculture names",
+      "selection": "apparent magnitude <= 7.0; all stars retained by tetra3 default_database.npz",
+      "epoch_equinox": "J2000.0",
+      "epoch_proper_motion": 2023.0,
+      "license": "Coordinates/selection: Hipparcos citation and tetra3 Apache-2.0 transformation; HR, proper name and Chinese-name enrichment: CC-BY-SA-4.0",
+      "source_url": "https://github.com/esa/tetra3",
+      "rows": 8818,
+      "projectable_rows": 8818,
+      "unique_hip": 8818,
+      "hr_filled": 6033,
+      "proper_name_filled": 319,
+      "common_name_zh_filled": 2253,
+      "current_chinese_index_hip_in_catalog": 2255,
+      "untranslated_current_chinese_entries": [38196, 106758],
+      "enrichment_sources": [
+        {
+          "dataset": "HYG Database v4.1",
+          "upstream_commit": "c7f7f883fe678cc7680169a50ccd7dcc49b060ce",
+          "file": "hyg/CURRENT/hygdata_v41.csv",
+          "fields": ["hr", "name"],
+          "license": "CC-BY-SA-4.0",
+          "source_url": "https://github.com/astronexus/HYG-Database/blob/c7f7f883fe678cc7680169a50ccd7dcc49b060ce/hyg/CURRENT/hygdata_v41.csv",
+          "source_sha256": "eb086d463456ba8c565c6432d741e3de3f8191f0262bbddb6ce51513191e8c9e",
+          "matched_hip": 8818
+        },
+        {
+          "dataset": "Stellarium Chinese skyculture",
+          "upstream_commit": "014fbb5e59233d133c22f9811af96b67d05a95c9",
+          "files": ["chinese/index.json", "chinese/po/zh_CN.po"],
+          "field": "common_name_zh",
+          "license": "CC-BY-SA-4.0",
+          "source_url": "https://github.com/Stellarium/stellarium-skycultures/tree/014fbb5e59233d133c22f9811af96b67d05a95c9/chinese",
+          "index_sha256": "32e02a66f93c254bcd1b86ee0a3448347d57d0b1ff84714695c0bd0506ab9b0e",
+          "zh_cn_po_sha256": "52f220ab11e9684573b4b82c1f06200df5b75a37d55ebd0ec960073815d7a990"
+        },
+        {
+          "dataset": "Stellarium v0.22.2 Chinese skyculture exact Simplified-Chinese star labels",
+          "upstream_tag": "v0.22.2",
+          "upstream_commit": "9275de93251f2e9e6032afdf889332b9c66a248c",
+          "file": "skycultures/chinese/star_names.zh_CN.fab",
+          "field": "common_name_zh",
+          "license": "CC-BY-SA-4.0",
+          "source_url": "https://github.com/Stellarium/stellarium/blob/9275de93251f2e9e6032afdf889332b9c66a248c/skycultures/chinese/star_names.zh_CN.fab",
+          "source_sha256": "6379331a5e7f7029a11ab2186c8a0b7897c73684aff410270d8544a4bbed9fd5",
+          "verbatim_primary_labels_used": 2252
+        }
+      ],
+      "sha256": "bf56aacb85750c3adb0eb6c3502acda27006b10a195c8eeee2c6ee87932a9951"
+    },
+    "constellation_lines": {
+      "file": "constellation_lines.json",
+      "dataset": "Celestial Data – constellations.lines",
+      "upstream": "d3-celestial",
+      "source_snapshot": "retrieved 2026-08-30; exact transformed artifact pinned by SHA-256",
+      "license": "BSD-3-Clause",
+      "source_url": "https://github.com/dieghernan/celestial_data/blob/main/data/constellations.lines.geojson",
+      "iau_constellations": 88,
+      "source_features": 89,
+      "note": "Serpens is represented by separate Caput and Cauda features sharing the Ser abbreviation.",
+      "segments": 753,
+      "sha256": "d079ceb22fe565e29b04f50eacfb231506c6e77618127836178373a5e0aa4679"
+    }
+  }
+}

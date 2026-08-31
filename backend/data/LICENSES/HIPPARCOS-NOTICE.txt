@@ -1,0 +1,19 @@
+Bright-star source notice
+=========================
+
+bright_stars.csv is a compact extraction of the ESA tetra3 0.1 bundled
+default_database.npz.  The database metadata identifies its source catalogue
+as `hip_main`, star_max_magnitude as 7.0, epoch_equinox as J2000, and
+epoch_proper_motion as 2023.0.  The CSV contains the 8,818 retained HIP stars,
+with RA/Dec in degrees and the apparent magnitude used by tetra3.
+
+Catalogue citation:
+  ESA (1997), The Hipparcos and Tycho Catalogues, ESA SP-1200;
+  CDS catalogue I/239, https://cdsarc.cds.unistra.fr/viz-bin/cat/I/239
+
+Transformation software:
+  tetra3 0.1, https://github.com/esa/tetra3, Apache-2.0.
+
+The HR column is deliberately present but blank because the tetra3 database
+retains HIP identifiers only.  Names are likewise left blank rather than
+introducing an unverifiable cross-match.

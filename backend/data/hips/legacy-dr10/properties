@@ -1,0 +1,59 @@
+hips_doi             = 10.26093/cds/aladin/k3kq-9e
+creator_did          = ivo://CDS/P/DESI-Legacy-Surveys/DR10/color
+client_category      = Image/Optical/Legacy Surveys
+hips_creator         = Boch T. (CDS)
+hips_copyright       = Universite de Strasbourg/CNRS
+hips_license         = ODbL-1.0
+obs_title            = DESI Legacy Surveys color (g, r, i, z)
+obs_collection       = DESI Legacy Surveys
+obs_description      = The DESI Legacy Imaging Surveys (http://legacysurvey.org/) are a combination of three public projects (the Dark Energy Camera Legacy Survey, the Beijing-Arizona Sky Survey, and the Mayall z-band Legacy Survey) that will jointly image ≈14,000 deg2 of the extragalactic sky visible from the northern hemisphere in three optical bands (g, r, and z) using telescopes at the Kitt Peak National Observatory and the Cerro Tololo Inter-American Observatory. The combined survey footprint is split into two contiguous areas by the Galactic plane. The optical imaging is conducted using a unique strategy of dynamically adjusting the exposure times and pointing selection during observing that results in a survey of nearly uniform depth. As of DR10, the Legacy Surveys inference model is being self-consistently expanded to > 20,000 square degrees by incorporating additional DECam data from NOIRLab that includes extra optical bands (g, r, i, z). As of July 20 2026, we updated the HiPS by adding images in the northern hemisphere, originating from  (MzLS+BASS) DR9, improving the total coverage from 55% to 67% of the sky..
+obs_ack              = https://www.legacysurvey.org/acknowledgment/
+prov_progenitor      = https://portal.nersc.gov/cfs/cosmo/data/legacysurvey/dr10/south/coadd/
+bib_reference        = 2019AJ....157..168D
+bib_reference_url    = https://ui.adsabs.harvard.edu/abs/2019AJ....157..168D/abstract
+obs_copyright        = DESI Imaging Legacy Surveys
+obs_copyright_url    = https://www.legacysurvey.org/acknowledgment/
+
+#t_min               = Start time in MJD ( =(Unixtime/86400)+40587  or https://heasarc.gsfc.nasa.gov/cgi-bin/Tools/xTime/xTime.pl)
+#t_max               = Stop time in MJD
+
+obs_regime           = Optical
+
+em_min               = 3.9e-7
+em_max               = 1.02e-6
+
+hips_builder         = Aladin/HipsGen v12.044
+hips_version         = 1.4
+hips_frame           = equatorial
+hips_order           = 11
+hips_order_min       = 0
+hips_tile_width      = 512
+#hips_service_url    = ex: http://yourHipsServer/Legacy-Surveys color
+hips_status          = public master clonableOnce
+hips_initial_ra      = 190.0040433
+hips_initial_dec     = -5.2893305
+hips_initial_fov     = 1.0
+hips_pixel_scale     = 5.591E-5
+s_pixel_scale        = 7.277E-5
+dataproduct_type     = image
+hipsgen_date         = 2023-03-08T08:10Z
+hipsgen_params       = id=CDS/P/Legacy-Surveys/color in=data/color out=hips/CDS_P_Legacy-Surveys_color partitioning=false color=png mode=median TILES
+hips_release_date    = 2026-07-19T22:35Z
+hips_tile_format     = png
+hipsgen_date_1       = 2023-03-08T14:03Z
+hipsgen_params_1     = id=CDS/P/Legacy-Surveys/color in=data/color out=hips/CDS_P_Legacy-Surveys_color partitioning=false color=png mode=median ALLSKY
+hips_creation_date   = 2023-03-08T14:03Z
+hipsgen_date_2       = 2023-03-09T07:40Z
+hipsgen_params_2     = id=CDS/P/Legacy-Surveys/color in=data/color out=hips/CDS_P_Legacy-Surveys_color partitioning=false color=png mode=median ALLSKY
+hipsgen_date_3       = 2023-03-09T13:42Z
+hipsgen_params_3     = id=CDS/P/Legacy-Surveys/color in=data/color out=hips/CDS_P_Legacy-Surveys_color partitioning=false color=png mode=median ALLSKY
+hipsgen_date_4       = 2023-03-10T07:10Z
+hipsgen_params_4     = id=CDS/P/Legacy-Surveys/color in=data/color out=hips/CDS_P_Legacy-Surveys_color partitioning=false color=png mode=median ALLSKY
+hipsgen_date_5       = 2023-03-10T08:54Z
+hipsgen_params_5     = id=CDS/P/Legacy-Surveys/color in=data/color out=hips/CDS_P_Legacy-Surveys_color partitioning=false color=png mode=median ALLSKY
+hipsgen_date_6       = 2026-06-29T21:57Z
+hipsgen_params_6     = id=CDS/P/Legacy-Surveys/color in=data/color out=hips/CDS_P_Legacy-Surveys_color partitioning=false color=png mode=median TILES
+hips_overlay         = overlayMean mergeOverwriteTile treeMedian
+dataproduct_subtype  = color
+moc_sky_fraction     = 0.67339
+

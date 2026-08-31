@@ -1,0 +1,34 @@
+.deps/
+.runtime/
+frontend/node_modules/
+frontend/dist/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.build-venv/
+build/
+dist/
+release/
+packaging/starfield-atlas.ico
+design/
+
+# Local configuration, logs, editors, and coverage output
+.env
+.env.*
+!.env.example
+*.log
+.coverage
+coverage.xml
+htmlcov/
+.idea/
+.vscode/
+*.swp
+*.tmp
+*.part
+
+# Generated real-image analysis artifacts are documented separately; selected,
+# attribution-safe previews live under docs/images/.
+tests/network-fixtures/results/
+
+# This local LOST camera sample has no confirmed redistribution licence.
+tests/network-fixtures/uwcubesat_lost_img_7660.png
