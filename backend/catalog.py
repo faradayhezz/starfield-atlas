@@ -16,8 +16,16 @@ from .plate_solver import PlateSolution
 
 DATA_DIR = Path(__file__).resolve().parent / "data"
 
+# Display corrections are separate from the pinned upstream CSV. NASA identifies
+# IC 434 as the bright background to Barnard 33, not NGC 2024 / the Flame Nebula:
+# https://science.nasa.gov/asset/hubble/the-horsehead-nebula/
+DISPLAY_NAME_CORRECTIONS_ZH = {"IC0434": "马头星云背景发射区"}
+
 
 TYPE_NAMES_ZH = {
+    "*": "恒星（历史深空目录记录）",
+    "**": "双星（历史深空目录记录）",
+    "*Ass": "星协",
     "G": "星系",
     "GPair": "星系对",
     "GTrpl": "星系三重系统",
@@ -49,6 +57,12 @@ class CatalogObject:
     magnitude: float | None = None
     messier: str | None = None
     common_name_zh: str | None = None
+    catalog: str = "OpenNGC"
+    magnitude_band: str | None = None
+    area_sqdeg: float | None = None
+    opacity: int | None = None
+    related_identifiers: tuple[str, ...] = ()
+    size_kind: str = "catalog_axes"
 
 
 def _number(value: Any) -> float | None:
@@ -108,10 +122,49 @@ def load_openngc() -> tuple[CatalogObject, ...]:
                     pa_deg=_number(row.get("pa_deg")),
                     magnitude=_number(row.get("mag")),
                     messier=_text(row.get("messier")),
-                    common_name_zh=_text(row.get("common_name_zh")),
+                    common_name_zh=DISPLAY_NAME_CORRECTIONS_ZH.get(name, _text(row.get("common_name_zh"))),
+                    magnitude_band=_text(row.get("mag_band")),
                 )
             )
     return tuple(objects)
+
+
+@lru_cache(maxsize=1)
+def load_dark_nebulae() -> tuple[CatalogObject, ...]:
+    path = DATA_DIR / "lynds_dark_nebulae.csv"
+    if not path.is_file():
+        return ()
+    objects: list[CatalogObject] = []
+    seen: set[str] = set()
+    with path.open("r", encoding="utf-8", newline="") as handle:
+        for row in csv.DictReader(handle):
+            name = _text(row.get("name"))
+            ra, dec = _number(row.get("ra_deg")), _number(row.get("dec_deg"))
+            if not name or name in seen or ra is None or dec is None or not (0 <= ra < 360 and -90 <= dec <= 90):
+                continue
+            seen.add(name)
+            area = _number(row.get("area_sqdeg"))
+            # An equivalent-area circle is a scale indicator, not a cloud outline.
+            diameter = 120 * math.sqrt(area / math.pi) if area and area > 0 else None
+            opacity = _number(row.get("opacity"))
+            objects.append(CatalogObject(
+                name, "DrkN", ra, dec, diameter, diameter,
+                catalog="Lynds LDN / CDS VII/7A", area_sqdeg=area,
+                opacity=int(opacity) if opacity and 1 <= opacity <= 6 else None,
+                related_identifiers=tuple(f"B{part}" for part in str(row.get("related_barnard") or "").split()),
+                size_kind="equivalent_area_circle",
+            ))
+    return tuple(objects)
+
+
+@lru_cache(maxsize=1)
+def load_deep_sky_catalog() -> tuple[CatalogObject, ...]:
+    # Distinct dark clouds may overlap or contain a Barnard object. Do not merge
+    # extended sources by coordinate proximity or a non-equivalent association.
+    objects = {item.name: item for item in load_openngc()}
+    for item in load_dark_nebulae():
+        objects.setdefault(item.name, item)
+    return tuple(objects.values())
 
 
 def _fallback_catalog() -> tuple[CatalogObject, ...]:
@@ -142,8 +195,13 @@ def _priority(item: CatalogObject) -> float:
     return value
 
 
-def deep_sky_in_frame(solution: PlateSolution, threshold: float = 75) -> list[dict[str, Any]]:
-    catalog = load_openngc()
+def deep_sky_in_frame(
+    solution: PlateSolution,
+    threshold: float = 75,
+    *,
+    magnitude_limit: float | None = None,
+) -> list[dict[str, Any]]:
+    catalog = load_deep_sky_catalog()
     if not catalog:
         return []
     ra = np.asarray([item.ra_deg for item in catalog])
@@ -153,13 +211,14 @@ def deep_sky_in_frame(solution: PlateSolution, threshold: float = 75) -> list[di
     diagonal_radius_deg = _frame_diagonal_radius_deg(solution)
     x, y, in_front = solution.world_to_pixel(ra, dec)
     result: list[dict[str, Any]] = []
-    # Surface brightness, sky glow and focal length make catalogue magnitude a
-    # very optimistic visibility predictor.  Keep every in-frame object in the
-    # result list, but only draw a conservative subset by default.  At the UI's
-    # default threshold (75) this corresponds to about magnitude 9.6; the user
-    # can still raise the control to expose objects down to about magnitude 11.
+    # Selection is a display recommendation, never evidence of image detection.
+    # Every in-frame row remains in the inventory, including unknown magnitudes.
     sensitivity = min(100.0, max(0.0, threshold))
-    max_magnitude = 5.5 + sensitivity * 0.055
+    max_magnitude = (
+        min(25.0, max(-5.0, float(magnitude_limit)))
+        if magnitude_limit is not None and math.isfinite(float(magnitude_limit))
+        else 5.5 + sensitivity * 0.145
+    )
     for index, item in enumerate(catalog):
         angular_radius = (item.major_arcmin or 2.0) / 120
         if center_distance_deg[index] > diagonal_radius_deg + angular_radius + 1.5:
@@ -175,7 +234,8 @@ def deep_sky_in_frame(solution: PlateSolution, threshold: float = 75) -> list[di
         ):
             continue
         large_catalog_target = (
-            item.major_arcmin is not None
+            item.catalog == "OpenNGC"
+            and item.major_arcmin is not None
             and item.major_arcmin >= 20
             and (item.magnitude is None or item.magnitude <= 9)
         )
@@ -191,7 +251,11 @@ def deep_sky_in_frame(solution: PlateSolution, threshold: float = 75) -> list[di
             or (sensitivity >= 35 and bool(item.common_name_zh))
             or (sensitivity >= 55 and large_catalog_target)
             or bright_resolved_target
+            or (sensitivity >= 90 and item.magnitude is not None and item.magnitude <= max_magnitude)
+            or (sensitivity >= 95 and item.object_type == "DrkN")
         )
+        if item.magnitude is not None and item.magnitude > max_magnitude:
+            expected_visible = False
         catalog_match = {
             "id": item.name,
             "name": item.name,
@@ -203,6 +267,7 @@ def deep_sky_in_frame(solution: PlateSolution, threshold: float = 75) -> list[di
             "x": round(float(x[index]), 2),
             "y": round(float(y[index]), 2),
             "magnitude": item.magnitude,
+            "magnitudeBand": item.magnitude_band,
             "majorArcmin": item.major_arcmin,
             "minorArcmin": item.minor_arcmin,
             "positionAngleDeg": item.pa_deg,
@@ -211,7 +276,16 @@ def deep_sky_in_frame(solution: PlateSolution, threshold: float = 75) -> list[di
             "radiusPx": round(radius_px, 2),
             "priority": round(_priority(item), 3),
             "expectedVisible": expected_visible,
+            "defaultVisible": expected_visible,
+            "recommendedLabel": expected_visible,
             "evidence": "catalog_position",
+            "pixelDetected": False,
+            "catalog": item.catalog,
+            "positionEpoch": "J2000.0",
+            "areaSqDeg": item.area_sqdeg,
+            "opacityClass": item.opacity,
+            "relatedIdentifiers": list(item.related_identifiers),
+            "sizeKind": item.size_kind,
         }
         catalog_match.update(media_for(item.name))
         result.append(catalog_match)
@@ -236,54 +310,150 @@ def load_bright_stars() -> tuple[dict[str, Any], ...]:
     return tuple(rows)
 
 
-def bright_stars_in_frame(solution: PlateSolution, threshold: float = 60) -> list[dict[str, Any]]:
-    stars = load_bright_stars()
+@lru_cache(maxsize=1)
+def load_stars() -> tuple[dict[str, Any], ...]:
+    """The full HYG inventory; legacy bright-star data remains a safe fallback."""
+    path = DATA_DIR / "faint_stars.csv"
+    if not path.is_file():
+        return load_bright_stars()
+    rows: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    with path.open("r", encoding="utf-8", newline="") as handle:
+        for row in csv.DictReader(handle):
+            ra, dec, mag = (_number(row.get(key)) for key in ("ra_deg", "dec_deg", "mag"))
+            identifier = _text(row.get("hyg"))
+            if not identifier or identifier == "0" or identifier in seen:
+                continue
+            if ra is None or dec is None or mag is None or not (0 <= ra < 360 and -90 <= dec <= 90):
+                continue
+            seen.add(identifier)
+            rows.append({**row, "ra_deg": ra, "dec_deg": dec, "mag": mag})
+    return tuple(rows)
+
+
+@lru_cache(maxsize=1)
+def _star_arrays() -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    stars = load_stars()
+    ra = np.asarray([star["ra_deg"] for star in stars], dtype=np.float64)
+    dec = np.asarray([star["dec_deg"] for star in stars], dtype=np.float64)
+    mag = np.asarray([star["mag"] for star in stars], dtype=np.float64)
+    vectors = _sky_vectors_local(ra, dec)
+    for array in (ra, dec, mag, vectors):
+        array.flags.writeable = False
+    return ra, dec, mag, vectors
+
+
+def _star_identifier(star: dict[str, Any], index: int) -> str:
+    # Keep existing HIP-based identifiers stable; non-HIP stars use an explicit
+    # namespace so HYG 123 cannot collide with HIP 123.
+    if _text(star.get("hip")):
+        return f"star-{star['hip']}"
+    if _text(star.get("hyg")):
+        return f"star-hyg-{star['hyg']}"
+    return f"star-hr-{star.get('hr') or index}"
+
+
+def _star_label(star: dict[str, Any]) -> str:
+    name = _text(star.get("common_name_zh")) or _text(star.get("name"))
+    if name:
+        return name
+    for key, prefix in (("hr", "HR"), ("hip", "HIP"), ("hd", "HD"), ("gl", "Gl"), ("hyg", "HYG")):
+        if value := _text(star.get(key)):
+            return f"{prefix} {value}"
+    return "恒星"
+
+
+def bright_stars_in_frame(
+    solution: PlateSolution,
+    threshold: float = 60,
+    *,
+    magnitude_limit: float | None = None,
+) -> list[dict[str, Any]]:
+    """Return all eligible frame stars; initial label density is independent.
+
+    The historic public function name is retained for API compatibility. There
+    is deliberately no inventory cap: faint HIP/HD/HYG objects remain selectable.
+    """
+    stars = load_stars()
     if not stars:
         return []
-    ra = np.asarray([item["ra_deg"] for item in stars])
-    dec = np.asarray([item["dec_deg"] for item in stars])
-    camera_cosine = (solution.rotation @ _sky_vectors_local(ra, dec).T).T[:, 0]
-    center_distance_deg = np.degrees(np.arccos(np.clip(camera_cosine, -1.0, 1.0)))
+    ra, dec, mag, vectors = _star_arrays()
+    camera_cosine = vectors @ solution.rotation[0]
     diagonal_radius_deg = _frame_diagonal_radius_deg(solution)
-    x, y, in_front = solution.world_to_pixel(ra, dec)
     sensitivity = min(100.0, max(0.0, threshold))
-    max_mag = 1.8 + sensitivity * 0.048
+    max_mag = (
+        min(21.0, max(-2.0, float(magnitude_limit)))
+        if magnitude_limit is not None and math.isfinite(float(magnitude_limit))
+        else 6.0 + sensitivity * 0.1
+    )
+    # Filter 119k stars with a cached vector array, then project only this cap.
+    indices = np.flatnonzero(
+        (camera_cosine >= math.cos(math.radians(min(89.9, diagonal_radius_deg + 1.5))))
+        & (mag <= max_mag)
+    )
+    if not len(indices):
+        return []
+    x, y, in_front = solution.world_to_pixel(ra[indices], dec[indices])
+    inside = in_front & np.isfinite(x) & np.isfinite(y)
+    inside &= (x >= 0) & (x < solution.image_width) & (y >= 0) & (y < solution.image_height)
     result: list[dict[str, Any]] = []
-    for index, star in enumerate(stars):
-        if center_distance_deg[index] > diagonal_radius_deg + 1.5:
-            continue
-        if not in_front[index] or star["mag"] > max_mag:
-            continue
-        if not (0 <= x[index] < solution.image_width and 0 <= y[index] < solution.image_height):
-            continue
-        identifier = _text(star.get("common_name_zh")) or _text(star.get("name"))
-        if not identifier:
-            hr = _text(star.get("hr"))
-            hip = _text(star.get("hip"))
-            identifier = f"HR {hr}" if hr else (f"HIP {hip}" if hip else "亮星")
+    for projected_index in np.flatnonzero(inside):
+        index = int(indices[projected_index])
+        star = stars[index]
+        identifier = _star_label(star)
         result.append(
             {
-                "id": f"star-{star.get('hip') or star.get('hr') or index}",
+                "id": _star_identifier(star, index),
                 "name": identifier,
                 "label": identifier,
                 "objectType": "Star",
-                "objectTypeZh": "亮星",
+                "objectTypeZh": "恒星" if star["mag"] > 6.5 else "亮星",
                 "raDeg": star["ra_deg"],
                 "decDeg": star["dec_deg"],
-                "x": round(float(x[index]), 2),
-                "y": round(float(y[index]), 2),
+                "x": round(float(x[projected_index]), 2),
+                "y": round(float(y[projected_index]), 2),
                 "magnitude": star["mag"],
+                "magnitudeBand": "V",
                 "priority": round(30 - star["mag"], 3),
-                "expectedVisible": True,
+                "expectedVisible": False,
+                "defaultVisible": False,
+                "recommendedLabel": False,
                 "evidence": "catalog_position",
+                "pixelDetected": False,
+                "catalog": "HYG v4.1" if star.get("hyg") else "Hipparcos / tetra3",
+                "positionEpoch": "J2000.0" if star.get("hyg") else "2023.0 (J2000 equinox)",
+                "properMotionRaMasYr": _number(star.get("pmra_masyr")),
+                "properMotionDecMasYr": _number(star.get("pmdec_masyr")),
+                "hip": _text(star.get("hip")),
+                "hd": _text(star.get("hd")),
+                "hyg": _text(star.get("hyg")),
             }
         )
     result.sort(key=lambda item: (float(item["magnitude"]), str(item["label"])))
-    # Bright-star labels are contextual anchors, not an attempt to print the
-    # full stellar catalogue.  Cap them so a 28 mm frame remains readable while
-    # the sensitivity control still exposes more anchors when requested.
-    max_labels = 4 + round(sensitivity * 0.14)
-    return result[:max_labels]
+    max_labels = 3 + round(sensitivity * 0.12)
+    for item in result[:max_labels]:
+        item["defaultVisible"] = True
+        item["recommendedLabel"] = True
+        item["expectedVisible"] = True
+    return result
+
+
+@lru_cache(maxsize=1)
+def catalog_summary() -> dict[str, Any]:
+    stars = load_stars()
+    deep_sky = load_deep_sky_catalog()
+    magnitudes = [float(star["mag"]) for star in stars]
+    return {
+        "stars": len(stars), "deepSky": len(deep_sky),
+        "darkNebulae": sum(item.object_type == "DrkN" for item in deep_sky),
+        "historicalStellarEntries": sum(item.object_type in {"*", "**"} for item in deep_sky),
+        "faintStars": sum(mag > 7 for mag in magnitudes),
+        "starMagnitudeRange": [min(magnitudes), max(magnitudes)] if magnitudes else None,
+        "defaultStarMagnitudeLimit": 12.0,
+        "starMagnitudeCompleteness": "Not complete to the faintest catalogue magnitude",
+        "evidence": "catalog_position", "pixelDetection": False,
+        "sources": ["HYG v4.1", "OpenNGC v20260501", "Lynds LDN / CDS VII/7A"],
+    }
 
 
 def constellation_segments_in_frame(solution: PlateSolution) -> list[dict[str, Any]]:

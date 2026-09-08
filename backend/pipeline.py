@@ -1,6 +1,10 @@
 from __future__ import annotations
 
 import json
+import math
+import shutil
+import threading
+import uuid
 from collections.abc import Callable
 from datetime import datetime
 from pathlib import Path
@@ -16,26 +20,38 @@ from .annotate import (
     normalize_font_weight,
     normalize_hex_color,
     render_annotation,
+    render_annotation_layer,
     save_jpeg,
 )
-from .catalog import bright_stars_in_frame, constellation_segments_in_frame, deep_sky_in_frame
-from .metadata import read_metadata
+from .catalog import bright_stars_in_frame, catalog_summary, constellation_segments_in_frame, deep_sky_in_frame
+from .image_io import ALLOWED_SUFFIXES, NativeImage, composite_native, display_rgb, load_native, save_native
 from .plate_solver import solve_plate
 
 
 DEFAULT_SETTINGS: dict[str, Any] = {
     "deepSky": True,
     "brightStars": True,
-    "constellations": True,
+    "constellations": False,
     "dsoThreshold": 75.0,
     "starThreshold": 60.0,
-    "constellationStrength": 70.0,
+    "constellationStrength": 55.0,
     "deepSkyColor": DSO_COLOR_HEX,
     "brightStarColor": STAR_COLOR_HEX,
     "constellationColor": CONSTELLATION_COLOR_HEX,
-    "fontWeight": 650,
-    "highContrast": True,
+    "fontWeight": 500,
+    "highContrast": False,
+    "annotationOpacity": 0.85,
+    "annotationLineWidth": 1.25,
+    "annotationFontSize": 18.0,
+    "markerStyle": "circle",
+    "labelDensity": "sparse",
+    "starMagnitudeLimit": 12.0,
+    "includeCatalogOnly": False,
+    "catalogDepth": "deep",
 }
+
+# A single native-frame operation at a time avoids concurrent 60 MP RAW buffers.
+_native_work_lock = threading.Lock()
 
 ProgressCallback = Callable[[str, int, str], None]
 CancellationCheck = Callable[[], bool]
@@ -76,7 +92,77 @@ def normalize_settings(settings: dict[str, Any] | None = None) -> dict[str, Any]
     options["highContrast"] = _setting_bool(
         options.get("highContrast"), bool(DEFAULT_SETTINGS["highContrast"])
     )
+    for key in ("deepSky", "brightStars", "constellations", "includeCatalogOnly"):
+        options[key] = _setting_bool(options.get(key), bool(DEFAULT_SETTINGS[key]))
+    for key, minimum, maximum in (
+        ("annotationOpacity", 0.05, 1.0), ("annotationLineWidth", 0.5, 3.0),
+        ("annotationFontSize", 8.0, 24.0), ("starMagnitudeLimit", 1.0, 16.0),
+        ("dsoThreshold", 0., 100.), ("starThreshold", 0., 100.),
+        ("constellationStrength", 0., 100.),
+    ):
+        try:
+            value = float(options[key])
+            options[key] = min(maximum, max(minimum, value)) if math.isfinite(value) else DEFAULT_SETTINGS[key]
+        except (ValueError, TypeError):
+            options[key] = DEFAULT_SETTINGS[key]
+    for key, allowed in (("markerStyle", {"circle", "corners"}),
+                         ("labelDensity", {"sparse", "balanced", "dense"}),
+                         ("catalogDepth", {"bright", "balanced", "deep"})):
+        if options.get(key) not in allowed:
+            options[key] = DEFAULT_SETTINGS[key]
     return options
+
+
+def select_deep_sky_inventory(objects: list[dict[str, Any]], depth: str) -> list[dict[str, Any]]:
+    """Filter DSO inventory only; unknown magnitudes never become guessed values.
+
+    A named recommended favorite remains useful even without photometry.
+    Unnamed unknown-magnitude dark clouds belong to the complete catalogue.
+    Stellar magnitude selection is independent of this DSO control.
+    """
+    if depth == "deep":
+        return objects
+    limit = 10.0 if depth == "bright" else 15.0
+    def included(item: dict[str, Any]) -> bool:
+        named_favorite = bool(item.get("expectedVisible") and (item.get("messier") or item.get("commonNameZh")))
+        magnitude = item.get("magnitude")
+        known_bright = isinstance(magnitude, (int, float)) and math.isfinite(magnitude) and magnitude <= limit
+        return bool(named_favorite or known_bright)
+    return [item for item in objects if included(item)]
+
+
+def _render_options(options: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "show_deep_sky": options["deepSky"], "show_bright_stars": options["brightStars"],
+        "show_constellations": options["constellations"],
+        "constellation_strength": options["constellationStrength"],
+        "deep_sky_color": options["deepSkyColor"], "bright_star_color": options["brightStarColor"],
+        "constellation_color": options["constellationColor"], "font_weight": options["fontWeight"],
+        "high_contrast": options["highContrast"], "annotation_opacity": options["annotationOpacity"],
+        "annotation_line_width": options["annotationLineWidth"], "annotation_font_size": options["annotationFontSize"],
+        "marker_style": options["markerStyle"], "label_density": options["labelDensity"],
+        "include_catalog_only": options["includeCatalogOnly"],
+    }
+
+
+def _save_full(native: NativeImage, job_dir: Path, deep_sky: list, stars: list, segments: list,
+               options: dict[str, Any], check_cancelled: Callable[[], None], *, stem: str = "annotated-full") -> str:
+    layer = render_annotation_layer(native.size, deep_sky, stars, segments, **_render_options(options))
+    try:
+        check_cancelled()
+        pixels = composite_native(native, layer, check_cancelled)
+    finally:
+        layer.close()
+    check_cancelled()
+    filename = stem + native.extension
+    partial_path = job_dir / (filename + ".partial")
+    try:
+        save_native(native, pixels, partial_path)
+        check_cancelled()
+        partial_path.replace(job_dir / filename)
+    finally:
+        partial_path.unlink(missing_ok=True)
+    return filename
 
 
 def _display_rgb(image: Image.Image) -> Image.Image:
@@ -170,6 +256,22 @@ def analyze_image(
     progress_callback: ProgressCallback | None = None,
     is_cancelled: CancellationCheck | None = None,
 ) -> dict[str, Any]:
+    while not _native_work_lock.acquire(timeout=.2):
+        if is_cancelled and is_cancelled():
+            raise AnalysisCancelled("识别任务已取消")
+    try:
+        return _analyze_image(input_path, job_dir, filename=filename, settings=settings,
+                              progress_callback=progress_callback, is_cancelled=is_cancelled)
+    finally:
+        _native_work_lock.release()
+
+
+def _analyze_image(
+    input_path: Path, job_dir: Path, *, filename: str,
+    settings: dict[str, Any] | None = None,
+    progress_callback: ProgressCallback | None = None,
+    is_cancelled: CancellationCheck | None = None,
+) -> dict[str, Any]:
     options = normalize_settings(settings)
     job_dir.mkdir(parents=True, exist_ok=True)
 
@@ -183,62 +285,38 @@ def analyze_image(
             progress_callback(stage, percent, message)
         check_cancelled()
 
-    source: Image.Image | None = None
+    native: NativeImage | None = None
     display_image: Image.Image | None = None
     try:
         report("validation", 18, "正在校验照片并读取 EXIF 信息")
-        source = Image.open(input_path)
-        metadata = read_metadata(source)
-        # Apply EXIF orientation once, in place.  The previous pipeline made a
-        # full-size copy here and solve_plate made another one immediately.
-        ImageOps.exif_transpose(source, in_place=True)
-        source.load()
+        native = load_native(input_path, check_cancelled)
+        metadata = native.metadata
+        source_name = "input" + input_path.suffix.lower()
+        source_target = job_dir / source_name
+        if input_path.resolve() != source_target.resolve():
+            shutil.copy2(input_path, source_target)
+        display_image = display_rgb(native)
         check_cancelled()
 
         report("solving", 25, "正在匹配恒星图样并解算天球坐标")
         solution = solve_plate(
-            source,
+            display_image,
             metadata,
             orientation_applied=True,
             cancel_callback=check_cancelled,
         )
 
         report("catalog", 55, "正在匹配画面范围内的天体目录")
-        deep_sky = deep_sky_in_frame(solution, float(options["dsoThreshold"]))
+        all_deep_sky = deep_sky_in_frame(solution, float(options["dsoThreshold"]))
+        deep_sky = select_deep_sky_inventory(all_deep_sky, str(options["catalogDepth"]))
         check_cancelled()
-        bright_stars = (
-            bright_stars_in_frame(solution, float(options["starThreshold"]))
-            if options["brightStars"]
-            else []
-        )
+        bright_stars = bright_stars_in_frame(solution, float(options["starThreshold"]), magnitude_limit=float(options["starMagnitudeLimit"]))
         check_cancelled()
-        constellation_segments = (
-            constellation_segments_in_frame(solution) if options["constellations"] else []
-        )
+        constellation_segments = constellation_segments_in_frame(solution)
         check_cancelled()
 
-        # Reuse an already decoded RGB frame instead of converting it into a
-        # second 60 MP buffer.  Other source modes still need one display copy.
-        if source.mode == "RGB":
-            display_image = source
-            source = None
-        else:
-            display_image = _display_rgb(source)
-            source.close()
-            source = None
         full_size = display_image.size
-
-        render_options = {
-            "show_deep_sky": bool(options["deepSky"]),
-            "show_bright_stars": bool(options["brightStars"]),
-            "show_constellations": bool(options["constellations"]),
-            "constellation_strength": float(options["constellationStrength"]),
-            "deep_sky_color": str(options["deepSkyColor"]),
-            "bright_star_color": str(options["brightStarColor"]),
-            "constellation_color": str(options["constellationColor"]),
-            "font_weight": int(options["fontWeight"]),
-            "high_contrast": bool(options["highContrast"]),
-        }
+        render_options = _render_options(options)
 
         report("preview", 65, "正在生成预览图与预览标注")
         annotated_preview_size = _fit_width(full_size, 2400)
@@ -277,23 +355,11 @@ def analyze_image(
                 preview_source.close()
         check_cancelled()
 
-        report("full", 82, "正在渲染并保存高分辨率标注")
-        full_annotation = render_annotation(
-            display_image,
-            deep_sky,
-            bright_stars,
-            constellation_segments,
-            **render_options,
-        )
-        # The annotation is now self-contained, so release the unannotated full
-        # frame before JPEG encoding allocates its own working buffers.
+        report("full", 82, "正在按原始尺寸、格式和位深保存标注")
         display_image.close()
         display_image = None
-        try:
-            check_cancelled()
-            save_jpeg(full_annotation, job_dir / "annotated-full.jpg", quality=93)
-        finally:
-            full_annotation.close()
+        exported_name = _save_full(native, job_dir, deep_sky, bright_stars,
+                                   constellation_segments, options, check_cancelled)
         check_cancelled()
 
         expected_visible = sum(1 for item in deep_sky if item["expectedVisible"])
@@ -308,8 +374,13 @@ def analyze_image(
         if solution.rmse_arcsec > 60:
             warnings.append("画面存在短星轨或压缩噪声，标注采用星轨中心并保留目录位置属性。")
         warnings.append(
-            "天体清单包含 OpenNGC 目录中与画面相交的全部条目；图上只标出按当前阈值预计可见的条目，以避免文字遮挡。"
+            "天体清单来自 HYG、OpenNGC 与 Lynds 暗星云目录的坐标投影；落在视场内不等于已从照片检测到该暗天体。默认只显示少量推荐标注，可在目录中查看更暗的条目。"
         )
+        if options["catalogDepth"] != "deep":
+            limit = 10 if options["catalogDepth"] == "bright" else 15
+            warnings.append(f"深空目录当前保留星等 ≤ {limit} 的条目和推荐命名天体；更暗或未知星等条目可切换完整目录查看。恒星极限星等单独生效。")
+        if metadata.is_raw:
+            warnings.append(native.export_info()["note"])
 
         job_id = job_dir.name
         result: dict[str, Any] = {
@@ -325,6 +396,14 @@ def analyze_image(
             "objects": deep_sky,
             "brightStars": bright_stars,
             "constellationSegments": constellation_segments,
+            "catalogSummary": catalog_summary(),
+            "catalogSelection": {
+                "depth": options["catalogDepth"],
+                "deepSkyInField": len(all_deep_sky),
+                "deepSkyIncluded": len(deep_sky),
+                "starMagnitudeLimit": options["starMagnitudeLimit"],
+                "unknownMagnitudePolicy": "all" if options["catalogDepth"] == "deep" else "named_recommended_only",
+            },
             "counts": {
                 "deepSky": len(deep_sky),
                 "expectedVisible": expected_visible,
@@ -333,7 +412,9 @@ def analyze_image(
             },
             "annotatedImageUrl": f"/api/artifacts/{job_id}/annotated-preview.jpg",
             "originalImageUrl": f"/api/artifacts/{job_id}/original-preview.jpg",
-            "downloadUrl": f"/api/download/{job_id}/annotated-full.jpg",
+            "downloadUrl": f"/api/download/{job_id}/{exported_name}",
+            "originalDownloadUrl": f"/api/download/{job_id}/{source_name}",
+            "export": native.export_info(),
             "resultsUrl": f"/api/download/{job_id}/results.json",
             "warnings": warnings,
             "settings": options,
@@ -347,5 +428,46 @@ def analyze_image(
     finally:
         if display_image is not None:
             display_image.close()
-        if source is not None:
-            source.close()
+        if native is not None:
+            native.close()
+
+
+def reexport_image(job_dir: Path, settings: dict[str, Any] | None = None,
+                   is_cancelled: CancellationCheck | None = None,
+                   progress_callback: ProgressCallback | None = None) -> dict[str, Any]:
+    """Re-render saved coordinates over untouched input; never re-encode a preview."""
+    def check_cancelled() -> None:
+        if is_cancelled and is_cancelled():
+            raise AnalysisCancelled("导出已取消")
+
+    while not _native_work_lock.acquire(timeout=.2):
+        check_cancelled()
+    native: NativeImage | None = None
+    try:
+        check_cancelled()
+        result = json.loads((job_dir / "results.json").read_text(encoding="utf-8"))
+        source_candidates = [path for path in job_dir.glob("input.*") if path.suffix.lower() in ALLOWED_SUFFIXES]
+        if len(source_candidates) != 1:
+            raise ValueError("找不到唯一的原始照片，请重新上传后导出")
+        analyzed_options = normalize_settings(result.get("settings", {}))
+        options = normalize_settings({**analyzed_options, **(settings or {})})
+        if any(options[key] != analyzed_options[key] for key in
+               ("catalogDepth", "starMagnitudeLimit", "dsoThreshold", "starThreshold")):
+            raise ValueError("目录参数已变化，请先重新解析，再按新目录导出")
+        if progress_callback:
+            progress_callback("validation", 18, "正在读取原始照片用于导出")
+        native = load_native(source_candidates[0], check_cancelled)
+        if progress_callback:
+            progress_callback("full", 65, "正在按原始尺寸和位深重新渲染标注")
+        # Catalogue coordinates are the analysis result. Style changes do not
+        # silently run a different astrometric solution or invent new detections.
+        deep_sky = select_deep_sky_inventory(result.get("objects", []), options["catalogDepth"])
+        exported_name = _save_full(native, job_dir, deep_sky,
+                                   result.get("brightStars", []), result.get("constellationSegments", []),
+                                   options, check_cancelled, stem="annotated-" + uuid.uuid4().hex[:12])
+        return {"downloadUrl": f"/api/download/{job_dir.name}/{exported_name}",
+                "export": native.export_info(), "settings": options}
+    finally:
+        if native is not None:
+            native.close()
+        _native_work_lock.release()

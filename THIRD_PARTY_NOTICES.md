@@ -45,6 +45,10 @@ accompany distributable builds.
 | Pillow | 12.3.0 | MIT-CMU | <https://github.com/python-pillow/Pillow> |
 | NumPy | 2.5.2 | BSD-3-Clause and bundled third-party terms | <https://github.com/numpy/numpy> |
 | SciPy | 1.18.1 | BSD-3-Clause and bundled third-party terms | <https://github.com/scipy/scipy> |
+| rawpy | 0.27.1 | MIT; bundled LibRaw LGPL-2.1/CDDL terms | <https://github.com/letmaik/rawpy> |
+| tifffile | 2026.8.23 | BSD-3-Clause | <https://github.com/cgohlke/tifffile> |
+| imagecodecs | 2026.8.16 | BSD-3-Clause and bundled codec licences | <https://github.com/cgohlke/imagecodecs> |
+| ExifRead | 3.5.1 | BSD-3-Clause | <https://github.com/ianare/exif-py> |
 | pywebview | 6.2.1 | BSD-3-Clause | <https://github.com/r0x0r/pywebview> |
 | pythonnet | runtime dependency | MIT | <https://github.com/pythonnet/pythonnet> |
 | PyInstaller | 6.22.2 | GPL-2.0-or-later with the PyInstaller bootloader exception | <https://github.com/pyinstaller/pyinstaller> |
@@ -58,7 +62,8 @@ alongside this notice.
 | Data | Terms | Project record |
 | --- | --- | --- |
 | OpenNGC v20260501 | CC BY-SA 4.0 | [`backend/data/LICENSES/OPENNGC-CC-BY-SA-4.0.txt`](backend/data/LICENSES/OPENNGC-CC-BY-SA-4.0.txt) |
-| HYG Database v4.1 enrichment | CC BY-SA 4.0 | [`backend/data/LICENSES/HYG-CC-BY-SA-4.0.md`](backend/data/LICENSES/HYG-CC-BY-SA-4.0.md) |
+| HYG Database v4.1 full stellar catalogue and enrichment | CC BY-SA 4.0 | [`backend/data/LICENSES/HYG-CC-BY-SA-4.0.md`](backend/data/LICENSES/HYG-CC-BY-SA-4.0.md) |
+| Lynds dark nebulae, CDS VII/7A | Scientific catalogue attribution and source terms | [`backend/data/LICENSES/LYNDS-DARK-NEBULAE-NOTICE.md`](backend/data/LICENSES/LYNDS-DARK-NEBULAE-NOTICE.md) |
 | Hipparcos-derived bright-star data | ESA Hipparcos catalogue notice | [`backend/data/LICENSES/HIPPARCOS-NOTICE.txt`](backend/data/LICENSES/HIPPARCOS-NOTICE.txt) |
 | Stellarium Chinese sky-culture names | CC BY-SA 4.0 | [`backend/data/LICENSES/STELLARIUM-CHINESE-SKYCULTURE-NOTICE.md`](backend/data/LICENSES/STELLARIUM-CHINESE-SKYCULTURE-NOTICE.md) |
 | Celestial Data / d3-celestial constellation geometry | BSD-3-Clause | [`backend/data/LICENSES/CELESTIAL-DATA-BSD-3-CLAUSE.txt`](backend/data/LICENSES/CELESTIAL-DATA-BSD-3-CLAUSE.txt) |

@@ -11,8 +11,11 @@ from .catalog import (
     _display_label,
     _messier_label,
     _priority,
-    load_bright_stars,
-    load_openngc,
+    _star_identifier,
+    _star_label,
+    catalog_summary,
+    load_deep_sky_catalog,
+    load_stars,
 )
 
 
@@ -70,10 +73,18 @@ def _constellation_catalog() -> tuple[list[dict[str, Any]], list[dict[str, Any]]
     return output_segments, labels
 
 
-@lru_cache(maxsize=1)
-def public_sky_catalog() -> dict[str, Any]:
+@lru_cache(maxsize=4)
+def public_sky_catalog(
+    star_magnitude_limit: float = 6.5,
+    deep_sky_magnitude_limit: float | None = None,
+) -> dict[str, Any]:
+    """All deep-sky entries plus a bounded all-sky stellar context layer.
+
+    Photo analysis separately projects the full stellar catalogue inside its
+    solved field; it does not transfer a 119k-star full-sky JSON on every open.
+    """
     deep_sky: list[dict[str, Any]] = []
-    for item in load_openngc():
+    for item in load_deep_sky_catalog():
         regular_target = bool(item.messier or item.common_name_zh)
         resolved_bright = (
             item.magnitude is not None
@@ -82,11 +93,12 @@ def public_sky_catalog() -> dict[str, Any]:
             and item.major_arcmin >= 6.0
         )
         large_target = (
-            item.major_arcmin is not None
+            item.catalog == "OpenNGC"
+            and item.major_arcmin is not None
             and item.major_arcmin >= 20.0
             and (item.magnitude is None or item.magnitude <= 11.0)
         )
-        if not (regular_target or resolved_bright or large_target):
+        if deep_sky_magnitude_limit is not None and item.magnitude is not None and item.magnitude > deep_sky_magnitude_limit:
             continue
         deep_sky.append(
             {
@@ -102,36 +114,41 @@ def public_sky_catalog() -> dict[str, Any]:
                 "majorArcmin": item.major_arcmin,
                 "minorArcmin": item.minor_arcmin,
                 "priority": round(_priority(item), 3),
+                "defaultVisible": regular_target or resolved_bright or large_target,
+                "catalog": item.catalog,
+                "evidence": "catalog_position",
+                "pixelDetected": False,
+                "magnitudeBand": item.magnitude_band,
+                "sizeKind": item.size_kind,
             }
         )
     deep_sky.sort(key=lambda item: (-float(item["priority"]), str(item["label"])))
 
     bright_stars: list[dict[str, Any]] = []
-    for index, star in enumerate(load_bright_stars()):
+    for index, star in enumerate(load_stars()):
         magnitude = float(star["mag"])
         common_name = str(star.get("common_name_zh") or "").strip()
-        if magnitude > 3.2 and not (common_name and magnitude <= 4.0):
+        if magnitude > max(-2.0, min(12.0, star_magnitude_limit)):
             continue
-        name = common_name or str(star.get("name") or "").strip()
-        if not name:
-            hr = str(star.get("hr") or "").strip()
-            hip = str(star.get("hip") or "").strip()
-            name = f"HR {hr}" if hr else (f"HIP {hip}" if hip else "亮星")
+        name = _star_label(star)
         bright_stars.append(
             {
-                "id": f"star-{star.get('hip') or star.get('hr') or index}",
+                "id": _star_identifier(star, index),
                 "label": name,
                 "raDeg": float(star["ra_deg"]),
                 "decDeg": float(star["dec_deg"]),
                 "magnitude": magnitude,
                 "priority": round(30.0 - magnitude, 3),
+                "defaultVisible": magnitude <= 3.2 or bool(common_name and magnitude <= 4.0),
+                "catalog": "HYG v4.1" if star.get("hyg") else "Hipparcos / tetra3",
+                "evidence": "catalog_position",
             }
         )
     bright_stars.sort(key=lambda item: (float(item["magnitude"]), str(item["label"])))
 
     constellation_segments, constellation_labels = _constellation_catalog()
     return {
-        "schemaVersion": 1,
+        "schemaVersion": 2,
         "frame": "ICRS/J2000",
         "deepSky": deep_sky,
         "brightStars": bright_stars,
@@ -143,9 +160,11 @@ def public_sky_catalog() -> dict[str, Any]:
             "constellations": len(constellation_labels),
             "constellationSegments": len(constellation_segments),
         },
+        "availableCatalog": catalog_summary(),
+        "selection": {"starMagnitudeLimit": star_magnitude_limit, "deepSkyMagnitudeLimit": deep_sky_magnitude_limit},
         "provenance": {
-            "deepSky": "OpenNGC v20260501 (CC BY-SA 4.0)",
-            "brightStars": "Hipparcos via CDS I/239",
-            "constellations": "Stellarium sky culture data",
+            "deepSky": "OpenNGC v20260501 (CC BY-SA 4.0); Lynds (1962), CDS VII/7A",
+            "brightStars": "HYG v4.1 (CC BY-SA 4.0); Chinese names from Stellarium skyculture",
+            "constellations": "Celestial Data / d3-celestial (BSD-3-Clause)",
         },
     }

@@ -3,6 +3,7 @@ import type {
   AnalysisSettings,
   DetectedObject,
   ImageMetadata,
+  NativeExportMetadata,
   LayerKey,
   Point,
   SkyCoordinate,
@@ -147,7 +148,11 @@ const normalizeObject = (value: unknown, index: number, fallback: LayerKey): Det
     raDeg: numberAt(value, ['raDeg', 'ra_deg', 'right_ascension_deg']),
     decDeg: numberAt(value, ['decDeg', 'dec_deg', 'declination_deg']),
     confidence,
-    detected: booleanAt(value, ['detected', 'image_detected', 'expectedVisible', 'expected_visible', 'visible']),
+    detected: booleanAt(value, ['defaultVisible', 'detected', 'image_detected', 'expectedVisible', 'expected_visible', 'visible']),
+    defaultVisible: booleanAt(value, ['defaultVisible']),
+    recommendedLabel: booleanAt(value, ['recommendedLabel']),
+    evidence: stringAt(value, ['evidence']),
+    pixelDetected: booleanAt(value, ['pixelDetected']),
     x: numberAt(value, ['x', 'pixel_x', 'cx']) ?? position?.x,
     y: numberAt(value, ['y', 'pixel_y', 'cy']) ?? position?.y,
     radius: width,
@@ -273,16 +278,32 @@ export const normalizeAnalysisResult = (payload: unknown, file: File): AnalysisR
   const uniqueObjects = [...new Map(objects.map((object) => [object.id, object])).values()]
   const consolidatedObjects: DetectedObject[] = []
   const constellationGroups = new Map<string, DetectedObject>()
+  const constellationEndpoints = new Map<string, { groupKey: string; point: Point; count: number }>()
   uniqueObjects.forEach((object) => {
     if (object.category !== 'constellations') {
       consolidatedObjects.push(object)
       return
     }
     const groupKey = object.constellation || object.label || '星座连线'
+    const raw = isRecord(object.raw) ? object.raw : {}
+    const sourceSegment = raw.sourceSegment ?? object.id
+    for (const line of object.lines ?? []) {
+      for (const point of [line[0], line[line.length - 1]]) {
+        const key = `${sourceSegment}:${point.x.toFixed(2)}:${point.y.toFixed(2)}`
+        const endpoint = constellationEndpoints.get(key)
+        if (endpoint) endpoint.count += 1
+        else constellationEndpoints.set(key, { groupKey, point, count: 1 })
+      }
+    }
     const existing = constellationGroups.get(groupKey)
     if (existing) existing.lines = [...(existing.lines ?? []), ...(object.lines ?? [])]
     else constellationGroups.set(groupKey, { ...object, id: `constellation-${groupKey}` })
   })
+  for (const endpoint of constellationEndpoints.values()) {
+    if (endpoint.count !== 1) continue
+    const group = constellationGroups.get(endpoint.groupKey)
+    if (group) (group.protectedPoints ??= []).push(endpoint.point)
+  }
   consolidatedObjects.push(...constellationGroups.values())
   const nested = valueAt(root, ['result', 'data'])
   const nestedRecord = isRecord(nested) ? nested : {}
@@ -302,6 +323,8 @@ export const normalizeAnalysisResult = (payload: unknown, file: File): AnalysisR
     originalImage: imageSource(valueAt(root, ['originalImageUrl', 'original_image_url', 'originalImage', 'original_image'])),
     downloadUrl: imageSource(valueAt(root, ['downloadUrl', 'download_url'])),
     resultsUrl: imageSource(valueAt(root, ['resultsUrl', 'results_url'])),
+    originalDownloadUrl: imageSource(valueAt(root, ['originalDownloadUrl', 'original_download_url'])),
+    export: isRecord(root.export) ? root.export as unknown as NativeExportMetadata : undefined,
     counts: {
       deepSky: numberAt(countsRecord, ['deepSky', 'deep_sky', 'dso']),
       expectedVisible: numberAt(countsRecord, ['expectedVisible', 'expected_visible']),
@@ -383,6 +406,12 @@ export async function analyzePhoto(file: File, settings: AnalysisSettings, reque
     constellationColor: settings.constellationColor,
     fontWeight: String(settings.fontWeight),
     highContrast: String(settings.highContrast),
+    annotationOpacity: String(settings.annotationOpacity),
+    annotationLineWidth: String(settings.annotationLineWidth),
+    annotationFontSize: String(settings.annotationFontSize),
+    markerStyle: settings.markerStyle,
+    starMagnitudeLimit: String(settings.starMagnitudeLimit),
+    includeCatalogOnly: String(settings.includeCatalogOnly),
     deep_sky: String(settings.deepSky.enabled),
     bright_stars: String(settings.brightStars.enabled),
     dso_threshold: String(settings.deepSky.value),
@@ -422,6 +451,25 @@ export async function analyzePhoto(file: File, settings: AnalysisSettings, reque
     throw new Error(stringAt(payload, ['error', 'message', 'detail']) ?? '识别失败')
   }
   return normalizeAnalysisResult(payload, file)
+}
+
+export async function exportAnnotatedPhoto(jobId: string, settings: AnalysisSettings, signal?: AbortSignal): Promise<{ downloadUrl: string; export: NativeExportMetadata }> {
+  const response = await fetch(`/api/export/${encodeURIComponent(jobId)}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({ settings: {
+      ...settings,
+      deepSky: settings.deepSky.enabled,
+      brightStars: settings.brightStars.enabled,
+      constellations: settings.constellations.enabled,
+      dsoThreshold: settings.deepSky.value,
+      starThreshold: settings.brightStars.value,
+      constellationStrength: settings.constellations.value,
+    } }),
+    signal,
+  })
+  if (!response.ok) throw new Error(await parseError(response))
+  return response.json() as Promise<{ downloadUrl: string; export: NativeExportMetadata }>
 }
 
 export async function getSkyMapManifest(signal?: AbortSignal): Promise<SkyMapManifest> {

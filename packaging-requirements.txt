@@ -1,5 +1,9 @@
 Pillow==12.3.0
 numpy==2.5.2
 scipy==1.18.1
+rawpy==0.27.1
+tifffile==2026.8.23
+imagecodecs==2026.8.16
+ExifRead==3.5.1
 pyinstaller==6.22.2
 pywebview==6.2.1

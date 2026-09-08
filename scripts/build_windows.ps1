@@ -6,7 +6,8 @@ $ErrorActionPreference = "Stop"
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $buildVenv = Join-Path $projectRoot ".build-venv"
 $releaseRoot = Join-Path $projectRoot "release"
-$portableRoot = Join-Path $releaseRoot "星图寻迹-Windows-x64"
+$releaseVersion = "1.2.0"
+$portableRoot = Join-Path $releaseRoot "星图寻迹-Windows-x64-v$releaseVersion"
 $pyInstallerWork = Join-Path ([System.IO.Path]::GetTempPath()) "starfield-atlas-pyi-work"
 $pyInstallerDist = Join-Path ([System.IO.Path]::GetTempPath()) "starfield-atlas-pyi-dist"
 $resolvedProjectRoot = [System.IO.Path]::GetFullPath($projectRoot).TrimEnd('\')
@@ -86,6 +87,10 @@ try {
 }
 
 if (Test-Path -LiteralPath $portableRoot) {
+    $resolvedPortableRoot = [System.IO.Path]::GetFullPath($portableRoot)
+    if (-not $resolvedPortableRoot.StartsWith($resolvedReleaseRoot.TrimEnd('\') + '\', [System.StringComparison]::OrdinalIgnoreCase)) {
+        throw "便携目录必须位于项目发布目录内。"
+    }
     Remove-Item -LiteralPath $portableRoot -Recurse -Force
 }
 New-Item -ItemType Directory -Path $portableRoot -Force | Out-Null
@@ -167,12 +172,15 @@ $instructions = @"
 5. 高清星图瓦片会按需联网读取并缓存在：%LOCALAPPDATA%\星图寻迹。
 6. 软件窗口关闭后，本地识别服务会自动退出。
 7. 需要 Windows 10/11 x64 和 Microsoft Edge WebView2 Runtime。
+8. 支持相机 RAW（由 LibRaw 解析），原片不变，标注输出为同像素尺寸的 16 位 TIFF。
+9. JPG/PNG/TIFF 保持原像素尺寸与格式；文件字节大小会随标注改变。
+10. 快捷键：Ctrl+O 打开，Ctrl+S 导出，H 隐藏标注，0 适合窗口，1 原像素/预览100%。
 
 项目与第三方许可证、目录和影像来源详见 LICENSE（若存在）、THIRD_PARTY_NOTICES.md、licenses、_internal\backend\data\LICENSES、各 SOURCES.md 与 README.md。
 "@
 Set-Content -LiteralPath (Join-Path $portableRoot "使用说明.txt") -Value $instructions -Encoding UTF8
 
-$zipPath = Join-Path $releaseRoot "Starfield-Atlas-Windows-x64-v1.1.0.zip"
+$zipPath = Join-Path $releaseRoot "Starfield-Atlas-Windows-x64-v$releaseVersion.zip"
 if (Test-Path -LiteralPath $zipPath) {
     Remove-Item -LiteralPath $zipPath -Force
 }
@@ -189,6 +197,11 @@ $aladinSourceArchive = Join-Path $releaseRoot "aladin-lite-v3.8.1-source.zip"
 if (Test-Path -LiteralPath $aladinSourceArchive) {
     $aladinSourceHash = (Get-FileHash -LiteralPath $aladinSourceArchive -Algorithm SHA256).Hash
     $hashes += "$(Split-Path -Leaf $aladinSourceArchive)  SHA256  $aladinSourceHash"
+}
+$nativeSourceArchive = Join-Path $releaseRoot "native-image-dependency-sources-v$releaseVersion.zip"
+if (Test-Path -LiteralPath $nativeSourceArchive) {
+    $nativeSourceHash = (Get-FileHash -LiteralPath $nativeSourceArchive -Algorithm SHA256).Hash
+    $hashes += "$(Split-Path -Leaf $nativeSourceArchive)  SHA256  $nativeSourceHash"
 }
 Set-Content -LiteralPath (Join-Path $releaseRoot "SHA256SUMS.txt") -Value $hashes -Encoding UTF8
 

@@ -411,8 +411,8 @@ export function SkyMapDialog({ result, onClose }: SkyMapDialogProps) {
       viewer.addCatalog(constellationCatalog)
 
       const starCatalog = Aladin.catalog({
-        name: '亮星', shape: 'plus', color: '#ffd95a', sourceSize: 8, displayLabel: true, labelColumn: 'label', labelColor: '#ffe590',
-        labelFont: '700 12px Inter, "Microsoft YaHei", sans-serif',
+        name: '恒星', shape: 'circle', color: '#b5a67d', sourceSize: 8, displayLabel: true, labelColumn: 'label', labelColor: '#c5b58a',
+        labelFont: '500 11px Inter, "Microsoft YaHei", sans-serif',
         filter: (source: { data: { magnitude?: number, skyIndex?: number } }) => {
           const fov = viewFovRef.current
           const magnitude = Number(source.data.magnitude ?? 99)
@@ -425,11 +425,12 @@ export function SkyMapDialog({ result, onClose }: SkyMapDialogProps) {
       viewer.addCatalog(starCatalog)
 
       const deepSkyCatalog = Aladin.catalog({
-        name: '常规深空天体', shape: 'circle', color: '#35ef8b', sourceSize: 7, displayLabel: true, labelColumn: 'label', labelColor: '#79ffb7',
-        labelFont: '700 12px Inter, "Microsoft YaHei", sans-serif', onClick: 'showPopup',
-        filter: (source: { data: { raDeg?: number, decDeg?: number, priority?: number, skyIndex?: number } }) => {
+        name: '深空天体目录', shape: 'circle', color: '#82a88e', sourceSize: 7, displayLabel: true, labelColumn: 'label', labelColor: '#97bda2',
+        labelFont: '500 11px Inter, "Microsoft YaHei", sans-serif', onClick: 'showPopup',
+        filter: (source: { data: { raDeg?: number, decDeg?: number, priority?: number, skyIndex?: number, defaultVisible?: boolean } }) => {
           const fov = viewFovRef.current
           const priority = Number(source.data.priority ?? 0)
+          if (fov > 12 && source.data.defaultVisible === false) return false
           const index = Number(source.data.skyIndex ?? Number.MAX_SAFE_INTEGER)
           const coordinateKey = `${Number(source.data.raDeg).toFixed(3)}:${Number(source.data.decDeg).toFixed(3)}`
           const minimumPriority = container.clientWidth < 600
@@ -450,7 +451,7 @@ export function SkyMapDialog({ result, onClose }: SkyMapDialogProps) {
       let photoLabelCatalog: AladinCatalog | undefined
       if (photoObjects.length) {
         photoMarkerCatalog = Aladin.catalog({
-          name: '照片视场内深空天体', shape: 'circle', color: '#25ff72', sourceSize: 9, onClick: 'showPopup',
+          name: '照片视场内深空天体', shape: 'circle', color: '#86b899', sourceSize: 9, onClick: 'showPopup',
           filter: (source: { data: { photoIndex?: number } }) => {
             const fov = viewFovRef.current
             const index = Number(source.data.photoIndex ?? Number.MAX_SAFE_INTEGER)
@@ -470,8 +471,8 @@ export function SkyMapDialog({ result, onClose }: SkyMapDialogProps) {
         viewer.addCatalog(photoMarkerCatalog)
 
         photoLabelCatalog = Aladin.catalog({
-          name: '照片视场重点标签', shape: 'circle', color: '#25ff72', sourceSize: 9, displayLabel: true,
-          labelColumn: 'label', labelColor: '#c5ffdc', labelFont: '800 12px Inter, "Microsoft YaHei", sans-serif',
+          name: '照片视场重点标签', shape: 'circle', color: '#86b899', sourceSize: 9, displayLabel: true,
+          labelColumn: 'label', labelColor: '#abc5b6', labelFont: '500 11px Inter, "Microsoft YaHei", sans-serif',
           filter: (source: { data: { photoIndex?: number } }) => {
             const fov = viewFovRef.current
             const index = Number(source.data.photoIndex ?? 999)

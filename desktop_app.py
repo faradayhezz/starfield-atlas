@@ -13,7 +13,7 @@ from backend.app_paths import LOG_DIR, WEBVIEW_DATA_DIR
 from backend.server import create_server
 
 
-APP_TITLE = "星图寻迹 · 星空照片识别与标注"
+APP_TITLE = "星图寻迹 · 天文影像分析"
 MUTEX_NAME = "Local\\StarfieldAtlasDesktop-3D14B123-822E-4A6A-9D5C-5CFEE8B15685"
 ERROR_ALREADY_EXISTS = 183
 
@@ -91,7 +91,7 @@ def _run_desktop() -> None:
             width=1440,
             height=900,
             min_size=(960, 640),
-            background_color="#080d10",
+            background_color="#191b1e",
             text_select=False,
         )
         webview.start(

@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 from PIL import Image, ImageChops
 
-from backend.annotate import DSO_COLOR, render_annotation
+from backend.annotate import DSO_COLOR, render_annotation, render_annotation_layer
 from backend.pipeline import DEFAULT_SETTINGS, analyze_image, normalize_settings
 from backend.server import _bool, _font_weight, _hex_color
 
@@ -77,19 +77,53 @@ class AnnotationStyleTests(unittest.TestCase):
             deep_sky_color="#FF00FF",
             bright_star_color="#00FFFF",
             constellation_color="#FF3300",
+            annotation_opacity=1,
+            show_constellations=True,
         )
-        self.assertEqual(rendered.getpixel((100, 80)), (255, 0, 255))
-        self.assertEqual(rendered.getpixel((250, 96)), (0, 255, 255))
+        pixels = set(rendered.get_flattened_data())
+        self.assertIn((255, 0, 255), pixels)
+        self.assertIn((0, 255, 255), pixels)
         self.assertEqual(rendered.getpixel((40, 180)), (255, 51, 0))
 
-    def test_default_color_remains_backward_compatible(self) -> None:
+    def test_default_style_is_subdued_and_transparent_at_target_core(self) -> None:
         rendered = render_annotation(
             Image.new("RGB", (400, 220), "black"),
             self.deep_sky,
             show_bright_stars=False,
             show_constellations=False,
         )
-        self.assertEqual(rendered.getpixel((100, 80)), DSO_COLOR)
+        self.assertEqual(rendered.getpixel((100, 100)), (0, 0, 0))
+        self.assertNotIn(DSO_COLOR, set(rendered.get_flattened_data()))
+        self.assertIsNotNone(rendered.getbbox())
+
+    def test_stellar_cores_are_unchanged_even_with_crossing_lines_and_emphasis(self) -> None:
+        background = Image.new("RGB", (1920, 1280), (13, 29, 47))
+        stars = [{"x": 600, "y": 500, "label": "HIP 123", "magnitude": 2}]
+        segments = [{"x1": 200, "y1": 500, "x2": 1200, "y2": 500}]
+        for style in ("circle", "corners"):
+            for contrast in (False, True):
+                with self.subTest(style=style, high_contrast=contrast):
+                    layer = render_annotation_layer(background.size, [], stars, segments, show_constellations=True,
+                                                    high_contrast=contrast, marker_style=style, annotation_opacity=1,
+                                                    annotation_line_width=3, font_weight=800)
+                    self.assertEqual(layer.getpixel((600, 500))[3], 0)
+                    self.assertEqual(layer.getpixel((603, 500))[3], 0)
+                    output = render_annotation(background, [], stars, segments, show_constellations=True,
+                                               high_contrast=contrast, marker_style=style, annotation_opacity=1,
+                                               annotation_line_width=3, font_weight=800)
+                    self.assertEqual(output.getpixel((600, 500)), background.getpixel((600, 500)))
+
+    def test_catalog_only_stars_are_searchable_but_not_drawn_by_default(self) -> None:
+        star = {"x": 200, "y": 100, "label": "HIP 999", "magnitude": 11, "defaultVisible": False}
+        hidden = render_annotation_layer((400, 250), [], [star])
+        shown = render_annotation_layer((400, 250), [], [star], include_catalog_only=True)
+        self.assertIsNone(hidden.getbbox())
+        self.assertIsNotNone(shown.getbbox())
+
+    def test_zero_opacity_preserves_all_source_pixels(self) -> None:
+        background = Image.new("RGB", (400, 220), (31, 62, 93))
+        output = render_annotation(background, self.deep_sky, self.bright_stars, self.segments, annotation_opacity=0)
+        self.assertIsNone(ImageChops.difference(background, output).getbbox())
 
     def test_heavy_high_contrast_style_changes_pixels(self) -> None:
         background = Image.new("RGB", (400, 220), (38, 42, 50))
@@ -141,6 +175,7 @@ class AnnotationStyleTests(unittest.TestCase):
                 patch("backend.pipeline.bright_stars_in_frame", return_value=[]),
                 patch("backend.pipeline.constellation_segments_in_frame", return_value=[]),
                 patch("backend.pipeline.render_annotation", side_effect=fake_render) as render,
+                patch("backend.pipeline.render_annotation_layer", wraps=render_annotation_layer) as full_render,
             ):
                 result = analyze_image(
                     input_path,
@@ -149,8 +184,9 @@ class AnnotationStyleTests(unittest.TestCase):
                     settings=custom,
                 )
 
-        self.assertEqual(render.call_count, 2)
-        for invocation in render.call_args_list:
+        self.assertEqual(render.call_count, 1)
+        self.assertEqual(full_render.call_count, 1)
+        for invocation in [*render.call_args_list, *full_render.call_args_list]:
             self.assertEqual(invocation.kwargs["deep_sky_color"], "#112233")
             self.assertEqual(invocation.kwargs["bright_star_color"], "#445566")
             self.assertEqual(invocation.kwargs["constellation_color"], "#778899")

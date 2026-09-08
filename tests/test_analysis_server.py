@@ -12,6 +12,8 @@ from pathlib import Path
 from unittest import mock
 
 from PIL import Image
+import numpy as np
+import imagecodecs
 
 from backend.analysis_tasks import AnalysisTaskRegistry
 from backend import server as server_module
@@ -311,6 +313,71 @@ class AnalysisServerTests(unittest.TestCase):
         )
         self.assertEqual(status, 400)
         self.assertIn("X-Request-Id", payload["error"])
+
+    def test_native_export_uses_original_png_and_style_without_solving(self) -> None:
+        job_id = "0123456789abcdef"
+        job = server_module.RUNTIME_DIR / job_id
+        job.mkdir()
+        pixels = np.arange(48 * 64 * 3, dtype=np.uint16).reshape(48, 64, 3)
+        (job / "input.png").write_bytes(imagecodecs.png_encode(pixels))
+        (job / "results.json").write_text(json.dumps({
+            "settings": {}, "objects": [], "constellationSegments": [],
+            "brightStars": [{"id": "star", "label": "Star", "x": 32, "y": 24,
+                             "magnitude": 3, "defaultVisible": True}],
+        }), encoding="utf-8")
+        with mock.patch("backend.pipeline.solve_plate") as solve:
+            status, payload = self.request("POST", f"/api/export/{job_id}", body=json.dumps({
+                "settings": {"brightStars": False, "deepSky": False, "constellations": False},
+            }).encode(), headers={"X-Request-Id": REQUEST_ID, "Content-Type": "application/json"})
+            solve.assert_not_called()
+        self.assertEqual(status, 200)
+        self.assertEqual(payload["export"]["bitDepth"], 16)
+        self.assertEqual((payload["export"]["width"], payload["export"]["height"]), (64, 48))
+        self.assertEqual(payload["export"]["format"], "PNG")
+        output = job / Path(payload["downloadUrl"]).name
+        np.testing.assert_array_equal(imagecodecs.png_decode(output.read_bytes()), pixels)
+        self.assertEqual(self.registry.get(REQUEST_ID)["status"], "complete")
+        status, marked = self.request("POST", f"/api/export/{job_id}", body=json.dumps({
+            "settings": {"brightStars": True, "brightStarColor": "#ff0000", "annotationOpacity": 1},
+        }).encode(), headers={"Content-Type": "application/json"})
+        self.assertEqual(status, 200)
+        marked_pixels = imagecodecs.png_decode((job / Path(marked["downloadUrl"]).name).read_bytes())
+        self.assertFalse(np.array_equal(marked_pixels, pixels))
+        np.testing.assert_array_equal(marked_pixels[24, 32], pixels[24, 32])
+        self.assertNotEqual(payload["downloadUrl"], marked["downloadUrl"])
+        np.testing.assert_array_equal(imagecodecs.png_decode((job / "input.png").read_bytes()), pixels)
+        status, changed = self.request("POST", f"/api/export/{job_id}", body=json.dumps({
+            "settings": {"catalogDepth": "bright"},
+        }).encode(), headers={"Content-Type": "application/json"})
+        self.assertEqual(status, 422)
+        self.assertIn("重新解析", changed["error"])
+
+    def test_export_rejects_invalid_job_and_invalid_json_settings(self) -> None:
+        status, _ = self.request("POST", "/api/export/../", body=b"{}")
+        self.assertEqual(status, 400)
+        job = server_module.RUNTIME_DIR / "0123456789abcdef"
+        job.mkdir()
+        (job / "results.json").write_text("{}")
+        status, _ = self.request("POST", "/api/export/0123456789abcdef", body=b'{"settings": []}')
+        self.assertEqual(status, 422)
+
+    def test_raw_upload_is_not_rejected_by_pillow_verification(self) -> None:
+        def fake_analyze(*args, **kwargs):
+            self.assertEqual(args[0].suffix, ".nef")
+            return {"status": "complete", "metadata": {"is_raw": True}, "objects": []}
+        with mock.patch.object(server_module, "analyze_image", side_effect=fake_analyze):
+            status, payload = self.request("POST", "/api/analyze", body=b"decoder owns RAW validation",
+                                           headers={"X-Request-Id": REQUEST_ID, "X-Filename": "camera.NEF"})
+        self.assertEqual(status, 200)
+        self.assertTrue(payload["metadata"]["is_raw"])
+
+    def test_catalog_depth_query_reaches_pipeline(self) -> None:
+        with mock.patch.object(server_module, "analyze_image", return_value={"status": "complete", "objects": []}) as analyze:
+            status, _ = self.request("POST", "/api/analyze?catalogDepth=bright&starMagnitudeLimit=13.5",
+                                     body=_jpeg_bytes(), headers=self.analyze_headers())
+        self.assertEqual(status, 200)
+        self.assertEqual(analyze.call_args.kwargs["settings"]["catalogDepth"], "bright")
+        self.assertEqual(float(analyze.call_args.kwargs["settings"]["starMagnitudeLimit"]), 13.5)
 
 
 if __name__ == "__main__":

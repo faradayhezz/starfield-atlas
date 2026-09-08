@@ -26,6 +26,8 @@ from .deep_sky_media import resolve_media_file
 from .hips_proxy import public_hips_manifest, resolve_hips_resource
 from .legacy_sky_map import public_manifest, resolve_layer_tile
 from .pipeline import AnalysisCancelled, DEFAULT_SETTINGS, analyze_image
+from .pipeline import reexport_image
+from .image_io import ALLOWED_SUFFIXES, RAW_SUFFIXES
 from .sky_catalog import public_sky_catalog
 
 
@@ -35,7 +37,6 @@ MAX_UPLOAD_BYTES = 200 * 1024 * 1024
 UPLOAD_CHUNK_BYTES = 1024 * 1024
 UPLOAD_IDLE_TIMEOUT_SECONDS = 15.0
 CLIENT_CLOSED_REQUEST = 499
-ALLOWED_SUFFIXES = {".jpg", ".jpeg", ".png", ".tif", ".tiff"}
 REQUEST_ID_PATTERN = re.compile(r"[0-9a-f]{32}")
 TASK_REGISTRY = AnalysisTaskRegistry()
 
@@ -159,6 +160,9 @@ class SkyHandler(BaseHTTPRequestHandler):
 
     def do_POST(self) -> None:  # noqa: N802
         parsed = urllib.parse.urlparse(self.path)
+        if parsed.path.startswith("/api/export/"):
+            self._export_result(parsed.path)
+            return
         if parsed.path != "/api/analyze":
             self._json({"status": "error", "error": "接口不存在"}, HTTPStatus.NOT_FOUND)
             return
@@ -189,7 +193,7 @@ class SkyHandler(BaseHTTPRequestHandler):
         suffix = Path(filename).suffix.lower()
         if suffix not in ALLOWED_SUFFIXES:
             self._json(
-                {"status": "error", "error": "仅支持 JPG、PNG 与 TIFF 照片"},
+                {"status": "error", "error": "支持 JPG、PNG、TIFF 及常见相机 RAW（ARW、CR2/CR3、NEF、DNG 等）"},
                 HTTPStatus.UNSUPPORTED_MEDIA_TYPE,
             )
             return
@@ -217,6 +221,14 @@ class SkyHandler(BaseHTTPRequestHandler):
             "highContrast": _bool(
                 _one(query, "highContrast"), bool(DEFAULT_SETTINGS["highContrast"])
             ),
+            "annotationOpacity": _one(query, "annotationOpacity") or DEFAULT_SETTINGS["annotationOpacity"],
+            "annotationLineWidth": _one(query, "annotationLineWidth") or DEFAULT_SETTINGS["annotationLineWidth"],
+            "annotationFontSize": _one(query, "annotationFontSize") or DEFAULT_SETTINGS["annotationFontSize"],
+            "markerStyle": _one(query, "markerStyle") or DEFAULT_SETTINGS["markerStyle"],
+            "labelDensity": _one(query, "labelDensity") or DEFAULT_SETTINGS["labelDensity"],
+            "starMagnitudeLimit": _one(query, "starMagnitudeLimit") or DEFAULT_SETTINGS["starMagnitudeLimit"],
+            "includeCatalogOnly": _bool(_one(query, "includeCatalogOnly"), False),
+            "catalogDepth": _one(query, "catalogDepth") or DEFAULT_SETTINGS["catalogDepth"],
         }
         registry = self._task_registry()
         try:
@@ -350,8 +362,11 @@ class SkyHandler(BaseHTTPRequestHandler):
             if is_cancelled():
                 self._respond_cancelled(request_id)
                 return
-            with Image.open(input_path) as image:
-                image.verify()
+            # RAW and 16/32-bit TIFF must be validated by their native decoder;
+            # Pillow cannot open many valid camera containers or RGB float TIFF.
+            if suffix not in RAW_SUFFIXES and suffix not in {".tif", ".tiff"}:
+                with Image.open(input_path) as image:
+                    image.verify()
             result = analyze_image(
                 input_path,
                 job_dir,
@@ -406,6 +421,68 @@ class SkyHandler(BaseHTTPRequestHandler):
             self._json(
                 {"status": "error", "error": str(exc)}, HTTPStatus.UNPROCESSABLE_ENTITY
             )
+
+    def _export_result(self, path: str) -> None:
+        parts = path.strip("/").split("/")
+        if len(parts) != 3 or not re.fullmatch(r"[0-9a-f]{16}", parts[2]):
+            self._json({"error": "无效的识别记录编号"}, HTTPStatus.BAD_REQUEST)
+            return
+        job_dir = RUNTIME_DIR / parts[2]
+        if not (job_dir / "results.json").is_file():
+            self._json({"error": "识别记录不存在，请先完成识别"}, HTTPStatus.NOT_FOUND)
+            return
+        request_id = self.headers.get("X-Request-Id", "").strip()
+        if request_id and REQUEST_ID_PATTERN.fullmatch(request_id) is None:
+            self._json({"error": "无效的导出请求编号"}, HTTPStatus.BAD_REQUEST)
+            return
+        registry = self._task_registry()
+        registered = False
+        try:
+            length = int(self.headers.get("Content-Length", "0"))
+            if not 0 < length <= 32768:
+                raise ValueError("导出设置长度必须在 1–32768 字节之间")
+            self.connection.settimeout(self._upload_idle_timeout())
+            chunks: list[bytes] = []
+            remaining = length
+            while remaining:
+                chunk = self.rfile.read(remaining)
+                if not chunk:
+                    raise ValueError("导出设置传输不完整")
+                chunks.append(chunk)
+                remaining -= len(chunk)
+            payload = json.loads(b"".join(chunks))
+            if not isinstance(payload, dict) or not isinstance(payload.get("settings", {}), dict):
+                raise ValueError("导出设置必须是 JSON 对象")
+            self.connection.settimeout(None)
+            if request_id:
+                registry.register(request_id, total_bytes=length)
+                registered = True
+                registry.update(request_id, status="processing", stage="validation", percent=15,
+                                message="正在准备原始尺寸导出", received_bytes=length)
+            def is_cancelled() -> bool:
+                return bool(request_id and registry.is_cancelled(request_id))
+            def progress(stage: str, percent: int, message: str) -> None:
+                if request_id:
+                    registry.update(request_id, status="processing", stage=stage,
+                                    percent=percent, message=message)
+            result = reexport_image(job_dir, payload.get("settings", {}),
+                                    is_cancelled=is_cancelled, progress_callback=progress)
+            if is_cancelled():
+                self._respond_cancelled(request_id, "导出已取消")
+                return
+            if request_id:
+                registry.update(request_id, status="complete", stage="complete", percent=100,
+                                message="原始尺寸标注已导出")
+                result["requestId"] = request_id
+            self._json(result)
+        except TaskAlreadyExistsError:
+            self._json({"error": "这个导出请求编号正在使用"}, HTTPStatus.CONFLICT)
+        except AnalysisCancelled:
+            self._respond_cancelled(request_id, "导出已取消")
+        except (ValueError, OSError) as exc:
+            if registered:
+                registry.update(request_id, status="error", stage="error", message=str(exc))
+            self._json({"status": "error", "error": str(exc)}, HTTPStatus.UNPROCESSABLE_ENTITY)
 
     def _task_registry(self) -> AnalysisTaskRegistry:
         return getattr(self.server, "task_registry", TASK_REGISTRY)

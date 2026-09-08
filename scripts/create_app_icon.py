@@ -15,16 +15,15 @@ def create_icon(destination: Path) -> None:
     def box(values: tuple[int, int, int, int]) -> tuple[int, int, int, int]:
         return tuple(value * scale for value in values)  # type: ignore[return-value]
 
-    draw.rounded_rectangle(box((0, 0, 256, 256)), radius=64 * scale, fill="#101618")
-    draw.ellipse(box((40, 40, 216, 216)), outline="#2bd875", width=12 * scale)
-    draw.line(box((128, 52, 128, 88)), fill="#718078", width=8 * scale)
-    draw.line(box((128, 168, 128, 204)), fill="#718078", width=8 * scale)
-    draw.line(box((52, 128, 88, 128)), fill="#718078", width=8 * scale)
-    draw.line(box((168, 128, 204, 128)), fill="#718078", width=8 * scale)
-    star = [(128, 84), (139, 117), (172, 128), (139, 139), (128, 172), (117, 139), (84, 128), (117, 117)]
-    draw.polygon([(x * scale, y * scale) for x, y in star], fill="#f3f7f4")
-    draw.ellipse(box((182, 58, 202, 78)), fill="#f4ce3a")
-    draw.arc(box((139, 69, 201, 135)), start=184, end=260, fill="#2bd875", width=8 * scale)
+    draw.rounded_rectangle(box((0, 0, 256, 256)), radius=48 * scale, fill="#191E24")
+    for points in (((92, 52), (52, 52), (52, 92)), ((164, 52), (204, 52), (204, 92)),
+                   ((204, 164), (204, 204), (164, 204)), ((92, 204), (52, 204), (52, 164))):
+        draw.line([(x * scale, y * scale) for x, y in points], fill="#83AFA6", width=12 * scale)
+    draw.line([(76 * scale, 156 * scale), (124 * scale, 116 * scale), (172 * scale, 140 * scale)], fill="#647E87", width=6 * scale)
+    star = [(124, 76), (133.6, 106.4), (164, 116), (133.6, 125.6), (124, 156), (114.4, 125.6), (84, 116), (114.4, 106.4)]
+    draw.polygon([(x * scale, y * scale) for x, y in star], fill="#E0E8E9")
+    draw.ellipse(box((162, 130, 182, 150)), fill="#83AFA6")
+    draw.ellipse(box((70, 150, 82, 162)), fill="#B6C5CB")
 
     icon = canvas.resize((size, size), Image.Resampling.LANCZOS)
     destination.parent.mkdir(parents=True, exist_ok=True)
@@ -33,6 +32,9 @@ def create_icon(destination: Path) -> None:
         format="ICO",
         sizes=[(16, 16), (24, 24), (32, 32), (48, 48), (64, 64), (128, 128), (256, 256)],
     )
+    icon.save(destination.with_suffix(".png"))
+    canvas.close()
+    icon.close()
 
 
 def main() -> None:

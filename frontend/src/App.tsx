@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { analyzePhoto, cancelAnalysis, getAnalysisProgress, type AnalysisTaskProgressResponse } from './api'
-import { createAnnotatedBlob, downloadBlob, exportResultJson, getImageDimensions, sourceToBlob } from './export'
+import { analyzePhoto, cancelAnalysis, exportAnnotatedPhoto, getAnalysisProgress, type AnalysisTaskProgressResponse } from './api'
+import { downloadBlob, exportResultJson, getImageDimensions, sourceToBlob } from './export'
 import {
   firstSupportedFileFromTransfer,
   hasSupportedImageExtension,
@@ -8,8 +8,9 @@ import {
   INCOMING_FILE_UNSUPPORTED_ERROR,
   normalizeIncomingFile,
   transferCarriesFiles,
+  IMAGE_FILE_ACCEPT,
+  canPreviewImageFile,
 } from './incomingFile'
-import { selectOverlayObjects } from './overlay'
 import { Header } from './components/Header'
 import { CloseIcon } from './components/Icons'
 import { ResultSidebar } from './components/ResultSidebar'
@@ -70,7 +71,7 @@ const initialProgress = (): AnalysisProgress => ({
 })
 
 function validatePhoto(file: File): string | undefined {
-  if (!hasSupportedImageExtension(file.name)) return '请选择 JPG、PNG 或 TIFF 格式的星空照片。'
+  if (!hasSupportedImageExtension(file.name)) return '请选择 JPG、PNG、TIFF 或相机 RAW 格式的星空照片。'
   if (file.size > MAX_FILE_SIZE) return '照片超过 200 MB，请先压缩或选择较小的文件。'
   if (file.size === 0) return '这个文件没有可读取的图像数据。'
   return undefined
@@ -110,6 +111,7 @@ function App() {
   const [notice, setNotice] = useState<string>()
   const [showSkyMap, setShowSkyMap] = useState(false)
   const [externalDragging, setExternalDragging] = useState(false)
+  const [exporting, setExporting] = useState(false)
 
   useEffect(() => () => {
     const activeRequest = requestIdRef.current
@@ -248,7 +250,7 @@ function App() {
         return
       }
       if (previewRef.current) URL.revokeObjectURL(previewRef.current)
-      const nextPreview = URL.createObjectURL(nextFile)
+      const nextPreview = canPreviewImageFile(nextFile) ? URL.createObjectURL(nextFile) : undefined
       previewRef.current = nextPreview
       setPreviewUrl(nextPreview)
       setFile(nextFile)
@@ -351,7 +353,7 @@ function App() {
   const hasCoordinateOverlay = Boolean(result?.objects.some((object) =>
     (object.x !== undefined && object.y !== undefined) || object.lines?.length,
   ))
-  const overlayBackground = result?.originalImage ?? previewUrl
+  const overlayBackground = previewUrl ?? result?.originalImage
   const canvasSource = useMemo(
     () => hasCoordinateOverlay && overlayBackground ? overlayBackground : result?.annotatedImage ?? overlayBackground,
     [hasCoordinateOverlay, overlayBackground, result?.annotatedImage],
@@ -361,36 +363,39 @@ function App() {
     const requiresAnalysis = nextSettings.deepSky.value !== settings.deepSky.value
       || nextSettings.brightStars.value !== settings.brightStars.value
       || nextSettings.catalogDepth !== settings.catalogDepth
-      || nextSettings.labelDensity !== settings.labelDensity
+      || nextSettings.starMagnitudeLimit !== settings.starMagnitudeLimit
     setSettings(nextSettings)
     if (result && requiresAnalysis) {
       setSettingsDirty(true)
-      setNotice('阈值或目录设置已更改，请点击「重新识别」应用。')
+      setNotice('目录参数已更改，点击「重新解析」应用。')
     }
   }
 
   const downloadAnnotated = async () => {
-    if (!result) return
+    if (!result || exporting) return
     try {
       if (settingsDirty) {
         setNotice('请先点击「重新识别」应用新阈值，再下载标注图。')
         return
       }
-      setNotice('正在准备高分辨率标注图…')
-      const visibleObjects = selectOverlayObjects(result.objects, settings)
-      const coordinateSize = { width: result.metadata.width, height: result.metadata.height }
-      let blob: Blob
-      if (hasCoordinateOverlay && previewUrl) blob = await createAnnotatedBlob(previewUrl, visibleObjects, settings, coordinateSize)
-      else if (hasCoordinateOverlay && result.originalImage) blob = await createAnnotatedBlob(result.originalImage, visibleObjects, settings, coordinateSize)
-      else if (result.downloadUrl) blob = await sourceToBlob(result.downloadUrl)
-      else if (result.annotatedImage) blob = await sourceToBlob(result.annotatedImage)
-      else if (canvasSource) blob = await createAnnotatedBlob(canvasSource, visibleObjects, settings, coordinateSize)
-      else throw new Error('当前没有可下载的标注图')
+      if (!result.jobId) throw new Error('此结果缺少原始文件任务，请重新解析后导出。')
+      setExporting(true)
+      setNotice('正在以原始像素导出标注图…')
+      const exported = await exportAnnotatedPhoto(result.jobId, settings)
       const base = result.metadata.filename.replace(/\.[^.]+$/, '') || 'starfield'
-      downloadBlob(blob, `${base}-annotated.png`)
+      const extension = exported.export.extension.replace(/^\./, '')
+      const downloadLink = document.createElement('a')
+      downloadLink.href = exported.downloadUrl
+      downloadLink.download = `${base}-annotated.${extension}`
+      document.body.append(downloadLink)
+      downloadLink.click()
+      downloadLink.remove()
+      setResult((current) => current && current.jobId === result.jobId ? { ...current, export: exported.export, downloadUrl: exported.downloadUrl } : current)
       setNotice('标注图已开始下载')
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : '下载标注图失败')
+    } finally {
+      setExporting(false)
     }
   }
 
@@ -410,6 +415,23 @@ function App() {
     }
   }
 
+  useEffect(() => {
+    const keydown = (event: KeyboardEvent) => {
+      if ((event.target as Element)?.closest('input, textarea, select, [contenteditable="true"]')) return
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'o') {
+        event.preventDefault()
+        if (!progress) openPicker()
+      }
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
+        event.preventDefault()
+        if (!progress && !exporting && result) void downloadAnnotated()
+      }
+      if (event.key === 'Escape' && progress) cancelCurrentAnalysis()
+    }
+    window.addEventListener('keydown', keydown)
+    return () => window.removeEventListener('keydown', keydown)
+  }, [progress, exporting, result, settings, settingsDirty])
+
   return (
     <div className="app-shell">
       <Header
@@ -417,6 +439,7 @@ function App() {
         hasResult={Boolean(result)}
         analyzing={Boolean(progress && progress.percent < 100)}
         settingsDirty={settingsDirty}
+        exporting={exporting}
         onUpload={openPicker}
         onReanalyze={reanalyze}
         onCancel={cancelCurrentAnalysis}
@@ -429,7 +452,7 @@ function App() {
         type="file"
         tabIndex={-1}
         aria-hidden="true"
-        accept=".jpg,.jpeg,.png,.tif,.tiff,image/jpeg,image/png,image/tiff"
+        accept={IMAGE_FILE_ACCEPT}
         onChange={(event) => {
           const nextFile = event.target.files?.item(0)
           if (nextFile) void chooseFile(nextFile)

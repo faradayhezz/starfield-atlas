@@ -9,11 +9,13 @@ from PyInstaller.utils.hooks import collect_all, collect_data_files
 project_root = Path(SPECPATH)
 webview_datas, webview_binaries, webview_hiddenimports = collect_all("webview")
 tetra3_datas = collect_data_files("tetra3", include_py_files=False)
+rawpy_datas, rawpy_binaries, rawpy_imports = collect_all("rawpy")
+codec_datas, codec_binaries, codec_imports = collect_all("imagecodecs")
 
 datas = [
     (str(project_root / "frontend" / "dist"), "frontend/dist"),
     (str(project_root / "README.md"), "."),
-] + webview_datas + tetra3_datas
+] + webview_datas + tetra3_datas + rawpy_datas + codec_datas
 
 backend_data_root = project_root / "backend" / "data"
 nasa_manifest = json.loads((backend_data_root / "nasa_deep_sky.json").read_text(encoding="utf-8"))
@@ -33,7 +35,8 @@ for source in backend_data_root.rglob("*"):
     destination = source.parent.relative_to(project_root).as_posix()
     datas.append((str(source), destination))
 
-hiddenimports = webview_hiddenimports + [
+hiddenimports = webview_hiddenimports + rawpy_imports + codec_imports + [
+    "tifffile", "exifread",
     "clr",
     "pythonnet",
     "scipy.ndimage",
@@ -52,7 +55,7 @@ hiddenimports = webview_hiddenimports + [
 a = Analysis(
     [str(project_root / "desktop_app.py")],
     pathex=[str(project_root)],
-    binaries=webview_binaries,
+    binaries=webview_binaries + rawpy_binaries + codec_binaries,
     datas=datas,
     hiddenimports=hiddenimports,
     hookspath=[],

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-30",
+  "generated_at": "2026-09-08",
   "catalogs": {
     "openngc": {
       "file": "openngc.csv",
@@ -30,13 +30,19 @@
       "proper_name_filled": 319,
       "common_name_zh_filled": 2253,
       "current_chinese_index_hip_in_catalog": 2255,
-      "untranslated_current_chinese_entries": [38196, 106758],
+      "untranslated_current_chinese_entries": [
+        38196,
+        106758
+      ],
       "enrichment_sources": [
         {
           "dataset": "HYG Database v4.1",
           "upstream_commit": "c7f7f883fe678cc7680169a50ccd7dcc49b060ce",
           "file": "hyg/CURRENT/hygdata_v41.csv",
-          "fields": ["hr", "name"],
+          "fields": [
+            "hr",
+            "name"
+          ],
           "license": "CC-BY-SA-4.0",
           "source_url": "https://github.com/astronexus/HYG-Database/blob/c7f7f883fe678cc7680169a50ccd7dcc49b060ce/hyg/CURRENT/hygdata_v41.csv",
           "source_sha256": "eb086d463456ba8c565c6432d741e3de3f8191f0262bbddb6ce51513191e8c9e",
@@ -45,7 +51,10 @@
         {
           "dataset": "Stellarium Chinese skyculture",
           "upstream_commit": "014fbb5e59233d133c22f9811af96b67d05a95c9",
-          "files": ["chinese/index.json", "chinese/po/zh_CN.po"],
+          "files": [
+            "chinese/index.json",
+            "chinese/po/zh_CN.po"
+          ],
           "field": "common_name_zh",
           "license": "CC-BY-SA-4.0",
           "source_url": "https://github.com/Stellarium/stellarium-skycultures/tree/014fbb5e59233d133c22f9811af96b67d05a95c9/chinese",
@@ -78,6 +87,39 @@
       "note": "Serpens is represented by separate Caput and Cauda features sharing the Ser abbreviation.",
       "segments": 753,
       "sha256": "d079ceb22fe565e29b04f50eacfb231506c6e77618127836178373a5e0aa4679"
+    },
+    "faint_stars": {
+      "file": "faint_stars.csv",
+      "dataset": "HYG Database v4.1, full stellar catalogue (Sun excluded)",
+      "source_url": "https://raw.githubusercontent.com/astronexus/HYG-Database/c7f7f883fe678cc7680169a50ccd7dcc49b060ce/hyg/CURRENT/hygdata_v41.csv",
+      "upstream_commit": "c7f7f883fe678cc7680169a50ccd7dcc49b060ce",
+      "source_sha256": "d9f69fd86bbf90a4e4d52b4c5c53eacfa6dfc0bfdef85bfd94f095e0bebe4ebd",
+      "sha256": "fbf63479747959b08ed98f6c493ae3085a65f65257fb1257e0884368ac8aa34b",
+      "rows": 119625,
+      "projectable_rows": 119625,
+      "epoch_equinox": "J2000.0",
+      "epoch_proper_motion": 2000.0,
+      "license": "CC-BY-SA-4.0",
+      "magnitude_min": -1.44,
+      "magnitude_max": 21.0,
+      "stars_fainter_than_mag_7": 104027,
+      "stars_at_or_brighter_than_mag_12": 117930,
+      "common_name_zh_filled": 2253,
+      "notes": "Apparent V magnitudes; catalogue is not complete to its faintest magnitude. Chinese names joined by exact HIP from the existing attributed bright-star catalogue. Coordinates retained at HYG epoch/equinox J2000; proper motions retained as metadata, not propagated without observation epoch."
+    },
+    "lynds_dark_nebulae": {
+      "file": "lynds_dark_nebulae.csv",
+      "dataset": "Lynds' Catalogue of Dark Nebulae (LDN), CDS VII/7A",
+      "source_url": "https://vizier.cds.unistra.fr/viz-bin/asu-tsv?-source=VII/7A/ldn&-out=LDN,Seq,Area,Opacity,Barn,_RAJ2000,_DEJ2000&-out.max=unlimited&-out.form=mini&-oc.form=d",
+      "source_sha256": "8541036557991230c0bfcfac5d37602d99aa4885f1a63cc4b7e38af459451149",
+      "sha256": "e368587a0d1cec533d8b3232f021fc4679318c209837e78d77932d2ae3602468",
+      "rows": 1791,
+      "projectable_rows": 1791,
+      "catalog_version": "22-Feb-1996 updated catalogue; queried 2026-09-08",
+      "epoch_equinox": "FK5/J2000.0 (VizieR-converted from FK4/B1950)",
+      "license": "Original scientific catalogue data; see LYNDS-DARK-NEBULAE-NOTICE.md for citation and source terms",
+      "citation": "Lynds B. T. (1962), Astrophysical Journal Supplement 7, 1; 1962ApJS....7....1L; CDS VII/7A",
+      "notes": "1,787 published LDN identifiers plus 4 unnumbered clouds with stable CDS sequence IDs. Area and opacity are not magnitudes. Area-derived equivalent circular radius is only an approximate size, not a measured boundary. Barnard associations can be subclouds, so they are related identifiers, not deduplication aliases."
     }
   }
 }

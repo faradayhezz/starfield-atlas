@@ -8,6 +8,12 @@
 *.json text eol=lf
 *.md text eol=lf
 
+# Catalogue manifests hash exact bytes; keep checkout newlines deterministic.
+backend/data/openngc.csv text eol=crlf
+backend/data/bright_stars.csv text eol=crlf
+backend/data/faint_stars.csv text eol=lf
+backend/data/lynds_dark_nebulae.csv text eol=lf
+
 *.ico binary
 *.jpg binary
 *.jpeg binary

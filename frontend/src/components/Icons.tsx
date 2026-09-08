@@ -90,13 +90,13 @@ export function MapIcon(props: IconProps) {
 export function BrandMark() {
   return (
     <span className="brand-mark" aria-hidden="true">
-      <svg viewBox="0 0 40 40">
-        <rect x="1" y="1" width="38" height="38" rx="10" fill="#101819" stroke="#33433c" />
-        <circle cx="20" cy="20" r="11.5" fill="none" stroke="#2bd875" strokeWidth="1.7" />
-        <path d="M20 5.5v6M20 28.5v6M5.5 20h6M28.5 20h6" stroke="#718078" strokeWidth="1.4" strokeLinecap="round" />
-        <path d="m20 12.3 2.1 5.6 5.6 2.1-5.6 2.1-2.1 5.6-2.1-5.6-5.6-2.1 5.6-2.1 2.1-5.6Z" fill="#f3f7f4" />
-        <circle cx="31.2" cy="8.8" r="1.8" fill="#f4ce3a" />
-        <path d="M29.3 10.1c-3.9 1.4-6.3 3.4-7.5 6.2" fill="none" stroke="#2bd875" strokeWidth="1.4" strokeLinecap="round" opacity=".88" />
+      <svg viewBox="0 0 64 64" fill="none">
+        <rect width="64" height="64" rx="12" fill="#191E24" />
+        <path d="M23 13H13V23M41 13H51V23M51 41V51H41M23 51H13V41" stroke="#83AFA6" strokeWidth="3" />
+        <path d="M19 39L31 29L43 35" stroke="#647E87" strokeWidth="1.5" />
+        <path d="M31 19L33.4 26.6L41 29L33.4 31.4L31 39L28.6 31.4L21 29L28.6 26.6Z" fill="#E0E8E9" />
+        <circle cx="43" cy="35" r="2.5" fill="#83AFA6" />
+        <circle cx="19" cy="39" r="1.5" fill="#B6C5CB" />
       </svg>
     </span>
   )

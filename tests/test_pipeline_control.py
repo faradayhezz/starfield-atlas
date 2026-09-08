@@ -9,7 +9,7 @@ import numpy as np
 from PIL import Image
 
 from backend.metadata import read_metadata
-from backend.pipeline import AnalysisCancelled, _display_rgb, analyze_image
+from backend.pipeline import AnalysisCancelled, _display_rgb, analyze_image, normalize_settings, select_deep_sky_inventory
 from backend.plate_solver import solve_plate
 
 
@@ -22,6 +22,43 @@ class FakeSolution:
 
 
 class PipelineControlTests(unittest.TestCase):
+    def test_depth_filters_dso_inventory_without_guessing_dark_cloud_magnitude(self) -> None:
+        items = [
+            {"id": "bright", "magnitude": 8.2},
+            {"id": "intermediate", "magnitude": 12.3},
+            {"id": "faint", "magnitude": 17.2},
+            {"id": "unknown-ldn", "magnitude": None, "objectType": "DrkN", "areaSqDeg": .001},
+            {"id": "named", "magnitude": None, "commonNameZh": "已命名目标", "expectedVisible": True},
+            {"id": "not-recommended", "magnitude": None, "commonNameZh": "未推荐目标", "expectedVisible": False},
+        ]
+        self.assertEqual([item["id"] for item in select_deep_sky_inventory(items, "bright")], ["bright", "named"])
+        self.assertEqual([item["id"] for item in select_deep_sky_inventory(items, "balanced")], ["bright", "intermediate", "named"])
+        self.assertIs(select_deep_sky_inventory(items, "deep"), items)
+        self.assertEqual(normalize_settings()["catalogDepth"], "deep")
+        self.assertEqual(normalize_settings({"catalogDepth": "invalid"})["catalogDepth"], "deep")
+
+    def test_depth_selection_reports_field_and_included_counts(self) -> None:
+        inventory = [{"id": "bright", "magnitude": 8., "expectedVisible": False},
+                     {"id": "faint", "magnitude": 17., "expectedVisible": False},
+                     {"id": "unknown", "magnitude": None, "expectedVisible": False}]
+        with TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "source.png"
+            Image.new("RGB", (128, 96)).save(source)
+            with (
+                patch("backend.pipeline.solve_plate", return_value=FakeSolution()),
+                patch("backend.pipeline.deep_sky_in_frame", return_value=inventory),
+                patch("backend.pipeline.bright_stars_in_frame", return_value=[]) as stars,
+                patch("backend.pipeline.constellation_segments_in_frame", return_value=[]),
+            ):
+                result = analyze_image(source, root / "0123456789abcdef", filename="source.png",
+                                       settings={"catalogDepth": "bright", "starMagnitudeLimit": 13.5})
+            self.assertEqual([item["id"] for item in result["objects"]], ["bright"])
+            self.assertEqual(result["counts"]["deepSky"], 1)
+            self.assertEqual(result["catalogSelection"]["deepSkyInField"], 3)
+            self.assertEqual(result["catalogSelection"]["deepSkyIncluded"], 1)
+            self.assertEqual(stars.call_args.kwargs["magnitude_limit"], 13.5)
+
     def test_pipeline_reports_real_stages_in_order(self) -> None:
         events: list[tuple[str, int, str]] = []
         with TemporaryDirectory() as temporary:
@@ -50,7 +87,8 @@ class PipelineControlTests(unittest.TestCase):
 
             self.assertEqual(result["status"], "complete")
             self.assertTrue((job_dir / "annotated-preview.jpg").is_file())
-            self.assertTrue((job_dir / "annotated-full.jpg").is_file())
+            self.assertTrue((job_dir / "annotated-full.png").is_file())
+            self.assertEqual(result["export"]["format"], "PNG")
             self.assertTrue((job_dir / "results.json").is_file())
 
         self.assertEqual(
@@ -181,7 +219,6 @@ class PipelineControlTests(unittest.TestCase):
             render_inputs,
             [
                 ((2400, 960), (2500, 1000)),
-                ((2500, 1000), None),
             ],
         )
         for image in (*render_sources, *render_outputs):

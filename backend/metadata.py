@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 from datetime import datetime
+from pathlib import Path
 from typing import Any
 
 from PIL import ExifTags, Image
@@ -26,6 +27,9 @@ class ImageMetadata:
     latitude: float | None = None
     longitude: float | None = None
     orientation: int | None = None
+    bit_depth: int | None = None
+    is_raw: bool = False
+    source_bytes: int | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -134,6 +138,61 @@ def _clean(value: Any) -> str | None:
         return None
     text = str(value).strip().strip("\x00")
     return text or None
+
+
+def read_file_metadata(path: Path) -> ImageMetadata:
+    """Read camera EXIF even when Pillow cannot open a camera RAW container."""
+    try:
+        with Image.open(path) as image:
+            metadata = read_metadata(image)
+        if path.suffix.lower() in {".jpg", ".jpeg", ".png", ".tif", ".tiff"}:
+            metadata.source_bytes = path.stat().st_size
+            return metadata
+    except (OSError, ValueError):
+        metadata = ImageMetadata(width=0, height=0, format=path.suffix[1:].upper())
+    import exifread
+
+    try:
+        with path.open("rb") as stream:
+            tags = exifread.process_file(stream, details=False, extract_thumbnail=False)
+    except (OSError, ValueError, TypeError, KeyError):
+        tags = {}
+
+    def number(key: str) -> float | None:
+        tag = tags.get(key)
+        values = getattr(tag, "values", None)
+        return _float(values[0]) if isinstance(values, (list, tuple)) and values else None
+
+    def string(key: str) -> str | None:
+        return _clean(tags.get(key))
+
+    for field, key in {
+        "camera_make": "Image Make", "camera_model": "Image Model",
+        "lens_model": "EXIF LensModel", "timezone_offset": "EXIF OffsetTimeOriginal",
+    }.items():
+        setattr(metadata, field, getattr(metadata, field) or string(key))
+    for field, key in {
+        "focal_length_mm": "EXIF FocalLength", "focal_length_35mm": "EXIF FocalLengthIn35mmFilm",
+        "exposure_seconds": "EXIF ExposureTime", "aperture": "EXIF FNumber",
+    }.items():
+        setattr(metadata, field, getattr(metadata, field) or number(key))
+    metadata.iso = metadata.iso or _int(number("EXIF ISOSpeedRatings"))
+    metadata.orientation = metadata.orientation or _int(number("Image Orientation"))
+    if not metadata.captured_at:
+        capture = string("EXIF DateTimeOriginal") or string("Image DateTime")
+        if capture:
+            try:
+                metadata.captured_at = datetime.strptime(capture, "%Y:%m:%d %H:%M:%S").isoformat()
+            except ValueError:
+                metadata.captured_at = capture
+    for field, coord, ref in (
+        ("latitude", "GPS GPSLatitude", "GPS GPSLatitudeRef"),
+        ("longitude", "GPS GPSLongitude", "GPS GPSLongitudeRef"),
+    ):
+        if getattr(metadata, field) is None:
+            setattr(metadata, field, _gps_decimal(getattr(tags.get(coord), "values", None), string(ref)))
+    metadata.source_bytes = path.stat().st_size
+    return metadata
 
 
 def estimated_horizontal_fov(metadata: ImageMetadata) -> float | None:

@@ -18,6 +18,12 @@ export interface AnalysisSettings {
   constellationColor: string
   fontWeight: AnnotationFontWeight
   highContrast: boolean
+  annotationOpacity: number
+  annotationLineWidth: number
+  annotationFontSize: number
+  markerStyle: 'circle' | 'corners'
+  starMagnitudeLimit: number
+  includeCatalogOnly: boolean
 }
 
 export interface ImageMetadata {
@@ -84,12 +90,17 @@ export interface DetectedObject {
   decDeg?: number
   confidence?: number
   detected?: boolean
+  defaultVisible?: boolean
+  recommendedLabel?: boolean
+  evidence?: string
+  pixelDetected?: boolean
   x?: number
   y?: number
   radius?: number
   labelX?: number
   labelY?: number
   lines?: Point[][]
+  protectedPoints?: Point[]
   thumbnail?: string
   thumbnailWidth?: number
   thumbnailHeight?: number
@@ -111,9 +122,22 @@ export interface AnalysisResult {
   originalImage?: string
   downloadUrl?: string
   resultsUrl?: string
+  originalDownloadUrl?: string
+  export?: NativeExportMetadata
   counts?: Partial<Record<LayerKey | 'expectedVisible', number>>
   warnings?: string[]
   raw: unknown
+}
+
+export interface NativeExportMetadata {
+  format: string
+  extension: string
+  bitDepth: number
+  width: number
+  height: number
+  originalFormat: string
+  isRaw: boolean
+  note?: string
 }
 
 export interface AnalysisProgress {
@@ -208,6 +232,7 @@ export interface SkyCatalogSource {
   decDeg: number
   magnitude?: number
   priority?: number
+  defaultVisible?: boolean
   catalogLabel?: string
   commonNameZh?: string
   objectType?: string
@@ -241,18 +266,24 @@ export interface SkyCatalog {
 export const DEFAULT_SETTINGS: AnalysisSettings = {
   deepSky: { enabled: true, value: 75 },
   brightStars: { enabled: true, value: 60 },
-  constellations: { enabled: true, value: 70 },
-  catalogDepth: 'balanced',
-  labelDensity: 'balanced',
-  deepSkyColor: '#18DF69',
-  brightStarColor: '#F4CE3A',
-  constellationColor: '#B86AE6',
-  fontWeight: 650,
-  highContrast: true,
+  constellations: { enabled: false, value: 55 },
+  catalogDepth: 'deep',
+  labelDensity: 'sparse',
+  deepSkyColor: '#69BE7A',
+  brightStarColor: '#D4B953',
+  constellationColor: '#A391BF',
+  fontWeight: 500,
+  highContrast: false,
+  annotationOpacity: .85,
+  annotationLineWidth: 1.25,
+  annotationFontSize: 18,
+  markerStyle: 'circle',
+  starMagnitudeLimit: 12,
+  includeCatalogOnly: false,
 }
 
 export const LAYER_LABELS: Record<LayerKey, string> = {
   deepSky: '深空天体',
-  brightStars: '亮星',
+  brightStars: '恒星',
   constellations: '星座',
 }

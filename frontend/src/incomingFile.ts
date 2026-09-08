@@ -1,7 +1,10 @@
-export const SUPPORTED_IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'tif', 'tiff'] as const
+export const RAW_IMAGE_EXTENSIONS = ['arw', 'cr2', 'cr3', 'nef', 'nrw', 'dng', 'raf', 'orf', 'rw2', 'pef', 'srw', 'raw', 'sr2', 'srf', '3fr', 'fff', 'iiq', 'rwl', 'mos', 'mrw', 'kdc', 'dcr', 'erf', 'mef', 'mdc', 'x3f'] as const
+export const SUPPORTED_IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'tif', 'tiff', ...RAW_IMAGE_EXTENSIONS] as const
+export const IMAGE_FILE_ACCEPT = SUPPORTED_IMAGE_EXTENSIONS.map((extension) => `.${extension}`).join(',')
+export const canPreviewImageFile = (file: File): boolean => /\.(jpe?g|png)$/i.test(file.name)
 
 export const INCOMING_FILE_READ_ERROR = '无法读取拖入的图片数据。微信虚拟附件可先复制图片，再按 Ctrl+V 粘贴。'
-export const INCOMING_FILE_UNSUPPORTED_ERROR = '没有从拖放来源读取到支持的 JPG、PNG 或 TIFF 图片。微信虚拟附件可先复制图片，再按 Ctrl+V 粘贴。'
+export const INCOMING_FILE_UNSUPPORTED_ERROR = '没有读取到支持的 JPG、PNG、TIFF 或相机 RAW 文件。微信虚拟附件可复制图片后按 Ctrl+V 粘贴。'
 
 interface ImageFormat {
   extension: 'jpg' | 'png' | 'tiff'
