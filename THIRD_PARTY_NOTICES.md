@@ -63,6 +63,7 @@ alongside this notice.
 | --- | --- | --- |
 | OpenNGC v20260501 | CC BY-SA 4.0 | [`backend/data/LICENSES/OPENNGC-CC-BY-SA-4.0.txt`](backend/data/LICENSES/OPENNGC-CC-BY-SA-4.0.txt) |
 | HYG Database v4.1 full stellar catalogue and enrichment | CC BY-SA 4.0 | [`backend/data/LICENSES/HYG-CC-BY-SA-4.0.md`](backend/data/LICENSES/HYG-CC-BY-SA-4.0.md) |
+| AT-HYG v3.2 / Tycho-2 indexed stellar extension | CC BY-SA 4.0 | [`backend/data/LICENSES/ATHYG-CC-BY-SA-4.0.md`](backend/data/LICENSES/ATHYG-CC-BY-SA-4.0.md) |
 | Lynds dark nebulae, CDS VII/7A | Scientific catalogue attribution and source terms | [`backend/data/LICENSES/LYNDS-DARK-NEBULAE-NOTICE.md`](backend/data/LICENSES/LYNDS-DARK-NEBULAE-NOTICE.md) |
 | Hipparcos-derived bright-star data | ESA Hipparcos catalogue notice | [`backend/data/LICENSES/HIPPARCOS-NOTICE.txt`](backend/data/LICENSES/HIPPARCOS-NOTICE.txt) |
 | Stellarium Chinese sky-culture names | CC BY-SA 4.0 | [`backend/data/LICENSES/STELLARIUM-CHINESE-SKYCULTURE-NOTICE.md`](backend/data/LICENSES/STELLARIUM-CHINESE-SKYCULTURE-NOTICE.md) |
@@ -100,6 +101,22 @@ additional institutional or photographer credits, which remain attached to the
 individual records.
 
 See [`backend/data/nasa-deep-sky/SOURCES.md`](backend/data/nasa-deep-sky/SOURCES.md).
+
+### NASA SkyView / DSS2 target cutouts
+
+In addition to the curated NASA images, 68 small DSS2 Red survey cutouts are
+bundled, and other catalogue targets can request their own field on demand.
+NASA GSFC SkyView provides the cutout service; the underlying Digitized Sky
+Survey data retain their original STScI, Palomar/Caltech, ROE and AAO credits and
+terms. These survey cutouts are explicitly distinguished from Hubble or other
+curated NASA target photographs. They are not relicensed by this application's
+GPL, and NASA delivery does not imply that every underlying survey image is
+public domain.
+
+The coordinates, reproducible NASA queries, image hashes, dimensions and credits
+are recorded in [`backend/data/nasa-survey-cutouts/SOURCES.md`](backend/data/nasa-survey-cutouts/SOURCES.md)
+and its manifest. See [SkyView documentation](https://skyview.gsfc.nasa.gov/current/docs/batchpage.html)
+and the [SkyView data-use FAQ](https://skyview.gsfc.nasa.gov/current/help/faq.html).
 
 ## Public real-sky photographs and README images
 

@@ -1,0 +1,4363 @@
+{
+  "schema_version": 1,
+  "dataset": "AT-HYG v3.2 / Tycho-2 extension",
+  "creator": "David Nash / Astronexus",
+  "license": "CC-BY-SA-4.0",
+  "upstream_commit": "650346e2bc57f664eb411bc5f44ffd94b8006af2",
+  "source_url": "https://github.com/astronexus/ATHYG-Database/tree/650346e2bc57f664eb411bc5f44ffd94b8006af2",
+  "sources": [
+    {
+      "url": "https://raw.githubusercontent.com/astronexus/ATHYG-Database/650346e2bc57f664eb411bc5f44ffd94b8006af2/data/athyg_v32-1.csv.gz",
+      "sha256": "c71d6863d1bbab46511bf680209e424ece9435790e46025f12477a105edd1c2f"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/astronexus/ATHYG-Database/650346e2bc57f664eb411bc5f44ffd94b8006af2/data/athyg_v32-2.csv.gz",
+      "sha256": "bd8fe86f089c7fd3104761458cd2b0c9955ea97259440585164e4b24ed9d2fd8"
+    }
+  ],
+  "rows": 2433199,
+  "base_hyg_rows": 119625,
+  "combined_stars": 2552824,
+  "faint_stars_gt_7": 2433138,
+  "stars_gt_12": 547068,
+  "magnitude_min": 4.143,
+  "magnitude_max": 15.193,
+  "magnitude_completeness": "Tycho-2 approximately 90% complete to V=11.5; not complete to the faintest magnitude. HYG uses V and Tycho uses VT.",
+  "completeness_reference": "https://heasarc.gsfc.nasa.gov/w3browse/all/tycho2.html",
+  "coordinate_frame": "ICRS, J2000.0",
+  "coordinate_quantization_deg": 1e-07,
+  "magnitude_quantization": 0.001,
+  "selection": "All valid AT-HYG records except the Sun and author-supplied exact HYG duplicates; no sky, brightness, or proximity cut.",
+  "deduplication": "Keep all HYG v4.1 base entries, exclude extension rows whose explicit HYG ID already exists, retain distinct TYC component IDs even if a HIP association is shared.",
+  "source_counts": {
+    "upstream_rows": 2552165,
+    "sun_excluded": 1,
+    "position_source_T": 2433199,
+    "magnitude_band_VT": 2433199,
+    "exact_hyg_duplicates_excluded": 118965
+  },
+  "total_compressed_bytes": 49837728,
+  "max_shard_rows": 27358,
+  "shards": [
+    {
+      "file": "cell_000.npz",
+      "cell": 0,
+      "rows": 569,
+      "center_ra_deg": 7.5,
+      "center_dec_deg": -85,
+      "cap_radius_deg": 12.5,
+      "sha256": "c0eb942815bb6e95db647182d34a48f9cb5728cf2b1439964a14cbd3b71523f0",
+      "bytes": 14446
+    },
+    {
+      "file": "cell_001.npz",
+      "cell": 1,
+      "rows": 577,
+      "center_ra_deg": 22.5,
+      "center_dec_deg": -85,
+      "cap_radius_deg": 12.5,
+      "sha256": "0aa2bf098168044e00cac5307b6258384a8720981ff19b7807cf441b02622cbe",
+      "bytes": 14616
+    },
+    {
+      "file": "cell_002.npz",
+      "cell": 2,
+      "rows": 633,
+      "center_ra_deg": 37.5,
+      "center_dec_deg": -85,
+      "cap_radius_deg": 12.5,
+      "sha256": "ca36f743e2ad7c861aadb5550fab6a2b0ae7b232770c815691bfbe70ee8653d5",
+      "bytes": 15717
+    },
+    {
+      "file": "cell_003.npz",
+      "cell": 3,
+      "rows": 661,
+      "center_ra_deg": 52.5,
+      "center_dec_deg": -85,
+      "cap_radius_deg": 12.5,
+      "sha256": "18daa6523ae19836997eb52db98dc99febaead571edf86ba436f0a7ddd10c019",
+      "bytes": 16283
+    },
+    {
+      "file": "cell_004.npz",
+      "cell": 4,
+      "rows": 620,
+      "center_ra_deg": 67.5,
+      "center_dec_deg": -85,
+      "cap_radius_deg": 12.5,
+      "sha256": "447bfe53bb8c5d1ce78e9748cba38156d771298639dd08b9f5910c51a1b49079",
+      "bytes": 15471
+    },
+    {
+      "file": "cell_005.npz",
+      "cell": 5,
+      "rows": 570,
+      "center_ra_deg": 82.5,
+      "center_dec_deg": -85,
+      "cap_radius_deg": 12.5,
+      "sha256": "e60f1aa77d876aa58d86a18ef467716c9f5d153f978793366f1e46b899793c10",
+      "bytes": 14551
+    },
+    {
+      "file": "cell_006.npz",
+      "cell": 6,
+      "rows": 598,
+      "center_ra_deg": 97.5,
+      "center_dec_deg": -85,
+      "cap_radius_deg": 12.5,
+      "sha256": "7177135e7f272ab4d7d76bb820638f32a30a8d94fbcdf4e20c74db5950308656",
+      "bytes": 15310
+    },
+    {
+      "file": "cell_007.npz",
+      "cell": 7,
+      "rows": 539,
+      "center_ra_deg": 112.5,
+      "center_dec_deg": -85,
+      "cap_radius_deg": 12.5,
+      "sha256": "016186b9342b59aeaa103a1a7dacd2104d00289b7ae7801f5d0075120d5478f1",
+      "bytes": 14074
+    },
+    {
+      "file": "cell_008.npz",
+      "cell": 8,
+      "rows": 620,
+      "center_ra_deg": 127.5,
+      "center_dec_deg": -85,
+      "cap_radius_deg": 12.5,
+      "sha256": "93ae67c8c065add44a8fd7cdb2e9eb5ff388f0e25add8115f193627238b0c0ae",
+      "bytes": 15636
+    },
+    {
+      "file": "cell_009.npz",
+      "cell": 9,
+      "rows": 721,
+      "center_ra_deg": 142.5,
+      "center_dec_deg": -85,
+      "cap_radius_deg": 12.5,
+      "sha256": "79292c9329139b7ba80b92ac23140f7712246b95738d22a6b3e2f1660af7bf1c",
+      "bytes": 17648
+    },
+    {
+      "file": "cell_010.npz",
+      "cell": 10,
+      "rows": 692,
+      "center_ra_deg": 157.5,
+      "center_dec_deg": -85,
+      "cap_radius_deg": 12.5,
+      "sha256": "7368660e268d080dabf589a9622d9f0725df64c90d5b14241035b687385145cb",
+      "bytes": 17048
+    },
+    {
+      "file": "cell_011.npz",
+      "cell": 11,
+      "rows": 602,
+      "center_ra_deg": 172.5,
+      "center_dec_deg": -85,
+      "cap_radius_deg": 12.5,
+      "sha256": "ab6024cce303568cde1e0dc37e94d6f85fb1a2020e093fcb5f6d86cb02d95287",
+      "bytes": 15202
+    },
+    {
+      "file": "cell_012.npz",
+      "cell": 12,
+      "rows": 608,
+      "center_ra_deg": 187.5,
+      "center_dec_deg": -85,
+      "cap_radius_deg": 12.5,
+      "sha256": "d8c778073f31d9199c3bfe1bcb4524f93f4903c1eba8882fe8b9d400376f48e7",
+      "bytes": 15390
+    },
+    {
+      "file": "cell_013.npz",
+      "cell": 13,
+      "rows": 687,
+      "center_ra_deg": 202.5,
+      "center_dec_deg": -85,
+      "cap_radius_deg": 12.5,
+      "sha256": "3ac3cc7abf96fdb98094e63c04a8b3d880e2356752abe1d332cf852ae2351e7c",
+      "bytes": 16993
+    },
+    {
+      "file": "cell_014.npz",
+      "cell": 14,
+      "rows": 693,
+      "center_ra_deg": 217.5,
+      "center_dec_deg": -85,
+      "cap_radius_deg": 12.5,
+      "sha256": "27aa7a4aa010a3c3f1132319b2d971a13984bea6ac957a6104c0df1f0dc3a103",
+      "bytes": 17124
+    },
+    {
+      "file": "cell_015.npz",
+      "cell": 15,
+      "rows": 749,
+      "center_ra_deg": 232.5,
+      "center_dec_deg": -85,
+      "cap_radius_deg": 12.5,
+      "sha256": "15a4dbf19c871ca9dee9602564a8028157c6ed3792ed80b59c37396834a3d05e",
+      "bytes": 18353
+    },
+    {
+      "file": "cell_016.npz",
+      "cell": 16,
+      "rows": 777,
+      "center_ra_deg": 247.5,
+      "center_dec_deg": -85,
+      "cap_radius_deg": 12.5,
+      "sha256": "ce0cd85bdc7ab2ed736a0bcfd3ee540e5fca760af49cb6ad59f8082cf8ed35d5",
+      "bytes": 18897
+    },
+    {
+      "file": "cell_017.npz",
+      "cell": 17,
+      "rows": 672,
+      "center_ra_deg": 262.5,
+      "center_dec_deg": -85,
+      "cap_radius_deg": 12.5,
+      "sha256": "11553292e43abc9a1ce7f020c6eec1ce73efa59e15134f711c4cad95032bec11",
+      "bytes": 16884
+    },
+    {
+      "file": "cell_018.npz",
+      "cell": 18,
+      "rows": 695,
+      "center_ra_deg": 277.5,
+      "center_dec_deg": -85,
+      "cap_radius_deg": 12.5,
+      "sha256": "512a5817d3a0c07dd41914b4079a8c0662221e84ba24e3f418e31de796d6a215",
+      "bytes": 17353
+    },
+    {
+      "file": "cell_019.npz",
+      "cell": 19,
+      "rows": 536,
+      "center_ra_deg": 292.5,
+      "center_dec_deg": -85,
+      "cap_radius_deg": 12.5,
+      "sha256": "600a0853e7b2045fa9d89644c9f29598a69f1a123fe3847a33680ba75e5305a6",
+      "bytes": 14109
+    },
+    {
+      "file": "cell_020.npz",
+      "cell": 20,
+      "rows": 521,
+      "center_ra_deg": 307.5,
+      "center_dec_deg": -85,
+      "cap_radius_deg": 12.5,
+      "sha256": "f1c3e833ac63f3126414bc2f6ee55a862f23dc549f1e5bc32cb164c0ccd4a8fb",
+      "bytes": 13808
+    },
+    {
+      "file": "cell_021.npz",
+      "cell": 21,
+      "rows": 489,
+      "center_ra_deg": 322.5,
+      "center_dec_deg": -85,
+      "cap_radius_deg": 12.5,
+      "sha256": "705fe5da163502eb678db7fa679274021037e156bcfb02e633660025e0e35dff",
+      "bytes": 13168
+    },
+    {
+      "file": "cell_022.npz",
+      "cell": 22,
+      "rows": 483,
+      "center_ra_deg": 337.5,
+      "center_dec_deg": -85,
+      "cap_radius_deg": 12.5,
+      "sha256": "85bc783784a9c14ab5b085f8883324e895fc685feb5eb926a13d7187bc11c9cf",
+      "bytes": 12877
+    },
+    {
+      "file": "cell_023.npz",
+      "cell": 23,
+      "rows": 505,
+      "center_ra_deg": 352.5,
+      "center_dec_deg": -85,
+      "cap_radius_deg": 12.5,
+      "sha256": "9feba79f0b9b67e209f7c40def7692de987109dde700405766d9d462e163c129",
+      "bytes": 13248
+    },
+    {
+      "file": "cell_024.npz",
+      "cell": 24,
+      "rows": 1599,
+      "center_ra_deg": 7.5,
+      "center_dec_deg": -75,
+      "cap_radius_deg": 12.5,
+      "sha256": "b04b444614a6f994cfbd68d27373b6c2848052bf19cdd8ca0c291561276ebad9",
+      "bytes": 35090
+    },
+    {
+      "file": "cell_025.npz",
+      "cell": 25,
+      "rows": 1530,
+      "center_ra_deg": 22.5,
+      "center_dec_deg": -75,
+      "cap_radius_deg": 12.5,
+      "sha256": "a99f959353ae0f20835bbb5e897132617a44dbc549ca82f35fcbae129ce1d964",
+      "bytes": 33713
+    },
+    {
+      "file": "cell_026.npz",
+      "cell": 26,
+      "rows": 1488,
+      "center_ra_deg": 37.5,
+      "center_dec_deg": -75,
+      "cap_radius_deg": 12.5,
+      "sha256": "47322382e249e301141566de37145350c2b4f53afd83a86b5f18febc4bf7befc",
+      "bytes": 32838
+    },
+    {
+      "file": "cell_027.npz",
+      "cell": 27,
+      "rows": 1403,
+      "center_ra_deg": 52.5,
+      "center_dec_deg": -75,
+      "cap_radius_deg": 12.5,
+      "sha256": "a69b59ae6868a9de6a3a8a4486f6d9bda36ce0c8c48b85567566b6eda2f33393",
+      "bytes": 31103
+    },
+    {
+      "file": "cell_028.npz",
+      "cell": 28,
+      "rows": 1492,
+      "center_ra_deg": 67.5,
+      "center_dec_deg": -75,
+      "cap_radius_deg": 12.5,
+      "sha256": "0b0bade37e6bee3e4a8fbf0ee63cc1ad5cf981b3751f937ce977257b1549d427",
+      "bytes": 33702
+    },
+    {
+      "file": "cell_029.npz",
+      "cell": 29,
+      "rows": 1760,
+      "center_ra_deg": 82.5,
+      "center_dec_deg": -75,
+      "cap_radius_deg": 12.5,
+      "sha256": "33696d6b4a9ace42f3e17046634523693097bd3db177c94c82a402126c898918",
+      "bytes": 40260
+    },
+    {
+      "file": "cell_030.npz",
+      "cell": 30,
+      "rows": 1752,
+      "center_ra_deg": 97.5,
+      "center_dec_deg": -75,
+      "cap_radius_deg": 12.5,
+      "sha256": "cc3e948cceacde483ce0b7117f587ef63a62fc8445bbb99cecedd6908f23c3fe",
+      "bytes": 39267
+    },
+    {
+      "file": "cell_031.npz",
+      "cell": 31,
+      "rows": 1785,
+      "center_ra_deg": 112.5,
+      "center_dec_deg": -75,
+      "cap_radius_deg": 12.5,
+      "sha256": "8a1731bfddb47430936f52bb0475ae6412e0cdfa57e381404ff05636635bb0a5",
+      "bytes": 39523
+    },
+    {
+      "file": "cell_032.npz",
+      "cell": 32,
+      "rows": 2589,
+      "center_ra_deg": 127.5,
+      "center_dec_deg": -75,
+      "cap_radius_deg": 12.5,
+      "sha256": "930d2577de11423b87bf6539bdb3664ea0fd3cf43d43fca30b66e8b8c5fb3559",
+      "bytes": 55519
+    },
+    {
+      "file": "cell_033.npz",
+      "cell": 33,
+      "rows": 2748,
+      "center_ra_deg": 142.5,
+      "center_dec_deg": -75,
+      "cap_radius_deg": 12.5,
+      "sha256": "57c0a77498dde7da817e2b7c6ed4ca1698b176cfa0852ad636eddd477899ace9",
+      "bytes": 58337
+    },
+    {
+      "file": "cell_034.npz",
+      "cell": 34,
+      "rows": 3025,
+      "center_ra_deg": 157.5,
+      "center_dec_deg": -75,
+      "cap_radius_deg": 12.5,
+      "sha256": "dee36a93b56491f85e855f07c6020c79e07afcca2a4ca87bf4dccc3ac84f21a8",
+      "bytes": 63692
+    },
+    {
+      "file": "cell_035.npz",
+      "cell": 35,
+      "rows": 2637,
+      "center_ra_deg": 172.5,
+      "center_dec_deg": -75,
+      "cap_radius_deg": 12.5,
+      "sha256": "065483bd222e11a97e7363a95ee1cf332c176d5c18e6187c6bb45853d64baa05",
+      "bytes": 55878
+    },
+    {
+      "file": "cell_036.npz",
+      "cell": 36,
+      "rows": 3119,
+      "center_ra_deg": 187.5,
+      "center_dec_deg": -75,
+      "cap_radius_deg": 12.5,
+      "sha256": "d2667886cf55f32e01ed7d4d4e47c9af0694d848df848cc7c4f88ddfa3bb0d95",
+      "bytes": 65357
+    },
+    {
+      "file": "cell_037.npz",
+      "cell": 37,
+      "rows": 3937,
+      "center_ra_deg": 202.5,
+      "center_dec_deg": -75,
+      "cap_radius_deg": 12.5,
+      "sha256": "f4efe767c6b6962745a0fe4f8c344e2dfd60c21d37788b2b11a7767f1b65f90f",
+      "bytes": 81622
+    },
+    {
+      "file": "cell_038.npz",
+      "cell": 38,
+      "rows": 4300,
+      "center_ra_deg": 217.5,
+      "center_dec_deg": -75,
+      "cap_radius_deg": 12.5,
+      "sha256": "18bb909527ff04ffa1c70fd27e2d71aae87ea92026761cb88d89ea38bc7a16f4",
+      "bytes": 88760
+    },
+    {
+      "file": "cell_039.npz",
+      "cell": 39,
+      "rows": 4456,
+      "center_ra_deg": 232.5,
+      "center_dec_deg": -75,
+      "cap_radius_deg": 12.5,
+      "sha256": "fe3f0faba949ddd1aef25ff0035ce08b9336b381738a7422215bd7a59e350513",
+      "bytes": 92438
+    },
+    {
+      "file": "cell_040.npz",
+      "cell": 40,
+      "rows": 3818,
+      "center_ra_deg": 247.5,
+      "center_dec_deg": -75,
+      "cap_radius_deg": 12.5,
+      "sha256": "58125b6b31247311c5c3d922617ec72486169fd38ddd8cf96e27bb5031a9cbf7",
+      "bytes": 79563
+    },
+    {
+      "file": "cell_041.npz",
+      "cell": 41,
+      "rows": 2992,
+      "center_ra_deg": 262.5,
+      "center_dec_deg": -75,
+      "cap_radius_deg": 12.5,
+      "sha256": "3b288ef464d8ec6deb8385fdaab27fe8fc1ff50eeb7646241bcdc3c4444f73c7",
+      "bytes": 63544
+    },
+    {
+      "file": "cell_042.npz",
+      "cell": 42,
+      "rows": 2369,
+      "center_ra_deg": 277.5,
+      "center_dec_deg": -75,
+      "cap_radius_deg": 12.5,
+      "sha256": "38d0fcd4fe06488231975ed0f4a6b0cd6969fab6d3389f0bfda3ecf3e385ee10",
+      "bytes": 51293
+    },
+    {
+      "file": "cell_043.npz",
+      "cell": 43,
+      "rows": 2186,
+      "center_ra_deg": 292.5,
+      "center_dec_deg": -75,
+      "cap_radius_deg": 12.5,
+      "sha256": "4882ab32990fbc7ef663f6745e71a2f63af7dbffab55824b6672fc659a6ab869",
+      "bytes": 47668
+    },
+    {
+      "file": "cell_044.npz",
+      "cell": 44,
+      "rows": 1895,
+      "center_ra_deg": 307.5,
+      "center_dec_deg": -75,
+      "cap_radius_deg": 12.5,
+      "sha256": "e77e17c2c19310c96a3db9f7832f8743e6d57685bf21b4511fc9e2becb5eac84",
+      "bytes": 41921
+    },
+    {
+      "file": "cell_045.npz",
+      "cell": 45,
+      "rows": 1605,
+      "center_ra_deg": 322.5,
+      "center_dec_deg": -75,
+      "cap_radius_deg": 12.5,
+      "sha256": "879f8ba597a0a38b845fb0f682b5692ee702d53327ba5433fe7783aaf7bb2ab1",
+      "bytes": 35800
+    },
+    {
+      "file": "cell_046.npz",
+      "cell": 46,
+      "rows": 1420,
+      "center_ra_deg": 337.5,
+      "center_dec_deg": -75,
+      "cap_radius_deg": 12.5,
+      "sha256": "3caa2d9bd1a3d7f7dc791d1de696fdd746ae14dedac94e86b9487522b4e596fa",
+      "bytes": 32030
+    },
+    {
+      "file": "cell_047.npz",
+      "cell": 47,
+      "rows": 1505,
+      "center_ra_deg": 352.5,
+      "center_dec_deg": -75,
+      "cap_radius_deg": 12.5,
+      "sha256": "c3ddd4a458825f578f1a86859a9ef964f881f0347c69c09de310e57e38d96f60",
+      "bytes": 33737
+    },
+    {
+      "file": "cell_048.npz",
+      "cell": 48,
+      "rows": 1898,
+      "center_ra_deg": 7.5,
+      "center_dec_deg": -65,
+      "cap_radius_deg": 12.5,
+      "sha256": "af4c3fb7dec14a5be32bf89fb950cfe86b2e4f39803642def372cdc410737367",
+      "bytes": 41072
+    },
+    {
+      "file": "cell_049.npz",
+      "cell": 49,
+      "rows": 1883,
+      "center_ra_deg": 22.5,
+      "center_dec_deg": -65,
+      "cap_radius_deg": 12.5,
+      "sha256": "0f447d306004d3ad8fbd4f3a4c91fd56acf610f1885972bd8bf3a46243af25e9",
+      "bytes": 40739
+    },
+    {
+      "file": "cell_050.npz",
+      "cell": 50,
+      "rows": 1835,
+      "center_ra_deg": 37.5,
+      "center_dec_deg": -65,
+      "cap_radius_deg": 12.5,
+      "sha256": "4d5f18612c9b276dc26b8190a12c5bf0a4566ac287163358e5526d6bef91dd7b",
+      "bytes": 39698
+    },
+    {
+      "file": "cell_051.npz",
+      "cell": 51,
+      "rows": 1978,
+      "center_ra_deg": 52.5,
+      "center_dec_deg": -65,
+      "cap_radius_deg": 12.5,
+      "sha256": "0f218a3a394df95c4ccc93f8944ff4f493fcc16536f1d0b68bf13824837eccb5",
+      "bytes": 42524
+    },
+    {
+      "file": "cell_052.npz",
+      "cell": 52,
+      "rows": 2435,
+      "center_ra_deg": 67.5,
+      "center_dec_deg": -65,
+      "cap_radius_deg": 12.5,
+      "sha256": "9b80827b886f1d29337ae25e55b9988e8126fb3e0beda62a8f867dd292191de8",
+      "bytes": 52583
+    },
+    {
+      "file": "cell_053.npz",
+      "cell": 53,
+      "rows": 3377,
+      "center_ra_deg": 82.5,
+      "center_dec_deg": -65,
+      "cap_radius_deg": 12.5,
+      "sha256": "d2b208d2a1d37da26ef1383a4644a533e41899dcfe40f30ff6e49f3916b61e96",
+      "bytes": 72421
+    },
+    {
+      "file": "cell_054.npz",
+      "cell": 54,
+      "rows": 3780,
+      "center_ra_deg": 97.5,
+      "center_dec_deg": -65,
+      "cap_radius_deg": 12.5,
+      "sha256": "824381753b67e48051b12a661d60e4a8ee2e1c55aa8cd0ef1951e77960736fc7",
+      "bytes": 79602
+    },
+    {
+      "file": "cell_055.npz",
+      "cell": 55,
+      "rows": 4348,
+      "center_ra_deg": 112.5,
+      "center_dec_deg": -65,
+      "cap_radius_deg": 12.5,
+      "sha256": "588ffea6e4bfbd72d93bb19c9abd02789d106144a1865483944e87f97e203b39",
+      "bytes": 90070
+    },
+    {
+      "file": "cell_056.npz",
+      "cell": 56,
+      "rows": 5802,
+      "center_ra_deg": 127.5,
+      "center_dec_deg": -65,
+      "cap_radius_deg": 12.5,
+      "sha256": "bb565fb4352b4519561d732a8fab08d656168ed85708ee56d34bf5457a63c246",
+      "bytes": 118268
+    },
+    {
+      "file": "cell_057.npz",
+      "cell": 57,
+      "rows": 8682,
+      "center_ra_deg": 142.5,
+      "center_dec_deg": -65,
+      "cap_radius_deg": 12.5,
+      "sha256": "da2f64fbb2b58381d6c7882f0ce4aa5eea53ef599712844081546041b5081db8",
+      "bytes": 174907
+    },
+    {
+      "file": "cell_058.npz",
+      "cell": 58,
+      "rows": 12276,
+      "center_ra_deg": 157.5,
+      "center_dec_deg": -65,
+      "cap_radius_deg": 12.5,
+      "sha256": "9788d27d556c2f65a1299eccb22d696719fe0832741cf4c20f3d492d9f35476e",
+      "bytes": 244562
+    },
+    {
+      "file": "cell_059.npz",
+      "cell": 59,
+      "rows": 13146,
+      "center_ra_deg": 172.5,
+      "center_dec_deg": -65,
+      "cap_radius_deg": 12.5,
+      "sha256": "a0a1869f03bd49dbab1360294035860bcce7eab6984587a30cbc469802a6e063",
+      "bytes": 263188
+    },
+    {
+      "file": "cell_060.npz",
+      "cell": 60,
+      "rows": 12643,
+      "center_ra_deg": 187.5,
+      "center_dec_deg": -65,
+      "cap_radius_deg": 12.5,
+      "sha256": "098e79b4fcac379e59325b01ba3bafdd8d84174921af006c7cf4e338fac60a52",
+      "bytes": 249415
+    },
+    {
+      "file": "cell_061.npz",
+      "cell": 61,
+      "rows": 14077,
+      "center_ra_deg": 202.5,
+      "center_dec_deg": -65,
+      "cap_radius_deg": 12.5,
+      "sha256": "7ff5e0d1eb51663df7712b3c9a06302897382ac3b90ca6028a49fd53e8f2459b",
+      "bytes": 275826
+    },
+    {
+      "file": "cell_062.npz",
+      "cell": 62,
+      "rows": 11657,
+      "center_ra_deg": 217.5,
+      "center_dec_deg": -65,
+      "cap_radius_deg": 12.5,
+      "sha256": "dd12edcdc3f5657b2355f42e89d92b6247ce816e05fd6d78561d3d6984d39a38",
+      "bytes": 231248
+    },
+    {
+      "file": "cell_063.npz",
+      "cell": 63,
+      "rows": 10271,
+      "center_ra_deg": 232.5,
+      "center_dec_deg": -65,
+      "cap_radius_deg": 12.5,
+      "sha256": "66a2fe9ae83d6e982f0411a43774e4436a1a14abedf2c0df60677dc530ac5f85",
+      "bytes": 206499
+    },
+    {
+      "file": "cell_064.npz",
+      "cell": 64,
+      "rows": 10172,
+      "center_ra_deg": 247.5,
+      "center_dec_deg": -65,
+      "cap_radius_deg": 12.5,
+      "sha256": "066d8997cdbfbb2f1485d1c5f9cd227d6cee729bc87c14fb149ac7c0b9cd1b59",
+      "bytes": 204095
+    },
+    {
+      "file": "cell_065.npz",
+      "cell": 65,
+      "rows": 6328,
+      "center_ra_deg": 262.5,
+      "center_dec_deg": -65,
+      "cap_radius_deg": 12.5,
+      "sha256": "3ef2365b7078e40db7cb88f6c68410e8c081032769858f2a0fc1fdad4ff34b09",
+      "bytes": 129553
+    },
+    {
+      "file": "cell_066.npz",
+      "cell": 66,
+      "rows": 4550,
+      "center_ra_deg": 277.5,
+      "center_dec_deg": -65,
+      "cap_radius_deg": 12.5,
+      "sha256": "8deeb5a9fc9b66612fbb020a1b3ec8a667ecfd8d48a5848eb60210319ed60d9a",
+      "bytes": 94570
+    },
+    {
+      "file": "cell_067.npz",
+      "cell": 67,
+      "rows": 3501,
+      "center_ra_deg": 292.5,
+      "center_dec_deg": -65,
+      "cap_radius_deg": 12.5,
+      "sha256": "ca1094c53ef801716cc4e8b1eefdcc282fe39b78cfa712725db91b57a2ba1584",
+      "bytes": 74576
+    },
+    {
+      "file": "cell_068.npz",
+      "cell": 68,
+      "rows": 3016,
+      "center_ra_deg": 307.5,
+      "center_dec_deg": -65,
+      "cap_radius_deg": 12.5,
+      "sha256": "29bedde42451c482da4f695e481f30c7cde5da7a1442f6bdbcc7f1c78561e7e9",
+      "bytes": 64785
+    },
+    {
+      "file": "cell_069.npz",
+      "cell": 69,
+      "rows": 2721,
+      "center_ra_deg": 322.5,
+      "center_dec_deg": -65,
+      "cap_radius_deg": 12.5,
+      "sha256": "559e1772ab1efc2402a2bfe33b109d64ae05032e41204a409ebb25432ee0178a",
+      "bytes": 58360
+    },
+    {
+      "file": "cell_070.npz",
+      "cell": 70,
+      "rows": 2415,
+      "center_ra_deg": 337.5,
+      "center_dec_deg": -65,
+      "cap_radius_deg": 12.5,
+      "sha256": "9d06aea62245ad645922f8cdb1d48ca11f43b845aded13aa7e887495e7bb84b7",
+      "bytes": 51792
+    },
+    {
+      "file": "cell_071.npz",
+      "cell": 71,
+      "rows": 2070,
+      "center_ra_deg": 352.5,
+      "center_dec_deg": -65,
+      "cap_radius_deg": 12.5,
+      "sha256": "9deeece5826937f25c2fe06a30b324fceb35afdf2c0afbf687e2eab612ca8fd3",
+      "bytes": 45007
+    },
+    {
+      "file": "cell_072.npz",
+      "cell": 72,
+      "rows": 2512,
+      "center_ra_deg": 7.5,
+      "center_dec_deg": -55,
+      "cap_radius_deg": 12.5,
+      "sha256": "43df81024107c89b9f54ddbcae6d019b2c94bca873e315694840cbf179a7b1e3",
+      "bytes": 53237
+    },
+    {
+      "file": "cell_073.npz",
+      "cell": 73,
+      "rows": 2269,
+      "center_ra_deg": 22.5,
+      "center_dec_deg": -55,
+      "cap_radius_deg": 12.5,
+      "sha256": "df525c774938aa4a3494756187aa7be4a6bd0085f992bd33edc738746712ef1c",
+      "bytes": 48364
+    },
+    {
+      "file": "cell_074.npz",
+      "cell": 74,
+      "rows": 2268,
+      "center_ra_deg": 37.5,
+      "center_dec_deg": -55,
+      "cap_radius_deg": 12.5,
+      "sha256": "a0f2b255d89edd54c8f4fdae53832eb041d00eae8086cff1a8616afb94ffe7f1",
+      "bytes": 48347
+    },
+    {
+      "file": "cell_075.npz",
+      "cell": 75,
+      "rows": 2609,
+      "center_ra_deg": 52.5,
+      "center_dec_deg": -55,
+      "cap_radius_deg": 12.5,
+      "sha256": "70d3b0a4e8192da01e145be1d823706f979e7bc710eeb934aa087175d7080101",
+      "bytes": 55024
+    },
+    {
+      "file": "cell_076.npz",
+      "cell": 76,
+      "rows": 3178,
+      "center_ra_deg": 67.5,
+      "center_dec_deg": -55,
+      "cap_radius_deg": 12.5,
+      "sha256": "80008ff2537f3cd1407dc4eef3047eeebce35f67089aaed2606db54bee1c8393",
+      "bytes": 66558
+    },
+    {
+      "file": "cell_077.npz",
+      "cell": 77,
+      "rows": 3965,
+      "center_ra_deg": 82.5,
+      "center_dec_deg": -55,
+      "cap_radius_deg": 12.5,
+      "sha256": "b4e63dab56486d6493b367f30e1e10570945260f6e73005c8c38638ef3d345a4",
+      "bytes": 82363
+    },
+    {
+      "file": "cell_078.npz",
+      "cell": 78,
+      "rows": 5319,
+      "center_ra_deg": 97.5,
+      "center_dec_deg": -55,
+      "cap_radius_deg": 12.5,
+      "sha256": "27e1fd296c7680b25b5da8e4762f8c2dce9c658da7345deabdc395408567340f",
+      "bytes": 109024
+    },
+    {
+      "file": "cell_079.npz",
+      "cell": 79,
+      "rows": 6712,
+      "center_ra_deg": 112.5,
+      "center_dec_deg": -55,
+      "cap_radius_deg": 12.5,
+      "sha256": "ad11e2e26964d5baf5fda07e10502afe743df2896cb16ca87d8ca4464ad7aafe",
+      "bytes": 136444
+    },
+    {
+      "file": "cell_080.npz",
+      "cell": 80,
+      "rows": 8876,
+      "center_ra_deg": 127.5,
+      "center_dec_deg": -55,
+      "cap_radius_deg": 12.5,
+      "sha256": "e0179306fe4343aaa08939374a007e192d0c5b7fe9e1aa98bd77c7c33ec70e29",
+      "bytes": 177615
+    },
+    {
+      "file": "cell_081.npz",
+      "cell": 81,
+      "rows": 16217,
+      "center_ra_deg": 142.5,
+      "center_dec_deg": -55,
+      "cap_radius_deg": 12.5,
+      "sha256": "82f00bb3b1d9163b7dd936327afb1b24a4fc86d8f610908366401b9bdb0111b7",
+      "bytes": 320904
+    },
+    {
+      "file": "cell_082.npz",
+      "cell": 82,
+      "rows": 20114,
+      "center_ra_deg": 157.5,
+      "center_dec_deg": -55,
+      "cap_radius_deg": 12.5,
+      "sha256": "546ba7c2cde09e47f3085780b5b1f7c0745656fd23ac14ca26e47ac7c81a2f42",
+      "bytes": 396712
+    },
+    {
+      "file": "cell_083.npz",
+      "cell": 83,
+      "rows": 17151,
+      "center_ra_deg": 172.5,
+      "center_dec_deg": -55,
+      "cap_radius_deg": 12.5,
+      "sha256": "ba60ab6ba1d379923ba0480d36118d020bea51a7d4e8d70274d05c646d0d38aa",
+      "bytes": 340970
+    },
+    {
+      "file": "cell_084.npz",
+      "cell": 84,
+      "rows": 12769,
+      "center_ra_deg": 187.5,
+      "center_dec_deg": -55,
+      "cap_radius_deg": 12.5,
+      "sha256": "d65945de63b0d8bdb03fff93d8b49a22aa363ef28eb6cee11b5fd7f180dc0891",
+      "bytes": 253806
+    },
+    {
+      "file": "cell_085.npz",
+      "cell": 85,
+      "rows": 11786,
+      "center_ra_deg": 202.5,
+      "center_dec_deg": -55,
+      "cap_radius_deg": 12.5,
+      "sha256": "4c9e672a7898307872fb0aee774760c012c87324340076948860efcc9bcbeab6",
+      "bytes": 235169
+    },
+    {
+      "file": "cell_086.npz",
+      "cell": 86,
+      "rows": 10631,
+      "center_ra_deg": 217.5,
+      "center_dec_deg": -55,
+      "cap_radius_deg": 12.5,
+      "sha256": "3a4c55b99c2f9cebdfc2bf551659c1eab20a3687f3c9cad9258670a69a30d21d",
+      "bytes": 212987
+    },
+    {
+      "file": "cell_087.npz",
+      "cell": 87,
+      "rows": 13072,
+      "center_ra_deg": 232.5,
+      "center_dec_deg": -55,
+      "cap_radius_deg": 12.5,
+      "sha256": "14dbb9a39073b4d936d814b96f2a8e4a77898c009c7537d61f4322893bf61c4d",
+      "bytes": 259620
+    },
+    {
+      "file": "cell_088.npz",
+      "cell": 88,
+      "rows": 16409,
+      "center_ra_deg": 247.5,
+      "center_dec_deg": -55,
+      "cap_radius_deg": 12.5,
+      "sha256": "b13f6b3d09368a38d644fe282dadc41b78e5287e6fcfac8b0160aac3d1bcbbaa",
+      "bytes": 322655
+    },
+    {
+      "file": "cell_089.npz",
+      "cell": 89,
+      "rows": 10172,
+      "center_ra_deg": 262.5,
+      "center_dec_deg": -55,
+      "cap_radius_deg": 12.5,
+      "sha256": "73dbe6b64699b5b25451a1caa7f62a3b8f0383134122bc69b36fd1ae74c96269",
+      "bytes": 204069
+    },
+    {
+      "file": "cell_090.npz",
+      "cell": 90,
+      "rows": 7290,
+      "center_ra_deg": 277.5,
+      "center_dec_deg": -55,
+      "cap_radius_deg": 12.5,
+      "sha256": "22adf4d752a87694f7094b3ce0b274ded1fe4f95ee1eff583f61004ea2567a18",
+      "bytes": 149891
+    },
+    {
+      "file": "cell_091.npz",
+      "cell": 91,
+      "rows": 5674,
+      "center_ra_deg": 292.5,
+      "center_dec_deg": -55,
+      "cap_radius_deg": 12.5,
+      "sha256": "ef6b93fb3ef981e81e9b1428462fd0139a823bd5b765a450ecea0e75c8758041",
+      "bytes": 117848
+    },
+    {
+      "file": "cell_092.npz",
+      "cell": 92,
+      "rows": 4180,
+      "center_ra_deg": 307.5,
+      "center_dec_deg": -55,
+      "cap_radius_deg": 12.5,
+      "sha256": "0c4d4d1450cef174f8fae0bcc891a3d6f90498c48c133c3831d3446c26382ccf",
+      "bytes": 88209
+    },
+    {
+      "file": "cell_093.npz",
+      "cell": 93,
+      "rows": 3491,
+      "center_ra_deg": 322.5,
+      "center_dec_deg": -55,
+      "cap_radius_deg": 12.5,
+      "sha256": "1a6c873fc37439c4d20b4825d6dcaec5f15259de249f0d8c12971b226468170a",
+      "bytes": 74132
+    },
+    {
+      "file": "cell_094.npz",
+      "cell": 94,
+      "rows": 2882,
+      "center_ra_deg": 337.5,
+      "center_dec_deg": -55,
+      "cap_radius_deg": 12.5,
+      "sha256": "d998943fbf1481416ad9fd8fe21f6f4b1eacf84a9c6fc9e1c2f673af221f6387",
+      "bytes": 61078
+    },
+    {
+      "file": "cell_095.npz",
+      "cell": 95,
+      "rows": 2568,
+      "center_ra_deg": 352.5,
+      "center_dec_deg": -55,
+      "cap_radius_deg": 12.5,
+      "sha256": "3afb4b016719543d893fa3e606636dce6cd6dc3f43b493e3fe9eddb069f93c1d",
+      "bytes": 55248
+    },
+    {
+      "file": "cell_096.npz",
+      "cell": 96,
+      "rows": 2720,
+      "center_ra_deg": 7.5,
+      "center_dec_deg": -45,
+      "cap_radius_deg": 12.5,
+      "sha256": "232176ce385114a3c0294c978c2e4580cae8e180c7feb95e53624ecf3ce19691",
+      "bytes": 57204
+    },
+    {
+      "file": "cell_097.npz",
+      "cell": 97,
+      "rows": 2660,
+      "center_ra_deg": 22.5,
+      "center_dec_deg": -45,
+      "cap_radius_deg": 12.5,
+      "sha256": "0adf169fae6be5d75d83d2c42f66d727ff49215972505f5805bc72b80123f169",
+      "bytes": 55969
+    },
+    {
+      "file": "cell_098.npz",
+      "cell": 98,
+      "rows": 2618,
+      "center_ra_deg": 37.5,
+      "center_dec_deg": -45,
+      "cap_radius_deg": 12.5,
+      "sha256": "0b238f00745e7c7231e25eb1f5613b2337e21b34faceb15884a3a2f8f796d569",
+      "bytes": 55191
+    },
+    {
+      "file": "cell_099.npz",
+      "cell": 99,
+      "rows": 2856,
+      "center_ra_deg": 52.5,
+      "center_dec_deg": -45,
+      "cap_radius_deg": 12.5,
+      "sha256": "65900181fdbcf8b116d6d0e65224205f2283e1df1f5582bf5e17fe50bc669218",
+      "bytes": 59806
+    },
+    {
+      "file": "cell_100.npz",
+      "cell": 100,
+      "rows": 3956,
+      "center_ra_deg": 67.5,
+      "center_dec_deg": -45,
+      "cap_radius_deg": 12.5,
+      "sha256": "c2f5d9dc6b5c20f9be8079815d3db446df59fc872edafa7c4de298ccc4263458",
+      "bytes": 83292
+    },
+    {
+      "file": "cell_101.npz",
+      "cell": 101,
+      "rows": 5247,
+      "center_ra_deg": 82.5,
+      "center_dec_deg": -45,
+      "cap_radius_deg": 12.5,
+      "sha256": "e1225a4528ade7c4ecceabd8187fcf735044e5016a7f04a9d3a31ba929954f7b",
+      "bytes": 112051
+    },
+    {
+      "file": "cell_102.npz",
+      "cell": 102,
+      "rows": 7506,
+      "center_ra_deg": 97.5,
+      "center_dec_deg": -45,
+      "cap_radius_deg": 12.5,
+      "sha256": "6884f9de211bc2bd60327b4fb0ea5bf6bddb7c9332ff212a32839dd560ea2cfb",
+      "bytes": 152134
+    },
+    {
+      "file": "cell_103.npz",
+      "cell": 103,
+      "rows": 10785,
+      "center_ra_deg": 112.5,
+      "center_dec_deg": -45,
+      "cap_radius_deg": 12.5,
+      "sha256": "9d71a93cb8e2d5a73192d70201a5ee211577f496f869cbeb33c3b42419c91f6f",
+      "bytes": 215287
+    },
+    {
+      "file": "cell_104.npz",
+      "cell": 104,
+      "rows": 15227,
+      "center_ra_deg": 127.5,
+      "center_dec_deg": -45,
+      "cap_radius_deg": 12.5,
+      "sha256": "01e2bc06e1b18319c5024ea10c58b5bb3ec4e89f25ee526ee88cacb2cf138dbf",
+      "bytes": 299049
+    },
+    {
+      "file": "cell_105.npz",
+      "cell": 105,
+      "rows": 12143,
+      "center_ra_deg": 142.5,
+      "center_dec_deg": -45,
+      "cap_radius_deg": 12.5,
+      "sha256": "23f38af43f07b2678d02049eee80fae124963f1fc218eabd93b97166131676d3",
+      "bytes": 242283
+    },
+    {
+      "file": "cell_106.npz",
+      "cell": 106,
+      "rows": 12137,
+      "center_ra_deg": 157.5,
+      "center_dec_deg": -45,
+      "cap_radius_deg": 12.5,
+      "sha256": "d1f1661ba1a0ea314d1a36d8fba4b7eaffb1493826d948c0af54791df760971e",
+      "bytes": 243125
+    },
+    {
+      "file": "cell_107.npz",
+      "cell": 107,
+      "rows": 9167,
+      "center_ra_deg": 172.5,
+      "center_dec_deg": -45,
+      "cap_radius_deg": 12.5,
+      "sha256": "f1de0c0aa4c9c6fcc9fe18b5ee55db74ed43ecfe2e54b8f209068dc2d5370326",
+      "bytes": 184216
+    },
+    {
+      "file": "cell_108.npz",
+      "cell": 108,
+      "rows": 7984,
+      "center_ra_deg": 187.5,
+      "center_dec_deg": -45,
+      "cap_radius_deg": 12.5,
+      "sha256": "8a74c63a2a524db40467883830ae90f32fe8d8c5300eb639dfa8eadc9a6479d6",
+      "bytes": 163101
+    },
+    {
+      "file": "cell_109.npz",
+      "cell": 109,
+      "rows": 8821,
+      "center_ra_deg": 202.5,
+      "center_dec_deg": -45,
+      "cap_radius_deg": 12.5,
+      "sha256": "dc69ad7f0070dd283d63cdf72efc3ff844caa7da9315f26e885ba7f7009109bf",
+      "bytes": 179935
+    },
+    {
+      "file": "cell_110.npz",
+      "cell": 110,
+      "rows": 10324,
+      "center_ra_deg": 217.5,
+      "center_dec_deg": -45,
+      "cap_radius_deg": 12.5,
+      "sha256": "4464e98980d951faa3e142795fd328ba6180e81a5ee64cae3f642620e1e14278",
+      "bytes": 209096
+    },
+    {
+      "file": "cell_111.npz",
+      "cell": 111,
+      "rows": 12387,
+      "center_ra_deg": 232.5,
+      "center_dec_deg": -45,
+      "cap_radius_deg": 12.5,
+      "sha256": "fc1786d48e6292bfc7641f5a7fb52bc326a87bc22e133ab3d4c441b3d6e70d37",
+      "bytes": 250140
+    },
+    {
+      "file": "cell_112.npz",
+      "cell": 112,
+      "rows": 10663,
+      "center_ra_deg": 247.5,
+      "center_dec_deg": -45,
+      "cap_radius_deg": 12.5,
+      "sha256": "d6191b8f119484c1ba04cbab8e2b180e79e530bfdbe1c89106a22ff36a310d23",
+      "bytes": 222422
+    },
+    {
+      "file": "cell_113.npz",
+      "cell": 113,
+      "rows": 14120,
+      "center_ra_deg": 262.5,
+      "center_dec_deg": -45,
+      "cap_radius_deg": 12.5,
+      "sha256": "5f88540f85ac69806ba574effae17f99cf4df1272ae622cb37d83a81427f8efd",
+      "bytes": 285783
+    },
+    {
+      "file": "cell_114.npz",
+      "cell": 114,
+      "rows": 13796,
+      "center_ra_deg": 277.5,
+      "center_dec_deg": -45,
+      "cap_radius_deg": 12.5,
+      "sha256": "d72207453175afca6c90fbe96654310d6aacacc816522c9b5862cdc70992d9fc",
+      "bytes": 276781
+    },
+    {
+      "file": "cell_115.npz",
+      "cell": 115,
+      "rows": 6891,
+      "center_ra_deg": 292.5,
+      "center_dec_deg": -45,
+      "cap_radius_deg": 12.5,
+      "sha256": "1560a1fb77b8d9e3e4836928062cb2ad4a684be0b0dc23b6774afc1f59b8a648",
+      "bytes": 142935
+    },
+    {
+      "file": "cell_116.npz",
+      "cell": 116,
+      "rows": 5445,
+      "center_ra_deg": 307.5,
+      "center_dec_deg": -45,
+      "cap_radius_deg": 12.5,
+      "sha256": "efa9df219ac28e03262058e0828d117abff4d27eb2a184cb3d007009e25a5d76",
+      "bytes": 113889
+    },
+    {
+      "file": "cell_117.npz",
+      "cell": 117,
+      "rows": 4191,
+      "center_ra_deg": 322.5,
+      "center_dec_deg": -45,
+      "cap_radius_deg": 12.5,
+      "sha256": "c6857070b2d607c4e3603d9a7158d1d1c9a2be34bf5585cabd2bf3bceca19758",
+      "bytes": 88405
+    },
+    {
+      "file": "cell_118.npz",
+      "cell": 118,
+      "rows": 3430,
+      "center_ra_deg": 337.5,
+      "center_dec_deg": -45,
+      "cap_radius_deg": 12.5,
+      "sha256": "acbd4387864e031a9cf5412bb41821913e18c07ee1e41653bce3a3b940bddb5c",
+      "bytes": 72292
+    },
+    {
+      "file": "cell_119.npz",
+      "cell": 119,
+      "rows": 2756,
+      "center_ra_deg": 352.5,
+      "center_dec_deg": -45,
+      "cap_radius_deg": 12.5,
+      "sha256": "1618018cd7a30ce8ab30918462df807e7e693a7197953fecdbd9828fb03c1b91",
+      "bytes": 59061
+    },
+    {
+      "file": "cell_120.npz",
+      "cell": 120,
+      "rows": 2713,
+      "center_ra_deg": 7.5,
+      "center_dec_deg": -35,
+      "cap_radius_deg": 12.5,
+      "sha256": "21d409e9768f9d434aebd11874c1731bf1cd505d94f4758ac2e6e2e07ea8bb73",
+      "bytes": 57117
+    },
+    {
+      "file": "cell_121.npz",
+      "cell": 121,
+      "rows": 2848,
+      "center_ra_deg": 22.5,
+      "center_dec_deg": -35,
+      "cap_radius_deg": 12.5,
+      "sha256": "6c995279da3d6e570490b39d2744c469e4f6b09b7525db4914f93bfbb3fb510d",
+      "bytes": 59784
+    },
+    {
+      "file": "cell_122.npz",
+      "cell": 122,
+      "rows": 2980,
+      "center_ra_deg": 37.5,
+      "center_dec_deg": -35,
+      "cap_radius_deg": 12.5,
+      "sha256": "c4c990941f6ef39b7d5ee02d915f7f39dfab6b22c7d02ebdfaecf7a666873989",
+      "bytes": 62239
+    },
+    {
+      "file": "cell_123.npz",
+      "cell": 123,
+      "rows": 3290,
+      "center_ra_deg": 52.5,
+      "center_dec_deg": -35,
+      "cap_radius_deg": 12.5,
+      "sha256": "87740f03cdb6870adb6900f1e112b782a09eb9cba298544646c212e1259bfbcb",
+      "bytes": 68479
+    },
+    {
+      "file": "cell_124.npz",
+      "cell": 124,
+      "rows": 4393,
+      "center_ra_deg": 67.5,
+      "center_dec_deg": -35,
+      "cap_radius_deg": 12.5,
+      "sha256": "d225b317eb6040880a224b8a8818985974324d54f6d4fd85a26175a843bc85ef",
+      "bytes": 90263
+    },
+    {
+      "file": "cell_125.npz",
+      "cell": 125,
+      "rows": 6228,
+      "center_ra_deg": 82.5,
+      "center_dec_deg": -35,
+      "cap_radius_deg": 12.5,
+      "sha256": "a365aba077ecba1de78adb82069acce37a4b8cb590794c101ca4a699b4b80422",
+      "bytes": 126611
+    },
+    {
+      "file": "cell_126.npz",
+      "cell": 126,
+      "rows": 9078,
+      "center_ra_deg": 97.5,
+      "center_dec_deg": -35,
+      "cap_radius_deg": 12.5,
+      "sha256": "fdab2dfd01a49ded810c2ee954aff4251eceef5673428bd190e2319fc27fe85c",
+      "bytes": 182877
+    },
+    {
+      "file": "cell_127.npz",
+      "cell": 127,
+      "rows": 14557,
+      "center_ra_deg": 112.5,
+      "center_dec_deg": -35,
+      "cap_radius_deg": 12.5,
+      "sha256": "0727c0e551e218d4f7dc43c80e42c6cd702d9a09488b94d856cca8c6443dc01a",
+      "bytes": 287024
+    },
+    {
+      "file": "cell_128.npz",
+      "cell": 128,
+      "rows": 19469,
+      "center_ra_deg": 127.5,
+      "center_dec_deg": -35,
+      "cap_radius_deg": 12.5,
+      "sha256": "f33279ac68fa491d8bb8cd3677f99e637a873f00f417482bfa4ba3b858c32dbd",
+      "bytes": 379202
+    },
+    {
+      "file": "cell_129.npz",
+      "cell": 129,
+      "rows": 12081,
+      "center_ra_deg": 142.5,
+      "center_dec_deg": -35,
+      "cap_radius_deg": 12.5,
+      "sha256": "39ca2f576cd43b281855a5015a6237c63b27672f977ee90b19baa76c8a11c036",
+      "bytes": 240201
+    },
+    {
+      "file": "cell_130.npz",
+      "cell": 130,
+      "rows": 9114,
+      "center_ra_deg": 157.5,
+      "center_dec_deg": -35,
+      "cap_radius_deg": 12.5,
+      "sha256": "2455c5a1df930bf560e5e65f976d261d4aa636c0a8496b9e56c2b3869b199e26",
+      "bytes": 183577
+    },
+    {
+      "file": "cell_131.npz",
+      "cell": 131,
+      "rows": 6239,
+      "center_ra_deg": 172.5,
+      "center_dec_deg": -35,
+      "cap_radius_deg": 12.5,
+      "sha256": "a5cc52cdec10e9f0cbe24dcf7609a16442985e6bd8e90feb3ecf537ba826949c",
+      "bytes": 127738
+    },
+    {
+      "file": "cell_132.npz",
+      "cell": 132,
+      "rows": 6086,
+      "center_ra_deg": 187.5,
+      "center_dec_deg": -35,
+      "cap_radius_deg": 12.5,
+      "sha256": "25f384e13eda6048a7247dacc4a7d5925aeb166fa826669d025ace92ed5f02a9",
+      "bytes": 125284
+    },
+    {
+      "file": "cell_133.npz",
+      "cell": 133,
+      "rows": 6848,
+      "center_ra_deg": 202.5,
+      "center_dec_deg": -35,
+      "cap_radius_deg": 12.5,
+      "sha256": "58002afdfa8985ae731490a44d6c0d27a02a4e3d2e8fcb32919d1608cbbe36f3",
+      "bytes": 141067
+    },
+    {
+      "file": "cell_134.npz",
+      "cell": 134,
+      "rows": 7627,
+      "center_ra_deg": 217.5,
+      "center_dec_deg": -35,
+      "cap_radius_deg": 12.5,
+      "sha256": "9652f594bcfc8754c8317edb18bb23eeaad823185925bb2211af4dec112f7b6f",
+      "bytes": 156282
+    },
+    {
+      "file": "cell_135.npz",
+      "cell": 135,
+      "rows": 7228,
+      "center_ra_deg": 232.5,
+      "center_dec_deg": -35,
+      "cap_radius_deg": 12.5,
+      "sha256": "61eaf859f262b24be673b1aa609ed610b997f01a28ad5c502236fafb630b0924",
+      "bytes": 147586
+    },
+    {
+      "file": "cell_136.npz",
+      "cell": 136,
+      "rows": 7048,
+      "center_ra_deg": 247.5,
+      "center_dec_deg": -35,
+      "cap_radius_deg": 12.5,
+      "sha256": "0ae7ee268f056fa8e039ec55790ca0459e56a338748179d2911c1f075f0112b0",
+      "bytes": 145574
+    },
+    {
+      "file": "cell_137.npz",
+      "cell": 137,
+      "rows": 15281,
+      "center_ra_deg": 262.5,
+      "center_dec_deg": -35,
+      "cap_radius_deg": 12.5,
+      "sha256": "74f434f263a00a732728f8b48e9df34ffcfa0d9a3c1636227d5364d169c6c647",
+      "bytes": 311264
+    },
+    {
+      "file": "cell_138.npz",
+      "cell": 138,
+      "rows": 16017,
+      "center_ra_deg": 277.5,
+      "center_dec_deg": -35,
+      "cap_radius_deg": 12.5,
+      "sha256": "7ce0b64087d5f90a2cbb027040170236bafa02b6bbde036c86957d4cebbe1005",
+      "bytes": 323340
+    },
+    {
+      "file": "cell_139.npz",
+      "cell": 139,
+      "rows": 6846,
+      "center_ra_deg": 292.5,
+      "center_dec_deg": -35,
+      "cap_radius_deg": 12.5,
+      "sha256": "b6a634d1cc0e1646d1b60aa24b672a1ea261aba8ed01f5d82c7c5633c3ddd4c3",
+      "bytes": 141410
+    },
+    {
+      "file": "cell_140.npz",
+      "cell": 140,
+      "rows": 6066,
+      "center_ra_deg": 307.5,
+      "center_dec_deg": -35,
+      "cap_radius_deg": 12.5,
+      "sha256": "3782ed581d7e83f3a86fd8a60ccc6cabd630e89c769c8e7c94cfc0d6170c6916",
+      "bytes": 125409
+    },
+    {
+      "file": "cell_141.npz",
+      "cell": 141,
+      "rows": 4306,
+      "center_ra_deg": 322.5,
+      "center_dec_deg": -35,
+      "cap_radius_deg": 12.5,
+      "sha256": "ea26fe6439b85016c18c7a03ee2923dee37f767610050505661fbebb9eb6cbdb",
+      "bytes": 90165
+    },
+    {
+      "file": "cell_142.npz",
+      "cell": 142,
+      "rows": 3509,
+      "center_ra_deg": 337.5,
+      "center_dec_deg": -35,
+      "cap_radius_deg": 12.5,
+      "sha256": "dd8fa38822334518bc534a389561d68a96d55fc6b246ca9d3155c0cde9a7c0ef",
+      "bytes": 74492
+    },
+    {
+      "file": "cell_143.npz",
+      "cell": 143,
+      "rows": 3054,
+      "center_ra_deg": 352.5,
+      "center_dec_deg": -35,
+      "cap_radius_deg": 12.5,
+      "sha256": "9bfc5b4e16e84feffcc05d6d3dc7203c84114ee02f5ca29c35dd6ccab1832242",
+      "bytes": 64755
+    },
+    {
+      "file": "cell_144.npz",
+      "cell": 144,
+      "rows": 2932,
+      "center_ra_deg": 7.5,
+      "center_dec_deg": -25,
+      "cap_radius_deg": 12.5,
+      "sha256": "2561bbf223d150af3d2b76b67ee9663980df06b7f9234b700c15d8545d237d3d",
+      "bytes": 61488
+    },
+    {
+      "file": "cell_145.npz",
+      "cell": 145,
+      "rows": 2979,
+      "center_ra_deg": 22.5,
+      "center_dec_deg": -25,
+      "cap_radius_deg": 12.5,
+      "sha256": "cf2e90ce062ee1d69a5db426772c36b49aa0b33f7ddee2a7430e6be812d146d3",
+      "bytes": 62464
+    },
+    {
+      "file": "cell_146.npz",
+      "cell": 146,
+      "rows": 3160,
+      "center_ra_deg": 37.5,
+      "center_dec_deg": -25,
+      "cap_radius_deg": 12.5,
+      "sha256": "edc8bb96b272e527148182be1b027f27de74618eececad780c06a39a63ba2ce6",
+      "bytes": 65867
+    },
+    {
+      "file": "cell_147.npz",
+      "cell": 147,
+      "rows": 3911,
+      "center_ra_deg": 52.5,
+      "center_dec_deg": -25,
+      "cap_radius_deg": 12.5,
+      "sha256": "1e28223e38b2a887a7156043754ff55d7ea14bce3b213169e4201e106193ebbd",
+      "bytes": 80841
+    },
+    {
+      "file": "cell_148.npz",
+      "cell": 148,
+      "rows": 5160,
+      "center_ra_deg": 67.5,
+      "center_dec_deg": -25,
+      "cap_radius_deg": 12.5,
+      "sha256": "34f33880b81a27f6cfd1d5537222371925d81e31c6effaabdce0f27923c2825f",
+      "bytes": 105356
+    },
+    {
+      "file": "cell_149.npz",
+      "cell": 149,
+      "rows": 8139,
+      "center_ra_deg": 82.5,
+      "center_dec_deg": -25,
+      "cap_radius_deg": 12.5,
+      "sha256": "1283f666a0ca8afe1458825158e3413c891b75fbe1eb969c0b2870548958712a",
+      "bytes": 164397
+    },
+    {
+      "file": "cell_150.npz",
+      "cell": 150,
+      "rows": 14580,
+      "center_ra_deg": 97.5,
+      "center_dec_deg": -25,
+      "cap_radius_deg": 12.5,
+      "sha256": "b8a582712cf0a0fe8b1d9ce4f53e7df4d1058706b11eddf895618ee2dd9bc76d",
+      "bytes": 288576
+    },
+    {
+      "file": "cell_151.npz",
+      "cell": 151,
+      "rows": 27358,
+      "center_ra_deg": 112.5,
+      "center_dec_deg": -25,
+      "cap_radius_deg": 12.5,
+      "sha256": "55defde3b4a7b7a0332fb6eda178b46a95487ec74d5add019db9b0620eef0930",
+      "bytes": 526404
+    },
+    {
+      "file": "cell_152.npz",
+      "cell": 152,
+      "rows": 18876,
+      "center_ra_deg": 127.5,
+      "center_dec_deg": -25,
+      "cap_radius_deg": 12.5,
+      "sha256": "e6294bf3c62ccc1a5d12ce44ffbb71fa14c17cf268c47b6ff57f9561fc8263ca",
+      "bytes": 368499
+    },
+    {
+      "file": "cell_153.npz",
+      "cell": 153,
+      "rows": 8719,
+      "center_ra_deg": 142.5,
+      "center_dec_deg": -25,
+      "cap_radius_deg": 12.5,
+      "sha256": "73c6dfe177019ba120d061ad3e2c25752dec5754d2b871ecb6fff3a9fccdbe77",
+      "bytes": 175570
+    },
+    {
+      "file": "cell_154.npz",
+      "cell": 154,
+      "rows": 6319,
+      "center_ra_deg": 157.5,
+      "center_dec_deg": -25,
+      "cap_radius_deg": 12.5,
+      "sha256": "20265e432bbc4266cb4229d8b42213bff8130f2756509ce7449d4f3bc792e9fe",
+      "bytes": 128352
+    },
+    {
+      "file": "cell_155.npz",
+      "cell": 155,
+      "rows": 5229,
+      "center_ra_deg": 172.5,
+      "center_dec_deg": -25,
+      "cap_radius_deg": 12.5,
+      "sha256": "df9b2f5faa24ee232341c29df00dce1782f0115e1a69b2492654fa098c57e39a",
+      "bytes": 108144
+    },
+    {
+      "file": "cell_156.npz",
+      "cell": 156,
+      "rows": 4571,
+      "center_ra_deg": 187.5,
+      "center_dec_deg": -25,
+      "cap_radius_deg": 12.5,
+      "sha256": "6211dcba77c6f3121011baa068be421f44609dd1cba1057c37437e268d50dc48",
+      "bytes": 95714
+    },
+    {
+      "file": "cell_157.npz",
+      "cell": 157,
+      "rows": 4780,
+      "center_ra_deg": 202.5,
+      "center_dec_deg": -25,
+      "cap_radius_deg": 12.5,
+      "sha256": "c210a77ba35f1f2be79c687e7eaed414ec3e34f6d6e7af2633e1ffcf6c1ce49f",
+      "bytes": 99944
+    },
+    {
+      "file": "cell_158.npz",
+      "cell": 158,
+      "rows": 5481,
+      "center_ra_deg": 217.5,
+      "center_dec_deg": -25,
+      "cap_radius_deg": 12.5,
+      "sha256": "9e35eb804ba89f95e47ba24c2d8e1a5b4815768fc4ee234ebeab97e2ab4bc66d",
+      "bytes": 114282
+    },
+    {
+      "file": "cell_159.npz",
+      "cell": 159,
+      "rows": 5241,
+      "center_ra_deg": 232.5,
+      "center_dec_deg": -25,
+      "cap_radius_deg": 12.5,
+      "sha256": "1de7f74351616db58d71b6a8dd9a9c43a052efd869ab88a8f9bba6a80d30cf45",
+      "bytes": 108628
+    },
+    {
+      "file": "cell_160.npz",
+      "cell": 160,
+      "rows": 5559,
+      "center_ra_deg": 247.5,
+      "center_dec_deg": -25,
+      "cap_radius_deg": 12.5,
+      "sha256": "079a41b76625b5870c2dc1ca61b69191c505bd275686887a3f628387d935c886",
+      "bytes": 115181
+    },
+    {
+      "file": "cell_161.npz",
+      "cell": 161,
+      "rows": 9575,
+      "center_ra_deg": 262.5,
+      "center_dec_deg": -25,
+      "cap_radius_deg": 12.5,
+      "sha256": "85bf9663acc217eacf9cc354cb69e4c5b50c2ea4bed254a8d5d03d846ba50041",
+      "bytes": 194805
+    },
+    {
+      "file": "cell_162.npz",
+      "cell": 162,
+      "rows": 14682,
+      "center_ra_deg": 277.5,
+      "center_dec_deg": -25,
+      "cap_radius_deg": 12.5,
+      "sha256": "265395e0f7197c7fc7ce2b7cfc859906e39f3a11a0fea493f0cec0a92a82f242",
+      "bytes": 298221
+    },
+    {
+      "file": "cell_163.npz",
+      "cell": 163,
+      "rows": 9676,
+      "center_ra_deg": 292.5,
+      "center_dec_deg": -25,
+      "cap_radius_deg": 12.5,
+      "sha256": "493934802625b1e5bd4d3978f972ab44e3a520ab8b34382cc2537ffbbb6f1bcf",
+      "bytes": 197355
+    },
+    {
+      "file": "cell_164.npz",
+      "cell": 164,
+      "rows": 6191,
+      "center_ra_deg": 307.5,
+      "center_dec_deg": -25,
+      "cap_radius_deg": 12.5,
+      "sha256": "22a5fef39b71f326215af559548b3b2f0fb80a5e3f69ce937e13893805d034a2",
+      "bytes": 128354
+    },
+    {
+      "file": "cell_165.npz",
+      "cell": 165,
+      "rows": 4806,
+      "center_ra_deg": 322.5,
+      "center_dec_deg": -25,
+      "cap_radius_deg": 12.5,
+      "sha256": "1686243a88b2b880847f3136481b7362eb7fb74e02e2cc17252f09bd23dfa51a",
+      "bytes": 101054
+    },
+    {
+      "file": "cell_166.npz",
+      "cell": 166,
+      "rows": 3847,
+      "center_ra_deg": 337.5,
+      "center_dec_deg": -25,
+      "cap_radius_deg": 12.5,
+      "sha256": "1b48586679eeec2b65ab920fd456852083b5cfa2b67702f1dabb724a241afcf0",
+      "bytes": 81859
+    },
+    {
+      "file": "cell_167.npz",
+      "cell": 167,
+      "rows": 3212,
+      "center_ra_deg": 352.5,
+      "center_dec_deg": -25,
+      "cap_radius_deg": 12.5,
+      "sha256": "3662258eecd554fa3fc3239db34dabe3f7f676b2904927e997ea881e4db452c8",
+      "bytes": 68503
+    },
+    {
+      "file": "cell_168.npz",
+      "cell": 168,
+      "rows": 3314,
+      "center_ra_deg": 7.5,
+      "center_dec_deg": -15,
+      "cap_radius_deg": 12.5,
+      "sha256": "7c5f4e7bcae446ffa724dbcdfc85d232189eda644766a9dff6b63dfe600db8b9",
+      "bytes": 69083
+    },
+    {
+      "file": "cell_169.npz",
+      "cell": 169,
+      "rows": 3093,
+      "center_ra_deg": 22.5,
+      "center_dec_deg": -15,
+      "cap_radius_deg": 12.5,
+      "sha256": "a423b250bb720392885d8e8f2b4a941971e954038306c16eaed2c4955201d5b3",
+      "bytes": 64807
+    },
+    {
+      "file": "cell_170.npz",
+      "cell": 170,
+      "rows": 3222,
+      "center_ra_deg": 37.5,
+      "center_dec_deg": -15,
+      "cap_radius_deg": 12.5,
+      "sha256": "a560fb61b5878df62f1ca1ba2007f34a3f2e2a73e2fd03014c4ad25d8013c0c4",
+      "bytes": 67172
+    },
+    {
+      "file": "cell_171.npz",
+      "cell": 171,
+      "rows": 3713,
+      "center_ra_deg": 52.5,
+      "center_dec_deg": -15,
+      "cap_radius_deg": 12.5,
+      "sha256": "a1f4da59329b47b9c4bc6f618b9dbbb4940d0e4065413e65f9c35925121dd4c5",
+      "bytes": 76883
+    },
+    {
+      "file": "cell_172.npz",
+      "cell": 172,
+      "rows": 5446,
+      "center_ra_deg": 67.5,
+      "center_dec_deg": -15,
+      "cap_radius_deg": 12.5,
+      "sha256": "01a52dfd871142c256064b4ff91142d6f18df96a6487370b30d1b7cbf609e0d7",
+      "bytes": 111133
+    },
+    {
+      "file": "cell_173.npz",
+      "cell": 173,
+      "rows": 7795,
+      "center_ra_deg": 82.5,
+      "center_dec_deg": -15,
+      "cap_radius_deg": 12.5,
+      "sha256": "03fdcffea3ad6bc7fd95bd7fd8183579c93e9cb805eb25c4880c5a0ee2162cd1",
+      "bytes": 157690
+    },
+    {
+      "file": "cell_174.npz",
+      "cell": 174,
+      "rows": 12925,
+      "center_ra_deg": 97.5,
+      "center_dec_deg": -15,
+      "cap_radius_deg": 12.5,
+      "sha256": "ba81861ca204ca94a2fc8ecfb13e5b8ec4ba79283f9d9e5b3b9718157f3aac42",
+      "bytes": 256377
+    },
+    {
+      "file": "cell_175.npz",
+      "cell": 175,
+      "rows": 24662,
+      "center_ra_deg": 112.5,
+      "center_dec_deg": -15,
+      "cap_radius_deg": 12.5,
+      "sha256": "97ab6e412ed8dfa12fc51ddad432e1cf8eb52557b69764b43c3245a0cf49c20e",
+      "bytes": 475039
+    },
+    {
+      "file": "cell_176.npz",
+      "cell": 176,
+      "rows": 12941,
+      "center_ra_deg": 127.5,
+      "center_dec_deg": -15,
+      "cap_radius_deg": 12.5,
+      "sha256": "4d228615fe4267a6fbdf0b43b9c58f30b161c70bf062ca2caf90a3f5ffb6054f",
+      "bytes": 256687
+    },
+    {
+      "file": "cell_177.npz",
+      "cell": 177,
+      "rows": 7385,
+      "center_ra_deg": 142.5,
+      "center_dec_deg": -15,
+      "cap_radius_deg": 12.5,
+      "sha256": "b4ee526160c3ad4a6573ea1c937090824eabfd5424cc7d2afde3086527021a08",
+      "bytes": 149677
+    },
+    {
+      "file": "cell_178.npz",
+      "cell": 178,
+      "rows": 5021,
+      "center_ra_deg": 157.5,
+      "center_dec_deg": -15,
+      "cap_radius_deg": 12.5,
+      "sha256": "f6bd1d8467e7fe591b4adfafd8b3ea485cde308268b4d6d29bcc8e8230b86861",
+      "bytes": 102982
+    },
+    {
+      "file": "cell_179.npz",
+      "cell": 179,
+      "rows": 4006,
+      "center_ra_deg": 172.5,
+      "center_dec_deg": -15,
+      "cap_radius_deg": 12.5,
+      "sha256": "cd4bf90ef5b9065f55133fb3c967ca85bf361d065e2761205acdfe8a8bdf6fd7",
+      "bytes": 83807
+    },
+    {
+      "file": "cell_180.npz",
+      "cell": 180,
+      "rows": 3741,
+      "center_ra_deg": 187.5,
+      "center_dec_deg": -15,
+      "cap_radius_deg": 12.5,
+      "sha256": "add5dc0b25fa9a72796bbf2b2558bf2e315aae3c0cc0c8e3ddc0a704b640821d",
+      "bytes": 78928
+    },
+    {
+      "file": "cell_181.npz",
+      "cell": 181,
+      "rows": 3811,
+      "center_ra_deg": 202.5,
+      "center_dec_deg": -15,
+      "cap_radius_deg": 12.5,
+      "sha256": "f50c42d0c033bd7bbfbf10221768fc194834af9ef9b9ec4c1d411269ea56a3bf",
+      "bytes": 80214
+    },
+    {
+      "file": "cell_182.npz",
+      "cell": 182,
+      "rows": 4073,
+      "center_ra_deg": 217.5,
+      "center_dec_deg": -15,
+      "cap_radius_deg": 12.5,
+      "sha256": "9b094e25a532610743dcd0004ec37b2fbc21258785432f4b423552c9af5ae59a",
+      "bytes": 86411
+    },
+    {
+      "file": "cell_183.npz",
+      "cell": 183,
+      "rows": 4970,
+      "center_ra_deg": 232.5,
+      "center_dec_deg": -15,
+      "cap_radius_deg": 12.5,
+      "sha256": "0cb2b472e74fca9a13d68dd1da0e3e0f39c7ce62b5151868a701878b42e3bf3b",
+      "bytes": 103654
+    },
+    {
+      "file": "cell_184.npz",
+      "cell": 184,
+      "rows": 3509,
+      "center_ra_deg": 247.5,
+      "center_dec_deg": -15,
+      "cap_radius_deg": 12.5,
+      "sha256": "33643d461c5ce9f69de69908f39caf002527284091c1b44b81dce507b60bbf89",
+      "bytes": 74327
+    },
+    {
+      "file": "cell_185.npz",
+      "cell": 185,
+      "rows": 7277,
+      "center_ra_deg": 262.5,
+      "center_dec_deg": -15,
+      "cap_radius_deg": 12.5,
+      "sha256": "06e12859486df7b8fa4a36bdb043166e127cd54391ab3d1981e4534a8f506ece",
+      "bytes": 149134
+    },
+    {
+      "file": "cell_186.npz",
+      "cell": 186,
+      "rows": 13697,
+      "center_ra_deg": 277.5,
+      "center_dec_deg": -15,
+      "cap_radius_deg": 12.5,
+      "sha256": "759354aa3a5849ec2598233907b343b2af8d4965c35e382b6006e9f21c508695",
+      "bytes": 273683
+    },
+    {
+      "file": "cell_187.npz",
+      "cell": 187,
+      "rows": 12044,
+      "center_ra_deg": 292.5,
+      "center_dec_deg": -15,
+      "cap_radius_deg": 12.5,
+      "sha256": "b233d9ebedcd13ac104809ee3fa09b15f8971c27b6df59f0a22f2c219e1342f2",
+      "bytes": 244185
+    },
+    {
+      "file": "cell_188.npz",
+      "cell": 188,
+      "rows": 6985,
+      "center_ra_deg": 307.5,
+      "center_dec_deg": -15,
+      "cap_radius_deg": 12.5,
+      "sha256": "a45fec243bdb1686e825ddb49d52e3a8b194cd2f22ee557ebd6e93898630a31f",
+      "bytes": 146133
+    },
+    {
+      "file": "cell_189.npz",
+      "cell": 189,
+      "rows": 5319,
+      "center_ra_deg": 322.5,
+      "center_dec_deg": -15,
+      "cap_radius_deg": 12.5,
+      "sha256": "4438cf7c968f298bb633ff18058cb45f8fd316d8c1b8b7ab9744fb0f3d73476d",
+      "bytes": 113814
+    },
+    {
+      "file": "cell_190.npz",
+      "cell": 190,
+      "rows": 3817,
+      "center_ra_deg": 337.5,
+      "center_dec_deg": -15,
+      "cap_radius_deg": 12.5,
+      "sha256": "96aaf8467b5f26855c8d8254811953409023137e6109eaabf0726697a3bea477",
+      "bytes": 81520
+    },
+    {
+      "file": "cell_191.npz",
+      "cell": 191,
+      "rows": 3277,
+      "center_ra_deg": 352.5,
+      "center_dec_deg": -15,
+      "cap_radius_deg": 12.5,
+      "sha256": "3b5b0a283ffbd068e36f58161df15c62053707bbe7ae8291bf47fdac8a165c4e",
+      "bytes": 69913
+    },
+    {
+      "file": "cell_192.npz",
+      "cell": 192,
+      "rows": 3189,
+      "center_ra_deg": 7.5,
+      "center_dec_deg": -5,
+      "cap_radius_deg": 12.5,
+      "sha256": "f9ce76ef1aafbdba80dbb1d9e3dc4cf78f68daac1319f4cb1c37a34925db028b",
+      "bytes": 66689
+    },
+    {
+      "file": "cell_193.npz",
+      "cell": 193,
+      "rows": 3257,
+      "center_ra_deg": 22.5,
+      "center_dec_deg": -5,
+      "cap_radius_deg": 12.5,
+      "sha256": "de6ed66dffcb01d2d69b807166092098e0f033f4cb3a24660da550152db88e69",
+      "bytes": 67869
+    },
+    {
+      "file": "cell_194.npz",
+      "cell": 194,
+      "rows": 3501,
+      "center_ra_deg": 37.5,
+      "center_dec_deg": -5,
+      "cap_radius_deg": 12.5,
+      "sha256": "e2fa8b6b9118c4a859914deff482fcdc1279f6736180b290b6b9a52073a34cb0",
+      "bytes": 72668
+    },
+    {
+      "file": "cell_195.npz",
+      "cell": 195,
+      "rows": 3767,
+      "center_ra_deg": 52.5,
+      "center_dec_deg": -5,
+      "cap_radius_deg": 12.5,
+      "sha256": "e667e4db341fd378b9e2d735073e29551fd3ae381bbb8be533423b5322fc6e77",
+      "bytes": 77860
+    },
+    {
+      "file": "cell_196.npz",
+      "cell": 196,
+      "rows": 5862,
+      "center_ra_deg": 67.5,
+      "center_dec_deg": -5,
+      "cap_radius_deg": 12.5,
+      "sha256": "6c9ed8a7b3ee67d3df52b60e99515d5fa7079944eb0f548f465198899f1e8349",
+      "bytes": 119196
+    },
+    {
+      "file": "cell_197.npz",
+      "cell": 197,
+      "rows": 7240,
+      "center_ra_deg": 82.5,
+      "center_dec_deg": -5,
+      "cap_radius_deg": 12.5,
+      "sha256": "72001c346ad5118a6a9ba164ccb6ca78311e1d2f9753960665c292008f01b051",
+      "bytes": 150690
+    },
+    {
+      "file": "cell_198.npz",
+      "cell": 198,
+      "rows": 15658,
+      "center_ra_deg": 97.5,
+      "center_dec_deg": -5,
+      "cap_radius_deg": 12.5,
+      "sha256": "39c60963057b3c3710a2e020de2562a4ba0aa4a31a5c211c3d0fb1721a3092ad",
+      "bytes": 314569
+    },
+    {
+      "file": "cell_199.npz",
+      "cell": 199,
+      "rows": 21189,
+      "center_ra_deg": 112.5,
+      "center_dec_deg": -5,
+      "cap_radius_deg": 12.5,
+      "sha256": "7dea5b6c6916a20d1c15e90e7a135919c25b124bf188255f1521b72150a8bb88",
+      "bytes": 415421
+    },
+    {
+      "file": "cell_200.npz",
+      "cell": 200,
+      "rows": 10086,
+      "center_ra_deg": 127.5,
+      "center_dec_deg": -5,
+      "cap_radius_deg": 12.5,
+      "sha256": "5daecb79dfb09f9471982b92e4909ae051b622d813c14eb3e5a531d18d82ea6a",
+      "bytes": 201942
+    },
+    {
+      "file": "cell_201.npz",
+      "cell": 201,
+      "rows": 5600,
+      "center_ra_deg": 142.5,
+      "center_dec_deg": -5,
+      "cap_radius_deg": 12.5,
+      "sha256": "b7d08a340fc2d7a113256ab2a2a50a0a400809cb315a119990759c3edba81d45",
+      "bytes": 114489
+    },
+    {
+      "file": "cell_202.npz",
+      "cell": 202,
+      "rows": 4005,
+      "center_ra_deg": 157.5,
+      "center_dec_deg": -5,
+      "cap_radius_deg": 12.5,
+      "sha256": "0f389b5804cfb8b50f1a577f883ce55f48c8920c7f8d230a28c7655f2a105dce",
+      "bytes": 83005
+    },
+    {
+      "file": "cell_203.npz",
+      "cell": 203,
+      "rows": 3144,
+      "center_ra_deg": 172.5,
+      "center_dec_deg": -5,
+      "cap_radius_deg": 12.5,
+      "sha256": "39e6e90fb5374f9dc5228ff86c15be4c82917a9bacb7867368cc3c6fb50fd675",
+      "bytes": 66196
+    },
+    {
+      "file": "cell_204.npz",
+      "cell": 204,
+      "rows": 3364,
+      "center_ra_deg": 187.5,
+      "center_dec_deg": -5,
+      "cap_radius_deg": 12.5,
+      "sha256": "4db4b964f10f10aee9986305cca699caebd0092d8eb00270a63af0614cbe547d",
+      "bytes": 71352
+    },
+    {
+      "file": "cell_205.npz",
+      "cell": 205,
+      "rows": 3268,
+      "center_ra_deg": 202.5,
+      "center_dec_deg": -5,
+      "cap_radius_deg": 12.5,
+      "sha256": "6cb241184e9615e15ea31247b4e6c264d1c9a43eaa71ff5904750e2b5587af8a",
+      "bytes": 69521
+    },
+    {
+      "file": "cell_206.npz",
+      "cell": 206,
+      "rows": 3376,
+      "center_ra_deg": 217.5,
+      "center_dec_deg": -5,
+      "cap_radius_deg": 12.5,
+      "sha256": "e0fdfa66c448caa2708ef915fc06b0155d795014e72ae907c68f1295493a4b4c",
+      "bytes": 71627
+    },
+    {
+      "file": "cell_207.npz",
+      "cell": 207,
+      "rows": 3744,
+      "center_ra_deg": 232.5,
+      "center_dec_deg": -5,
+      "cap_radius_deg": 12.5,
+      "sha256": "6992a41eb9d7423ccca9b72043caee2c5d427c2d596607f87439ffbbccc2d98c",
+      "bytes": 78632
+    },
+    {
+      "file": "cell_208.npz",
+      "cell": 208,
+      "rows": 4009,
+      "center_ra_deg": 247.5,
+      "center_dec_deg": -5,
+      "cap_radius_deg": 12.5,
+      "sha256": "dba787d6f08a02118cde6fa1855639aa15cc1f95b8561630ca95ce957ff31ac4",
+      "bytes": 84227
+    },
+    {
+      "file": "cell_209.npz",
+      "cell": 209,
+      "rows": 3382,
+      "center_ra_deg": 262.5,
+      "center_dec_deg": -5,
+      "cap_radius_deg": 12.5,
+      "sha256": "4caf66412e0592f0a0c4602ddf90685db489a92e275768a2bc0699d92cab0193",
+      "bytes": 71839
+    },
+    {
+      "file": "cell_210.npz",
+      "cell": 210,
+      "rows": 6690,
+      "center_ra_deg": 277.5,
+      "center_dec_deg": -5,
+      "cap_radius_deg": 12.5,
+      "sha256": "194c37e004a167cf11ee8673e20a751bf93614efcb5f3da3aa8c439a2efae67e",
+      "bytes": 137362
+    },
+    {
+      "file": "cell_211.npz",
+      "cell": 211,
+      "rows": 10177,
+      "center_ra_deg": 292.5,
+      "center_dec_deg": -5,
+      "cap_radius_deg": 12.5,
+      "sha256": "fe6dc073e63cd339718d696b396daacd5e4b32974ebe32c2a679525d89b51528",
+      "bytes": 206976
+    },
+    {
+      "file": "cell_212.npz",
+      "cell": 212,
+      "rows": 8633,
+      "center_ra_deg": 307.5,
+      "center_dec_deg": -5,
+      "cap_radius_deg": 12.5,
+      "sha256": "f975b45fce858862012c109234c551cc136fe564f7fd6706366f735cfb985fcd",
+      "bytes": 177146
+    },
+    {
+      "file": "cell_213.npz",
+      "cell": 213,
+      "rows": 5760,
+      "center_ra_deg": 322.5,
+      "center_dec_deg": -5,
+      "cap_radius_deg": 12.5,
+      "sha256": "7f08e58dc9dfdbe56c63723bcb365c6a74c59f384c2d9ddca70a354e64d447f7",
+      "bytes": 119496
+    },
+    {
+      "file": "cell_214.npz",
+      "cell": 214,
+      "rows": 4075,
+      "center_ra_deg": 337.5,
+      "center_dec_deg": -5,
+      "cap_radius_deg": 12.5,
+      "sha256": "ee033d851cdf3057d90fb532b91e6c62423c050eb6430c6206e9c653171e7098",
+      "bytes": 86293
+    },
+    {
+      "file": "cell_215.npz",
+      "cell": 215,
+      "rows": 3442,
+      "center_ra_deg": 352.5,
+      "center_dec_deg": -5,
+      "cap_radius_deg": 12.5,
+      "sha256": "737adea2dabfdd80620c42b52a06d75a69e34f6f1fbd34735f1018eb55745cae",
+      "bytes": 72851
+    },
+    {
+      "file": "cell_216.npz",
+      "cell": 216,
+      "rows": 3772,
+      "center_ra_deg": 7.5,
+      "center_dec_deg": 5,
+      "cap_radius_deg": 12.5,
+      "sha256": "0a90fcc182513731170fba7bef526aceab2ae7da47ddc62d883ce4a09425d0e7",
+      "bytes": 78029
+    },
+    {
+      "file": "cell_217.npz",
+      "cell": 217,
+      "rows": 3598,
+      "center_ra_deg": 22.5,
+      "center_dec_deg": 5,
+      "cap_radius_deg": 12.5,
+      "sha256": "1936273066dbf93edc77ff4c869a35082f511e0d9324a3a8da8bf45924804c74",
+      "bytes": 74611
+    },
+    {
+      "file": "cell_218.npz",
+      "cell": 218,
+      "rows": 3588,
+      "center_ra_deg": 37.5,
+      "center_dec_deg": 5,
+      "cap_radius_deg": 12.5,
+      "sha256": "8251f040d6d1e8dff5740b66a0df517930f87c7599e29217ac0eb210abe54452",
+      "bytes": 74403
+    },
+    {
+      "file": "cell_219.npz",
+      "cell": 219,
+      "rows": 3658,
+      "center_ra_deg": 52.5,
+      "center_dec_deg": 5,
+      "cap_radius_deg": 12.5,
+      "sha256": "1cae24fc32d28a8459457036275a8a4d1c763333cdd3df465af6496e21ff75c6",
+      "bytes": 75666
+    },
+    {
+      "file": "cell_220.npz",
+      "cell": 220,
+      "rows": 5223,
+      "center_ra_deg": 67.5,
+      "center_dec_deg": 5,
+      "cap_radius_deg": 12.5,
+      "sha256": "379dac93bd9c7c07bec0866d89fad3f854657ac4c074c4f0e49041e70494ade8",
+      "bytes": 106968
+    },
+    {
+      "file": "cell_221.npz",
+      "cell": 221,
+      "rows": 8745,
+      "center_ra_deg": 82.5,
+      "center_dec_deg": 5,
+      "cap_radius_deg": 12.5,
+      "sha256": "535735a2041162170294b3ee793b699afae6d240dd65e1aa6ad8fdc909f077e8",
+      "bytes": 183447
+    },
+    {
+      "file": "cell_222.npz",
+      "cell": 222,
+      "rows": 17545,
+      "center_ra_deg": 97.5,
+      "center_dec_deg": 5,
+      "cap_radius_deg": 12.5,
+      "sha256": "a8a7c40bd61d08d78891047fe562e826d3ded8b518d5601e5b8f1db058589f4a",
+      "bytes": 357591
+    },
+    {
+      "file": "cell_223.npz",
+      "cell": 223,
+      "rows": 16331,
+      "center_ra_deg": 112.5,
+      "center_dec_deg": 5,
+      "cap_radius_deg": 12.5,
+      "sha256": "0b6fc552b1d31497d326011bcd4b6c9026f8c26d7a9f4be4fc25808fe7507054",
+      "bytes": 323074
+    },
+    {
+      "file": "cell_224.npz",
+      "cell": 224,
+      "rows": 7805,
+      "center_ra_deg": 127.5,
+      "center_dec_deg": 5,
+      "cap_radius_deg": 12.5,
+      "sha256": "2a8a8745174fd37b02e6c0a0b179dc39e34110ba8dc9801125f38450a3d6f878",
+      "bytes": 157876
+    },
+    {
+      "file": "cell_225.npz",
+      "cell": 225,
+      "rows": 4866,
+      "center_ra_deg": 142.5,
+      "center_dec_deg": 5,
+      "cap_radius_deg": 12.5,
+      "sha256": "b35d9048f1ca3d7bd497a3503f7d1da320c3fe64ba02d899e786391af89cd3de",
+      "bytes": 99815
+    },
+    {
+      "file": "cell_226.npz",
+      "cell": 226,
+      "rows": 3645,
+      "center_ra_deg": 157.5,
+      "center_dec_deg": 5,
+      "cap_radius_deg": 12.5,
+      "sha256": "f9ec7a01d1436b55c68fa8eac02dfd1b6c417f893ebd35fc474a8551ac2a7d35",
+      "bytes": 75835
+    },
+    {
+      "file": "cell_227.npz",
+      "cell": 227,
+      "rows": 2984,
+      "center_ra_deg": 172.5,
+      "center_dec_deg": 5,
+      "cap_radius_deg": 12.5,
+      "sha256": "53414308dc9d9dfebb92019b77da6e49b0a065e3a5679de402d4b116acc58725",
+      "bytes": 63029
+    },
+    {
+      "file": "cell_228.npz",
+      "cell": 228,
+      "rows": 3051,
+      "center_ra_deg": 187.5,
+      "center_dec_deg": 5,
+      "cap_radius_deg": 12.5,
+      "sha256": "9deefbf70458d5a846951fe9f37c36a004e9770f3eacf346102d091ef4e5749c",
+      "bytes": 64726
+    },
+    {
+      "file": "cell_229.npz",
+      "cell": 229,
+      "rows": 3156,
+      "center_ra_deg": 202.5,
+      "center_dec_deg": 5,
+      "cap_radius_deg": 12.5,
+      "sha256": "cc557878eb03cdffbfe1191511cb0224c497d303a66e41e0e51463433d211a81",
+      "bytes": 66608
+    },
+    {
+      "file": "cell_230.npz",
+      "cell": 230,
+      "rows": 3309,
+      "center_ra_deg": 217.5,
+      "center_dec_deg": 5,
+      "cap_radius_deg": 12.5,
+      "sha256": "e840a16337c47cc5cf2ccefd03db304472231fa829d6497d5c6a1fe4e07d3267",
+      "bytes": 69932
+    },
+    {
+      "file": "cell_231.npz",
+      "cell": 231,
+      "rows": 3961,
+      "center_ra_deg": 232.5,
+      "center_dec_deg": 5,
+      "cap_radius_deg": 12.5,
+      "sha256": "ba2c3300321fbfeadd68c9d95880facd26d2fb0c71704788462acba7ded9ae99",
+      "bytes": 83355
+    },
+    {
+      "file": "cell_232.npz",
+      "cell": 232,
+      "rows": 6241,
+      "center_ra_deg": 247.5,
+      "center_dec_deg": 5,
+      "cap_radius_deg": 12.5,
+      "sha256": "a1448a7a334a1690875222eee38cd4556aa8fd28c2dd3f8292c38209923bea0f",
+      "bytes": 128695
+    },
+    {
+      "file": "cell_233.npz",
+      "cell": 233,
+      "rows": 9004,
+      "center_ra_deg": 262.5,
+      "center_dec_deg": 5,
+      "cap_radius_deg": 12.5,
+      "sha256": "81c5fea53bafc206f47f092af48a591bf4e9a97c2792dbe3e948ed1102ccc6e6",
+      "bytes": 183114
+    },
+    {
+      "file": "cell_234.npz",
+      "cell": 234,
+      "rows": 11617,
+      "center_ra_deg": 277.5,
+      "center_dec_deg": 5,
+      "cap_radius_deg": 12.5,
+      "sha256": "de72c57f825112d8498049dc2ed474164e60f8343054e997b4cdf50378580808",
+      "bytes": 232919
+    },
+    {
+      "file": "cell_235.npz",
+      "cell": 235,
+      "rows": 13695,
+      "center_ra_deg": 292.5,
+      "center_dec_deg": 5,
+      "cap_radius_deg": 12.5,
+      "sha256": "2b5a3fa09fb2984a20f83cfb1bfc2127b055abd99214017f4e671c5c17c94c49",
+      "bytes": 276527
+    },
+    {
+      "file": "cell_236.npz",
+      "cell": 236,
+      "rows": 12781,
+      "center_ra_deg": 307.5,
+      "center_dec_deg": 5,
+      "cap_radius_deg": 12.5,
+      "sha256": "66fa2b9600b8db7aefdcbaaa635006d3937b52990a3e6c62c7668f2698d4ef90",
+      "bytes": 257288
+    },
+    {
+      "file": "cell_237.npz",
+      "cell": 237,
+      "rows": 6719,
+      "center_ra_deg": 322.5,
+      "center_dec_deg": 5,
+      "cap_radius_deg": 12.5,
+      "sha256": "dcdd28ef5a982ccbf0a79d492c0bf13a866f9063e27ad25dd2f8d50d3b8ae8f9",
+      "bytes": 138087
+    },
+    {
+      "file": "cell_238.npz",
+      "cell": 238,
+      "rows": 4786,
+      "center_ra_deg": 337.5,
+      "center_dec_deg": 5,
+      "cap_radius_deg": 12.5,
+      "sha256": "fa84cbcec1ddb320a16192b175a6e090937496d24d1bc786fa1c5e15896c93d9",
+      "bytes": 99304
+    },
+    {
+      "file": "cell_239.npz",
+      "cell": 239,
+      "rows": 3694,
+      "center_ra_deg": 352.5,
+      "center_dec_deg": 5,
+      "cap_radius_deg": 12.5,
+      "sha256": "73b8828261ae0914e56f986c9e056ed0dd13a7474b22da14537aed1f7ec5bb98",
+      "bytes": 77610
+    },
+    {
+      "file": "cell_240.npz",
+      "cell": 240,
+      "rows": 4047,
+      "center_ra_deg": 7.5,
+      "center_dec_deg": 15,
+      "cap_radius_deg": 12.5,
+      "sha256": "1a0ebd94b020d80781a1dec48f3f93fd2b4a5f0265514778ceecf2cd1347b66b",
+      "bytes": 83629
+    },
+    {
+      "file": "cell_241.npz",
+      "cell": 241,
+      "rows": 3853,
+      "center_ra_deg": 22.5,
+      "center_dec_deg": 15,
+      "cap_radius_deg": 12.5,
+      "sha256": "240931c850280a507172a20c1dce165278a0a56f0d78ae3b9d321cc4b5d5bc97",
+      "bytes": 79683
+    },
+    {
+      "file": "cell_242.npz",
+      "cell": 242,
+      "rows": 3693,
+      "center_ra_deg": 37.5,
+      "center_dec_deg": 15,
+      "cap_radius_deg": 12.5,
+      "sha256": "9440273a915dafed2026f768da0996a2cc288c4aa8ac343dc9655c9ad8e76be6",
+      "bytes": 76396
+    },
+    {
+      "file": "cell_243.npz",
+      "cell": 243,
+      "rows": 3643,
+      "center_ra_deg": 52.5,
+      "center_dec_deg": 15,
+      "cap_radius_deg": 12.5,
+      "sha256": "7b28d73834ec8cfd1d832340fac641e6d4c1c1ec378cf357734006ac13abca53",
+      "bytes": 75964
+    },
+    {
+      "file": "cell_244.npz",
+      "cell": 244,
+      "rows": 3321,
+      "center_ra_deg": 67.5,
+      "center_dec_deg": 15,
+      "cap_radius_deg": 12.5,
+      "sha256": "49f2a5fb733cb1115677352ed24a1a96c49a583692b6b8b87d4eeea3c4d7017f",
+      "bytes": 73542
+    },
+    {
+      "file": "cell_245.npz",
+      "cell": 245,
+      "rows": 9300,
+      "center_ra_deg": 82.5,
+      "center_dec_deg": 15,
+      "cap_radius_deg": 12.5,
+      "sha256": "5d7c9adb5e85e1330bfeadaa6bf9800e42127fee17afbad45ccfc24c063a9bc4",
+      "bytes": 192347
+    },
+    {
+      "file": "cell_246.npz",
+      "cell": 246,
+      "rows": 16568,
+      "center_ra_deg": 97.5,
+      "center_dec_deg": 15,
+      "cap_radius_deg": 12.5,
+      "sha256": "7e1bf1e598472285432cdbaed8cee84d6b5272b2c7726fbc65c01859b906f68c",
+      "bytes": 335712
+    },
+    {
+      "file": "cell_247.npz",
+      "cell": 247,
+      "rows": 12647,
+      "center_ra_deg": 112.5,
+      "center_dec_deg": 15,
+      "cap_radius_deg": 12.5,
+      "sha256": "8c72a692bf6f4c4ff09794462a26ad0b64ccda55437dba95b5f980483b40ab3a",
+      "bytes": 250854
+    },
+    {
+      "file": "cell_248.npz",
+      "cell": 248,
+      "rows": 6429,
+      "center_ra_deg": 127.5,
+      "center_dec_deg": 15,
+      "cap_radius_deg": 12.5,
+      "sha256": "c080bbb892e9d4e4dda077198856677fa67a801d30350890ca92347afc3e4a20",
+      "bytes": 130729
+    },
+    {
+      "file": "cell_249.npz",
+      "cell": 249,
+      "rows": 4172,
+      "center_ra_deg": 142.5,
+      "center_dec_deg": 15,
+      "cap_radius_deg": 12.5,
+      "sha256": "6414cc4232f85a5aed43a2dc870f8ebc3a39f6359add0e260ca29c3aa3b74441",
+      "bytes": 86180
+    },
+    {
+      "file": "cell_250.npz",
+      "cell": 250,
+      "rows": 3397,
+      "center_ra_deg": 157.5,
+      "center_dec_deg": 15,
+      "cap_radius_deg": 12.5,
+      "sha256": "716f0c675601d4405289c43adeb8ebdcfc0140fcee4c245fe38c4624b7e44e1c",
+      "bytes": 70829
+    },
+    {
+      "file": "cell_251.npz",
+      "cell": 251,
+      "rows": 2923,
+      "center_ra_deg": 172.5,
+      "center_dec_deg": 15,
+      "cap_radius_deg": 12.5,
+      "sha256": "bca0ae0586ad27d935a343a65868ba17aaa1723cc67c857bcceb4387eff0ba6a",
+      "bytes": 61637
+    },
+    {
+      "file": "cell_252.npz",
+      "cell": 252,
+      "rows": 2789,
+      "center_ra_deg": 187.5,
+      "center_dec_deg": 15,
+      "cap_radius_deg": 12.5,
+      "sha256": "dd608e5754afe513531ee4948acab53109f863f2abb49c2343c91991bef69f40",
+      "bytes": 59575
+    },
+    {
+      "file": "cell_253.npz",
+      "cell": 253,
+      "rows": 2857,
+      "center_ra_deg": 202.5,
+      "center_dec_deg": 15,
+      "cap_radius_deg": 12.5,
+      "sha256": "ed6db89a903eb715d4e9fef79b0fc2930602d49f13c5e931d51d800952dd8630",
+      "bytes": 60613
+    },
+    {
+      "file": "cell_254.npz",
+      "cell": 254,
+      "rows": 3238,
+      "center_ra_deg": 217.5,
+      "center_dec_deg": 15,
+      "cap_radius_deg": 12.5,
+      "sha256": "d56e2683f8c0076e9cc36409b197ea66c85ff3c0f6b378acc81440930be87773",
+      "bytes": 68170
+    },
+    {
+      "file": "cell_255.npz",
+      "cell": 255,
+      "rows": 3621,
+      "center_ra_deg": 232.5,
+      "center_dec_deg": 15,
+      "cap_radius_deg": 12.5,
+      "sha256": "c50d833f754f826f9468ce754ff8bd5a664c7a3cf7592f0ec763412cb22ab560",
+      "bytes": 76192
+    },
+    {
+      "file": "cell_256.npz",
+      "cell": 256,
+      "rows": 5837,
+      "center_ra_deg": 247.5,
+      "center_dec_deg": 15,
+      "cap_radius_deg": 12.5,
+      "sha256": "bde642e5c6780e74cfef94c0c812d72f4788166c38b3d9a0e07f59f1f7bd1fb1",
+      "bytes": 119865
+    },
+    {
+      "file": "cell_257.npz",
+      "cell": 257,
+      "rows": 9187,
+      "center_ra_deg": 262.5,
+      "center_dec_deg": 15,
+      "cap_radius_deg": 12.5,
+      "sha256": "d7cfcc6e671f787a86711f5196cb5bcf506c35eac4cd4d111f1220cec24510a3",
+      "bytes": 186272
+    },
+    {
+      "file": "cell_258.npz",
+      "cell": 258,
+      "rows": 13506,
+      "center_ra_deg": 277.5,
+      "center_dec_deg": 15,
+      "cap_radius_deg": 12.5,
+      "sha256": "7a8504cff5369aca0f0f1c81f2f9e0b09f131ad48a1f0101a3c48a50dc2eecc1",
+      "bytes": 274532
+    },
+    {
+      "file": "cell_259.npz",
+      "cell": 259,
+      "rows": 16971,
+      "center_ra_deg": 292.5,
+      "center_dec_deg": 15,
+      "cap_radius_deg": 12.5,
+      "sha256": "2b2932eb8b85f69069bfb5349d3ac35b179b36e357267c351b91b21890aa5d7d",
+      "bytes": 348560
+    },
+    {
+      "file": "cell_260.npz",
+      "cell": 260,
+      "rows": 15805,
+      "center_ra_deg": 307.5,
+      "center_dec_deg": 15,
+      "cap_radius_deg": 12.5,
+      "sha256": "aefa205bd0ba57841c025bb20af8f2390441d184d6b69c83b453cdb87866045d",
+      "bytes": 323818
+    },
+    {
+      "file": "cell_261.npz",
+      "cell": 261,
+      "rows": 8433,
+      "center_ra_deg": 322.5,
+      "center_dec_deg": 15,
+      "cap_radius_deg": 12.5,
+      "sha256": "54ea6ef9d61e37ae65845c845b5390a45ea1b6f826e013b9ae98e28e383ab115",
+      "bytes": 171526
+    },
+    {
+      "file": "cell_262.npz",
+      "cell": 262,
+      "rows": 6546,
+      "center_ra_deg": 337.5,
+      "center_dec_deg": 15,
+      "cap_radius_deg": 12.5,
+      "sha256": "5bbda91729541af50f95da6b63624bb32dc7a54ea516bf7b5ea68ec7846ed9f3",
+      "bytes": 133945
+    },
+    {
+      "file": "cell_263.npz",
+      "cell": 263,
+      "rows": 4579,
+      "center_ra_deg": 352.5,
+      "center_dec_deg": 15,
+      "cap_radius_deg": 12.5,
+      "sha256": "882144fecb00764b2b82adee6019a4c7000e6de331a0757eaf473d94ef24b8d2",
+      "bytes": 94868
+    },
+    {
+      "file": "cell_264.npz",
+      "cell": 264,
+      "rows": 5258,
+      "center_ra_deg": 7.5,
+      "center_dec_deg": 25,
+      "cap_radius_deg": 12.5,
+      "sha256": "b28507fef130e51ecf05b1893dca2b1f57a7f7df31c082a075b52afc61dac290",
+      "bytes": 107330
+    },
+    {
+      "file": "cell_265.npz",
+      "cell": 265,
+      "rows": 4797,
+      "center_ra_deg": 22.5,
+      "center_dec_deg": 25,
+      "cap_radius_deg": 12.5,
+      "sha256": "d5050381719abf2593042e90788fe800e866deff865cff12799ac091ed5ffde5",
+      "bytes": 98320
+    },
+    {
+      "file": "cell_266.npz",
+      "cell": 266,
+      "rows": 4539,
+      "center_ra_deg": 37.5,
+      "center_dec_deg": 25,
+      "cap_radius_deg": 12.5,
+      "sha256": "f46b0ce51ca2c47905e50a2895f62ccb0532d1b4d4ab1c63ba06f5b5f99903b8",
+      "bytes": 93376
+    },
+    {
+      "file": "cell_267.npz",
+      "cell": 267,
+      "rows": 4972,
+      "center_ra_deg": 52.5,
+      "center_dec_deg": 25,
+      "cap_radius_deg": 12.5,
+      "sha256": "b45eced0b267f81fbfc3b9233e5e6d878c584588cd6a8583d15f6a8b9b205d49",
+      "bytes": 102985
+    },
+    {
+      "file": "cell_268.npz",
+      "cell": 268,
+      "rows": 3457,
+      "center_ra_deg": 67.5,
+      "center_dec_deg": 25,
+      "cap_radius_deg": 12.5,
+      "sha256": "8d677532698a690ea944a65b1d0231303d479287ae7cc32b533a55411f6614f4",
+      "bytes": 76122
+    },
+    {
+      "file": "cell_269.npz",
+      "cell": 269,
+      "rows": 8783,
+      "center_ra_deg": 82.5,
+      "center_dec_deg": 25,
+      "cap_radius_deg": 12.5,
+      "sha256": "4b4f2fac1959b181319e2cbcfb9f22d07c047daa57395a9fcdbc7cbc53e6e7fb",
+      "bytes": 182238
+    },
+    {
+      "file": "cell_270.npz",
+      "cell": 270,
+      "rows": 14721,
+      "center_ra_deg": 97.5,
+      "center_dec_deg": 25,
+      "cap_radius_deg": 12.5,
+      "sha256": "bb08ed8c642fcec95f4d093348e7d1df1700a01989a5d1bbed4bbe326be0d61f",
+      "bytes": 300197
+    },
+    {
+      "file": "cell_271.npz",
+      "cell": 271,
+      "rows": 9314,
+      "center_ra_deg": 112.5,
+      "center_dec_deg": 25,
+      "cap_radius_deg": 12.5,
+      "sha256": "bd2c55d659b7c6dab17839edfbb9683f34dbcff0f06752814ce7e613c975d0d0",
+      "bytes": 187731
+    },
+    {
+      "file": "cell_272.npz",
+      "cell": 272,
+      "rows": 5768,
+      "center_ra_deg": 127.5,
+      "center_dec_deg": 25,
+      "cap_radius_deg": 12.5,
+      "sha256": "b2b4aed1fccdc5919f1d318705cc348a47172fcb18e98151af9d10c700f76eb1",
+      "bytes": 117674
+    },
+    {
+      "file": "cell_273.npz",
+      "cell": 273,
+      "rows": 4024,
+      "center_ra_deg": 142.5,
+      "center_dec_deg": 25,
+      "cap_radius_deg": 12.5,
+      "sha256": "fe720beeb962edb0f4226d40548f2ce9a3ef173ec3c33ae79fe0b5e890fd43db",
+      "bytes": 83229
+    },
+    {
+      "file": "cell_274.npz",
+      "cell": 274,
+      "rows": 3361,
+      "center_ra_deg": 157.5,
+      "center_dec_deg": 25,
+      "cap_radius_deg": 12.5,
+      "sha256": "f46b300e51b2378f097d31c635c46153b877d98eb91003f6e36b6aa4266a1f7a",
+      "bytes": 70109
+    },
+    {
+      "file": "cell_275.npz",
+      "cell": 275,
+      "rows": 2513,
+      "center_ra_deg": 172.5,
+      "center_dec_deg": 25,
+      "cap_radius_deg": 12.5,
+      "sha256": "5a893ab05524cdc324b4ce5335acdd73624f338623ffa62a74b4db5a96959c24",
+      "bytes": 53281
+    },
+    {
+      "file": "cell_276.npz",
+      "cell": 276,
+      "rows": 2701,
+      "center_ra_deg": 187.5,
+      "center_dec_deg": 25,
+      "cap_radius_deg": 12.5,
+      "sha256": "32bc3aec55fb9e79b8e4416cc18aa68198989660d556c8eb76b002fa2d7ee8f3",
+      "bytes": 57222
+    },
+    {
+      "file": "cell_277.npz",
+      "cell": 277,
+      "rows": 2760,
+      "center_ra_deg": 202.5,
+      "center_dec_deg": 25,
+      "cap_radius_deg": 12.5,
+      "sha256": "cddf63dae654dbbf9939fd84478bfdbc07e7314f5e6c853b0623fc81ff133ac8",
+      "bytes": 58441
+    },
+    {
+      "file": "cell_278.npz",
+      "cell": 278,
+      "rows": 3150,
+      "center_ra_deg": 217.5,
+      "center_dec_deg": 25,
+      "cap_radius_deg": 12.5,
+      "sha256": "c2126b8944f6d38493e55f40a2a78325c722397c44d8614a9e8a3948f7b2ebd1",
+      "bytes": 66176
+    },
+    {
+      "file": "cell_279.npz",
+      "cell": 279,
+      "rows": 3652,
+      "center_ra_deg": 232.5,
+      "center_dec_deg": 25,
+      "cap_radius_deg": 12.5,
+      "sha256": "aefeb120cfc1da65cc52ff9c01862c46b4d52c2dacb1f11ec9921d9c77e04124",
+      "bytes": 76580
+    },
+    {
+      "file": "cell_280.npz",
+      "cell": 280,
+      "rows": 5338,
+      "center_ra_deg": 247.5,
+      "center_dec_deg": 25,
+      "cap_radius_deg": 12.5,
+      "sha256": "9f6a3540e525a35b0dd56a4e445e90c416ffc46ff75ea48a903f780789b2dddc",
+      "bytes": 109853
+    },
+    {
+      "file": "cell_281.npz",
+      "cell": 281,
+      "rows": 8854,
+      "center_ra_deg": 262.5,
+      "center_dec_deg": 25,
+      "cap_radius_deg": 12.5,
+      "sha256": "011697e7db78bd403f9a9896f702edcf4f50fd317eff1c77b37f4838d0019f70",
+      "bytes": 179945
+    },
+    {
+      "file": "cell_282.npz",
+      "cell": 282,
+      "rows": 14690,
+      "center_ra_deg": 277.5,
+      "center_dec_deg": 25,
+      "cap_radius_deg": 12.5,
+      "sha256": "a9ff5a808e87dfee7545d4a2314389293fdb93852271a3051c1f3fd23cbc0336",
+      "bytes": 303743
+    },
+    {
+      "file": "cell_283.npz",
+      "cell": 283,
+      "rows": 17896,
+      "center_ra_deg": 292.5,
+      "center_dec_deg": 25,
+      "cap_radius_deg": 12.5,
+      "sha256": "83c664e62583b436933a5723f5336c0c78937ed1da4c1deb0a5e8af07308f33f",
+      "bytes": 366136
+    },
+    {
+      "file": "cell_284.npz",
+      "cell": 284,
+      "rows": 18279,
+      "center_ra_deg": 307.5,
+      "center_dec_deg": 25,
+      "cap_radius_deg": 12.5,
+      "sha256": "70bc5984cc1b942a397327c9a6ebafd6862e3a8b0046bcb4088de2cf316d4e81",
+      "bytes": 376849
+    },
+    {
+      "file": "cell_285.npz",
+      "cell": 285,
+      "rows": 11943,
+      "center_ra_deg": 322.5,
+      "center_dec_deg": 25,
+      "cap_radius_deg": 12.5,
+      "sha256": "5671fe4c4b55893db350f90fc6f3f3f94698a24838a72d98248f8e6d5e368530",
+      "bytes": 239232
+    },
+    {
+      "file": "cell_286.npz",
+      "cell": 286,
+      "rows": 7950,
+      "center_ra_deg": 337.5,
+      "center_dec_deg": 25,
+      "cap_radius_deg": 12.5,
+      "sha256": "d0d48de3afe1db4eca448a43f2a21b88cca4273a48a0c5a2ca4a2facb20bd2f0",
+      "bytes": 161460
+    },
+    {
+      "file": "cell_287.npz",
+      "cell": 287,
+      "rows": 5601,
+      "center_ra_deg": 352.5,
+      "center_dec_deg": 25,
+      "cap_radius_deg": 12.5,
+      "sha256": "a0786ce42aa3d4e2af283ae4560bbdf6f0a05dc6f5008ee5ac8404f3fcc097c6",
+      "bytes": 114989
+    },
+    {
+      "file": "cell_288.npz",
+      "cell": 288,
+      "rows": 6772,
+      "center_ra_deg": 7.5,
+      "center_dec_deg": 35,
+      "cap_radius_deg": 12.5,
+      "sha256": "672ab237c808642568f0e9903948582afc6a9c3988ecf5142d4b68cd1c68e047",
+      "bytes": 137273
+    },
+    {
+      "file": "cell_289.npz",
+      "cell": 289,
+      "rows": 7276,
+      "center_ra_deg": 22.5,
+      "center_dec_deg": 35,
+      "cap_radius_deg": 12.5,
+      "sha256": "5376a1b58b067f8dd9677a5b5af738a8781f744b59d8139d71dd1fc19ac9039e",
+      "bytes": 146972
+    },
+    {
+      "file": "cell_290.npz",
+      "cell": 290,
+      "rows": 7057,
+      "center_ra_deg": 37.5,
+      "center_dec_deg": 35,
+      "cap_radius_deg": 12.5,
+      "sha256": "05a13daa4ae785cee96d84888d313e1c0e3d17a7814d12f3fdfa15b4fdedbb06",
+      "bytes": 142663
+    },
+    {
+      "file": "cell_291.npz",
+      "cell": 291,
+      "rows": 5589,
+      "center_ra_deg": 52.5,
+      "center_dec_deg": 35,
+      "cap_radius_deg": 12.5,
+      "sha256": "e381baa2cb9f2ac754e879e86665d800179aedfb3e7f17f415d7c2533f259b93",
+      "bytes": 118179
+    },
+    {
+      "file": "cell_292.npz",
+      "cell": 292,
+      "rows": 4891,
+      "center_ra_deg": 67.5,
+      "center_dec_deg": 35,
+      "cap_radius_deg": 12.5,
+      "sha256": "620b09ee076ed218baaa9e43fcdbd6031192845a0f331c76ff37b41d2a167849",
+      "bytes": 105767
+    },
+    {
+      "file": "cell_293.npz",
+      "cell": 293,
+      "rows": 11689,
+      "center_ra_deg": 82.5,
+      "center_dec_deg": 35,
+      "cap_radius_deg": 12.5,
+      "sha256": "072e5687e9ad0ecba4f9e315e46d2d2db3cf1334370cb0c403fd591548a8e4f5",
+      "bytes": 236836
+    },
+    {
+      "file": "cell_294.npz",
+      "cell": 294,
+      "rows": 10383,
+      "center_ra_deg": 97.5,
+      "center_dec_deg": 35,
+      "cap_radius_deg": 12.5,
+      "sha256": "72522e6fd8a75379b8dde0bd0aefcc1e23b881ec9f3056f7313f8a52db6b40a3",
+      "bytes": 209970
+    },
+    {
+      "file": "cell_295.npz",
+      "cell": 295,
+      "rows": 7120,
+      "center_ra_deg": 112.5,
+      "center_dec_deg": 35,
+      "cap_radius_deg": 12.5,
+      "sha256": "ff2689b071812f5df3576ce37b225931b84d36f9ba12284d8ddf7f5accf85bb6",
+      "bytes": 144798
+    },
+    {
+      "file": "cell_296.npz",
+      "cell": 296,
+      "rows": 5019,
+      "center_ra_deg": 127.5,
+      "center_dec_deg": 35,
+      "cap_radius_deg": 12.5,
+      "sha256": "e4f1db3e67dfb2ec9fbbeac5b86dc8c45e2780c3c3c881d9ecc59975063a1907",
+      "bytes": 102805
+    },
+    {
+      "file": "cell_297.npz",
+      "cell": 297,
+      "rows": 3546,
+      "center_ra_deg": 142.5,
+      "center_dec_deg": 35,
+      "cap_radius_deg": 12.5,
+      "sha256": "2e6f4860bcfb104f6600bfd98667c0e0aef84d702e8f6770a9325217ab8aec18",
+      "bytes": 73730
+    },
+    {
+      "file": "cell_298.npz",
+      "cell": 298,
+      "rows": 3005,
+      "center_ra_deg": 157.5,
+      "center_dec_deg": 35,
+      "cap_radius_deg": 12.5,
+      "sha256": "c688c3ed55e6f0799c8f86043b600e69136e9d3ed314fe4bea96bbc28691d8e9",
+      "bytes": 63183
+    },
+    {
+      "file": "cell_299.npz",
+      "cell": 299,
+      "rows": 2398,
+      "center_ra_deg": 172.5,
+      "center_dec_deg": 35,
+      "cap_radius_deg": 12.5,
+      "sha256": "a04458b2446022536a0b6e8dc6d961a928fcc9c1b1f5c1e743a8dd99cbf657c4",
+      "bytes": 51117
+    },
+    {
+      "file": "cell_300.npz",
+      "cell": 300,
+      "rows": 2490,
+      "center_ra_deg": 187.5,
+      "center_dec_deg": 35,
+      "cap_radius_deg": 12.5,
+      "sha256": "55dc41f48483572d9a23081453eef62cf6053e6c6fa8671096e7c711ba57d274",
+      "bytes": 53157
+    },
+    {
+      "file": "cell_301.npz",
+      "cell": 301,
+      "rows": 2728,
+      "center_ra_deg": 202.5,
+      "center_dec_deg": 35,
+      "cap_radius_deg": 12.5,
+      "sha256": "3c32744131a10c8be757fb3e20fa4f0a478d76e66a7b8c3769edbedb44e40f11",
+      "bytes": 57789
+    },
+    {
+      "file": "cell_302.npz",
+      "cell": 302,
+      "rows": 2904,
+      "center_ra_deg": 217.5,
+      "center_dec_deg": 35,
+      "cap_radius_deg": 12.5,
+      "sha256": "bec50231c332c9a5ed1eac02111c700441affaff7ea568873b596bea9f2b29e8",
+      "bytes": 61172
+    },
+    {
+      "file": "cell_303.npz",
+      "cell": 303,
+      "rows": 3566,
+      "center_ra_deg": 232.5,
+      "center_dec_deg": 35,
+      "cap_radius_deg": 12.5,
+      "sha256": "0ce0bd3acbad94d70df0f4ced478b0de27c2098fbeb9b393c308038896717c98",
+      "bytes": 74470
+    },
+    {
+      "file": "cell_304.npz",
+      "cell": 304,
+      "rows": 4731,
+      "center_ra_deg": 247.5,
+      "center_dec_deg": 35,
+      "cap_radius_deg": 12.5,
+      "sha256": "b504e438570bdbfc0f1d654827eea72ce92e82c550521a4ec1cb806b211c8dcd",
+      "bytes": 97934
+    },
+    {
+      "file": "cell_305.npz",
+      "cell": 305,
+      "rows": 7001,
+      "center_ra_deg": 262.5,
+      "center_dec_deg": 35,
+      "cap_radius_deg": 12.5,
+      "sha256": "c4f0eda07423fe1baa43f2e17081336af4247b8e2ba4e2355fb24313b31d31fe",
+      "bytes": 142988
+    },
+    {
+      "file": "cell_306.npz",
+      "cell": 306,
+      "rows": 11586,
+      "center_ra_deg": 277.5,
+      "center_dec_deg": 35,
+      "cap_radius_deg": 12.5,
+      "sha256": "d2c5b24a78246ca59ad47c66fae11f46e70dd8eddaced042b07eec10fcfc84a8",
+      "bytes": 231682
+    },
+    {
+      "file": "cell_307.npz",
+      "cell": 307,
+      "rows": 22189,
+      "center_ra_deg": 292.5,
+      "center_dec_deg": 35,
+      "cap_radius_deg": 12.5,
+      "sha256": "54c63bc33213d5d901e1c05d2b80f91436cd0222d6606437e824696161298ce7",
+      "bytes": 439299
+    },
+    {
+      "file": "cell_308.npz",
+      "cell": 308,
+      "rows": 21067,
+      "center_ra_deg": 307.5,
+      "center_dec_deg": 35,
+      "cap_radius_deg": 12.5,
+      "sha256": "000af24b827d30908c49b5a76c8016e4257ddbaa3d5bdbc9d376a80a1b09b73b",
+      "bytes": 422518
+    },
+    {
+      "file": "cell_309.npz",
+      "cell": 309,
+      "rows": 16059,
+      "center_ra_deg": 322.5,
+      "center_dec_deg": 35,
+      "cap_radius_deg": 12.5,
+      "sha256": "422a0b1a890e8b657b9542119ebb9f2079abc3f4d3db910b419d945841a774b3",
+      "bytes": 318587
+    },
+    {
+      "file": "cell_310.npz",
+      "cell": 310,
+      "rows": 10727,
+      "center_ra_deg": 337.5,
+      "center_dec_deg": 35,
+      "cap_radius_deg": 12.5,
+      "sha256": "6c0ae6cea34bb8c2377694ba610df12261abf203a1fed9b5a31cdd6f2647582b",
+      "bytes": 215844
+    },
+    {
+      "file": "cell_311.npz",
+      "cell": 311,
+      "rows": 7169,
+      "center_ra_deg": 352.5,
+      "center_dec_deg": 35,
+      "cap_radius_deg": 12.5,
+      "sha256": "a87f00b4671dd71fe7c8e5497e03c944dcd6257d75764c86edca377afaeaa00c",
+      "bytes": 145912
+    },
+    {
+      "file": "cell_312.npz",
+      "cell": 312,
+      "rows": 9084,
+      "center_ra_deg": 7.5,
+      "center_dec_deg": 45,
+      "cap_radius_deg": 12.5,
+      "sha256": "a3a4a80bb303d72ec5430394420e1749980aa38e57b859777f1cdbdcc0ea6922",
+      "bytes": 182300
+    },
+    {
+      "file": "cell_313.npz",
+      "cell": 313,
+      "rows": 8806,
+      "center_ra_deg": 22.5,
+      "center_dec_deg": 45,
+      "cap_radius_deg": 12.5,
+      "sha256": "7d4c18dfd755ce9d36333421147190d114adb079d428e108c473624623558abb",
+      "bytes": 176717
+    },
+    {
+      "file": "cell_314.npz",
+      "cell": 314,
+      "rows": 10104,
+      "center_ra_deg": 37.5,
+      "center_dec_deg": 45,
+      "cap_radius_deg": 12.5,
+      "sha256": "d8facb77b50ea788042e0bcbdcf8dc12c548a68f58ad306d61916ff12b38f7bf",
+      "bytes": 200833
+    },
+    {
+      "file": "cell_315.npz",
+      "cell": 315,
+      "rows": 8139,
+      "center_ra_deg": 52.5,
+      "center_dec_deg": 45,
+      "cap_radius_deg": 12.5,
+      "sha256": "03e869fb20d797f4fae120b6fc4a05a754851202b258000c340d119d25a35b1f",
+      "bytes": 164649
+    },
+    {
+      "file": "cell_316.npz",
+      "cell": 316,
+      "rows": 7056,
+      "center_ra_deg": 67.5,
+      "center_dec_deg": 45,
+      "cap_radius_deg": 12.5,
+      "sha256": "ab5094946d8ff694082360d0c4880af69d866f5ce2b85170cb0817f2889b48c5",
+      "bytes": 144730
+    },
+    {
+      "file": "cell_317.npz",
+      "cell": 317,
+      "rows": 8604,
+      "center_ra_deg": 82.5,
+      "center_dec_deg": 45,
+      "cap_radius_deg": 12.5,
+      "sha256": "f8798ad2162d21e51c2bddb2707bc68de8f39dc88b4fd7a0fd695b5c87223e6e",
+      "bytes": 174001
+    },
+    {
+      "file": "cell_318.npz",
+      "cell": 318,
+      "rows": 7580,
+      "center_ra_deg": 97.5,
+      "center_dec_deg": 45,
+      "cap_radius_deg": 12.5,
+      "sha256": "56b3e487355c3d672ee2cc9aa623fc21fe3e73492fd7a34be02cc68f2c6dde24",
+      "bytes": 152592
+    },
+    {
+      "file": "cell_319.npz",
+      "cell": 319,
+      "rows": 4937,
+      "center_ra_deg": 112.5,
+      "center_dec_deg": 45,
+      "cap_radius_deg": 12.5,
+      "sha256": "1580ca6a9b0993e1ca96f26c5460fd7c4133949160623ad5cac5c97aa20a6008",
+      "bytes": 101823
+    },
+    {
+      "file": "cell_320.npz",
+      "cell": 320,
+      "rows": 3471,
+      "center_ra_deg": 127.5,
+      "center_dec_deg": 45,
+      "cap_radius_deg": 12.5,
+      "sha256": "ce2f93cbadc6e2ea8c975436263909bf7ffa173b06b7c67c9db81f6ca4a4de8b",
+      "bytes": 72650
+    },
+    {
+      "file": "cell_321.npz",
+      "cell": 321,
+      "rows": 2917,
+      "center_ra_deg": 142.5,
+      "center_dec_deg": 45,
+      "cap_radius_deg": 12.5,
+      "sha256": "a4b0e829c6740ea708cf8175756e826602583031189b058b3c9b1beb5a9c1eb0",
+      "bytes": 61454
+    },
+    {
+      "file": "cell_322.npz",
+      "cell": 322,
+      "rows": 2549,
+      "center_ra_deg": 157.5,
+      "center_dec_deg": 45,
+      "cap_radius_deg": 12.5,
+      "sha256": "874513a8ab84631455936c42344bcae0f66014e1fc729345c8fdec58cd10c07f",
+      "bytes": 54024
+    },
+    {
+      "file": "cell_323.npz",
+      "cell": 323,
+      "rows": 2229,
+      "center_ra_deg": 172.5,
+      "center_dec_deg": 45,
+      "cap_radius_deg": 12.5,
+      "sha256": "69cd3e0bdc24f8ad536cb69a0ec5a48904ae0d26cd2b671f4ce9d8a56a729a87",
+      "bytes": 47855
+    },
+    {
+      "file": "cell_324.npz",
+      "cell": 324,
+      "rows": 2090,
+      "center_ra_deg": 187.5,
+      "center_dec_deg": 45,
+      "cap_radius_deg": 12.5,
+      "sha256": "2cdf167cbe8de977cdbe4e84cc189ca565dccce318660749cf59f7a05e707ec9",
+      "bytes": 45217
+    },
+    {
+      "file": "cell_325.npz",
+      "cell": 325,
+      "rows": 2300,
+      "center_ra_deg": 202.5,
+      "center_dec_deg": 45,
+      "cap_radius_deg": 12.5,
+      "sha256": "604075dd3c0c3958c93d0003e790a9a47f041b27c811892cee7fc5dbe29a63ce",
+      "bytes": 49234
+    },
+    {
+      "file": "cell_326.npz",
+      "cell": 326,
+      "rows": 2558,
+      "center_ra_deg": 217.5,
+      "center_dec_deg": 45,
+      "cap_radius_deg": 12.5,
+      "sha256": "8b6c9d7b71b8886f4a6142e76fa51d9e7f225d1a8985e328940dec0953164f7f",
+      "bytes": 54643
+    },
+    {
+      "file": "cell_327.npz",
+      "cell": 327,
+      "rows": 2990,
+      "center_ra_deg": 232.5,
+      "center_dec_deg": 45,
+      "cap_radius_deg": 12.5,
+      "sha256": "bac94e9d2226bffc32cf5d2f90567b05996cb88bf411af88eadd1beac838c4ae",
+      "bytes": 63119
+    },
+    {
+      "file": "cell_328.npz",
+      "cell": 328,
+      "rows": 3826,
+      "center_ra_deg": 247.5,
+      "center_dec_deg": 45,
+      "cap_radius_deg": 12.5,
+      "sha256": "f5d8d2293e42fa5ceb894cc7f61b3ee1f365a4f001ffe2a8b4e8e6b342b91d30",
+      "bytes": 80174
+    },
+    {
+      "file": "cell_329.npz",
+      "cell": 329,
+      "rows": 5204,
+      "center_ra_deg": 262.5,
+      "center_dec_deg": 45,
+      "cap_radius_deg": 12.5,
+      "sha256": "c47d35087b41779099236500e4ef2acdad5cb1843dd84494c967f06c01591fc4",
+      "bytes": 107877
+    },
+    {
+      "file": "cell_330.npz",
+      "cell": 330,
+      "rows": 7716,
+      "center_ra_deg": 277.5,
+      "center_dec_deg": 45,
+      "cap_radius_deg": 12.5,
+      "sha256": "198e5f4f8f23cbc329f5326cf15cb2b6b5f3412623d5772befc786c3b20442c5",
+      "bytes": 157339
+    },
+    {
+      "file": "cell_331.npz",
+      "cell": 331,
+      "rows": 13475,
+      "center_ra_deg": 292.5,
+      "center_dec_deg": 45,
+      "cap_radius_deg": 12.5,
+      "sha256": "843d84c0c8f687334cab9cebee6b1361aa4b827f02bcb9d8e0171ded4f8c48dc",
+      "bytes": 269455
+    },
+    {
+      "file": "cell_332.npz",
+      "cell": 332,
+      "rows": 14408,
+      "center_ra_deg": 307.5,
+      "center_dec_deg": 45,
+      "cap_radius_deg": 12.5,
+      "sha256": "9efb49bda220eca069c3d81bd4f395005eea66c40221bad02bcd38ba860dcc68",
+      "bytes": 287693
+    },
+    {
+      "file": "cell_333.npz",
+      "cell": 333,
+      "rows": 15214,
+      "center_ra_deg": 322.5,
+      "center_dec_deg": 45,
+      "cap_radius_deg": 12.5,
+      "sha256": "e1d67b9aa1295a594a41d8276290024d4d9fa44c2361ae945d72c1b44688b6ac",
+      "bytes": 301820
+    },
+    {
+      "file": "cell_334.npz",
+      "cell": 334,
+      "rows": 13371,
+      "center_ra_deg": 337.5,
+      "center_dec_deg": 45,
+      "cap_radius_deg": 12.5,
+      "sha256": "9cdce78bc1f47a8a881a1b43cf4257e5c2c0981a411a3160345cc5238e4eaf9a",
+      "bytes": 266019
+    },
+    {
+      "file": "cell_335.npz",
+      "cell": 335,
+      "rows": 9712,
+      "center_ra_deg": 352.5,
+      "center_dec_deg": 45,
+      "cap_radius_deg": 12.5,
+      "sha256": "64f6ee4fc56db2a0e9ed9276fbead5eb32b5219a29f858169d6d73a83ca3d3f7",
+      "bytes": 195165
+    },
+    {
+      "file": "cell_336.npz",
+      "cell": 336,
+      "rows": 11894,
+      "center_ra_deg": 7.5,
+      "center_dec_deg": 55,
+      "cap_radius_deg": 12.5,
+      "sha256": "6df1b505506811d00fcf273273f302421f89a80c573583622374a0a32957b116",
+      "bytes": 235946
+    },
+    {
+      "file": "cell_337.npz",
+      "cell": 337,
+      "rows": 10796,
+      "center_ra_deg": 22.5,
+      "center_dec_deg": 55,
+      "cap_radius_deg": 12.5,
+      "sha256": "e25838243a08fc1141c5d3775541c3a6afef5676b1cf0cc34465ad5893222c0e",
+      "bytes": 215010
+    },
+    {
+      "file": "cell_338.npz",
+      "cell": 338,
+      "rows": 10503,
+      "center_ra_deg": 37.5,
+      "center_dec_deg": 55,
+      "cap_radius_deg": 12.5,
+      "sha256": "b2fff55132c445e0abf5ed8057cc39a9607c3b5e9a5e2f1ac337d35fdd847a30",
+      "bytes": 208590
+    },
+    {
+      "file": "cell_339.npz",
+      "cell": 339,
+      "rows": 4524,
+      "center_ra_deg": 52.5,
+      "center_dec_deg": 55,
+      "cap_radius_deg": 12.5,
+      "sha256": "b6d4defc7e48ab1f015e7f47254a3df57cfeee6a27a88e234f9e34b37003d333",
+      "bytes": 93319
+    },
+    {
+      "file": "cell_340.npz",
+      "cell": 340,
+      "rows": 5489,
+      "center_ra_deg": 67.5,
+      "center_dec_deg": 55,
+      "cap_radius_deg": 12.5,
+      "sha256": "77adeaa5078d14c69bf183c4676154e7129da1990585ec181ee83d8c8555a327",
+      "bytes": 112285
+    },
+    {
+      "file": "cell_341.npz",
+      "cell": 341,
+      "rows": 5218,
+      "center_ra_deg": 82.5,
+      "center_dec_deg": 55,
+      "cap_radius_deg": 12.5,
+      "sha256": "4e68e52f5eea2061ab7784040ef685bdd5933967302e8615bc4f018ff3d3b1a6",
+      "bytes": 107315
+    },
+    {
+      "file": "cell_342.npz",
+      "cell": 342,
+      "rows": 5525,
+      "center_ra_deg": 97.5,
+      "center_dec_deg": 55,
+      "cap_radius_deg": 12.5,
+      "sha256": "3eea850b1c8b787f20c125898779f8afb97001d407571cd64ea901967ddad45a",
+      "bytes": 113945
+    },
+    {
+      "file": "cell_343.npz",
+      "cell": 343,
+      "rows": 4346,
+      "center_ra_deg": 112.5,
+      "center_dec_deg": 55,
+      "cap_radius_deg": 12.5,
+      "sha256": "58cfafd13a275dafdf0a6709469d4afe71fab38e547edcf7de08f6d53aae3355",
+      "bytes": 91185
+    },
+    {
+      "file": "cell_344.npz",
+      "cell": 344,
+      "rows": 2996,
+      "center_ra_deg": 127.5,
+      "center_dec_deg": 55,
+      "cap_radius_deg": 12.5,
+      "sha256": "b038c918047d9f2c577acc8e4f9ef60681720f4caca7d6bba1802ba62a6fc43b",
+      "bytes": 64052
+    },
+    {
+      "file": "cell_345.npz",
+      "cell": 345,
+      "rows": 2707,
+      "center_ra_deg": 142.5,
+      "center_dec_deg": 55,
+      "cap_radius_deg": 12.5,
+      "sha256": "d0c16c856dbf7efee604530f8f42a0bbdf1b62d02ce9cf40b82211534be31b63",
+      "bytes": 57827
+    },
+    {
+      "file": "cell_346.npz",
+      "cell": 346,
+      "rows": 2425,
+      "center_ra_deg": 157.5,
+      "center_dec_deg": 55,
+      "cap_radius_deg": 12.5,
+      "sha256": "8f0e2562c03d8db3ec5a8a84b56271dff9574a8d6bdc2ee85e88d3d23d6f6316",
+      "bytes": 52032
+    },
+    {
+      "file": "cell_347.npz",
+      "cell": 347,
+      "rows": 2111,
+      "center_ra_deg": 172.5,
+      "center_dec_deg": 55,
+      "cap_radius_deg": 12.5,
+      "sha256": "32f745a9bf42a888389dc62a5685e8633ecfc5647ab1bff514b77a067d10df2a",
+      "bytes": 45714
+    },
+    {
+      "file": "cell_348.npz",
+      "cell": 348,
+      "rows": 2126,
+      "center_ra_deg": 187.5,
+      "center_dec_deg": 55,
+      "cap_radius_deg": 12.5,
+      "sha256": "4687fe56d04b063b992462f5a38cf28f028dcfffedd564eef25b6fc9c7ac2346",
+      "bytes": 46293
+    },
+    {
+      "file": "cell_349.npz",
+      "cell": 349,
+      "rows": 2125,
+      "center_ra_deg": 202.5,
+      "center_dec_deg": 55,
+      "cap_radius_deg": 12.5,
+      "sha256": "4428832da0d131dad17e43d7bc94673be76b62f795f8c206ee546811485e16a5",
+      "bytes": 46270
+    },
+    {
+      "file": "cell_350.npz",
+      "cell": 350,
+      "rows": 2250,
+      "center_ra_deg": 217.5,
+      "center_dec_deg": 55,
+      "cap_radius_deg": 12.5,
+      "sha256": "7ea5849ca6a713856b2d2ac1a4baa0d2ee9a66f319c0970855c19522841f20c3",
+      "bytes": 48928
+    },
+    {
+      "file": "cell_351.npz",
+      "cell": 351,
+      "rows": 2618,
+      "center_ra_deg": 232.5,
+      "center_dec_deg": 55,
+      "cap_radius_deg": 12.5,
+      "sha256": "f5af34af920b74a43b6a6e5216d3bdd6ae66dfe9a415dda090915e2d63fcb438",
+      "bytes": 56052
+    },
+    {
+      "file": "cell_352.npz",
+      "cell": 352,
+      "rows": 3190,
+      "center_ra_deg": 247.5,
+      "center_dec_deg": 55,
+      "cap_radius_deg": 12.5,
+      "sha256": "4a7adbfd65c58a3a7e1f9eadea3054e44dae741c49d56687f8821f5be0af4420",
+      "bytes": 68069
+    },
+    {
+      "file": "cell_353.npz",
+      "cell": 353,
+      "rows": 3683,
+      "center_ra_deg": 262.5,
+      "center_dec_deg": 55,
+      "cap_radius_deg": 12.5,
+      "sha256": "d64b2a2046fab560f5508500d2e75fe5062586a97ea0bff57f2acdea385f6f1e",
+      "bytes": 78279
+    },
+    {
+      "file": "cell_354.npz",
+      "cell": 354,
+      "rows": 5808,
+      "center_ra_deg": 277.5,
+      "center_dec_deg": 55,
+      "cap_radius_deg": 12.5,
+      "sha256": "935c5eed470fe7ad50f4ccc76233aa62a5f6d0e74b3fdb74b3c89a1aa856aa73",
+      "bytes": 120437
+    },
+    {
+      "file": "cell_355.npz",
+      "cell": 355,
+      "rows": 8824,
+      "center_ra_deg": 292.5,
+      "center_dec_deg": 55,
+      "cap_radius_deg": 12.5,
+      "sha256": "7184b26fc26c7e78d8c25806ee281861dd4f9c470dec25901ed070d23a9a7108",
+      "bytes": 180284
+    },
+    {
+      "file": "cell_356.npz",
+      "cell": 356,
+      "rows": 9025,
+      "center_ra_deg": 307.5,
+      "center_dec_deg": 55,
+      "cap_radius_deg": 12.5,
+      "sha256": "4105bcc06e0f8ae2e4cab570f94f525ad6f525ac3e675d1b45bd945c31fcf404",
+      "bytes": 183842
+    },
+    {
+      "file": "cell_357.npz",
+      "cell": 357,
+      "rows": 9037,
+      "center_ra_deg": 322.5,
+      "center_dec_deg": 55,
+      "cap_radius_deg": 12.5,
+      "sha256": "8ed7816ed59543b28f0d4607bf255505c910a69bea43fb3b2ff9c596090e8a48",
+      "bytes": 182756
+    },
+    {
+      "file": "cell_358.npz",
+      "cell": 358,
+      "rows": 15341,
+      "center_ra_deg": 337.5,
+      "center_dec_deg": 55,
+      "cap_radius_deg": 12.5,
+      "sha256": "ef5f07cd6320e12a7611d047ddf868f476084c3d6a3044f237e5306e39eb85fa",
+      "bytes": 303100
+    },
+    {
+      "file": "cell_359.npz",
+      "cell": 359,
+      "rows": 12400,
+      "center_ra_deg": 352.5,
+      "center_dec_deg": 55,
+      "cap_radius_deg": 12.5,
+      "sha256": "87881d16aebca7d27b3c36765fe3bac46487d69fea1fad518179447667585259",
+      "bytes": 246674
+    },
+    {
+      "file": "cell_360.npz",
+      "cell": 360,
+      "rows": 6473,
+      "center_ra_deg": 7.5,
+      "center_dec_deg": 65,
+      "cap_radius_deg": 12.5,
+      "sha256": "7c7cc6f7164142ecc84eb6f161d7662bc31df09df076b92310202b797c412fbe",
+      "bytes": 130099
+    },
+    {
+      "file": "cell_361.npz",
+      "cell": 361,
+      "rows": 5997,
+      "center_ra_deg": 22.5,
+      "center_dec_deg": 65,
+      "cap_radius_deg": 12.5,
+      "sha256": "d6f4532693affe6dce61330029ae668dc19a93042e9eda477143ef1263b46812",
+      "bytes": 120689
+    },
+    {
+      "file": "cell_362.npz",
+      "cell": 362,
+      "rows": 4783,
+      "center_ra_deg": 37.5,
+      "center_dec_deg": 65,
+      "cap_radius_deg": 12.5,
+      "sha256": "273b950c3138c5a435c72563efbd955ee64947e889b6e469427b37a73108197a",
+      "bytes": 98001
+    },
+    {
+      "file": "cell_363.npz",
+      "cell": 363,
+      "rows": 4247,
+      "center_ra_deg": 52.5,
+      "center_dec_deg": 65,
+      "cap_radius_deg": 12.5,
+      "sha256": "348b7fc7c6ac46ba47b4dcb4ec7088bdfe3a783af26e0376a536dc1044e4b501",
+      "bytes": 87648
+    },
+    {
+      "file": "cell_364.npz",
+      "cell": 364,
+      "rows": 3604,
+      "center_ra_deg": 67.5,
+      "center_dec_deg": 65,
+      "cap_radius_deg": 12.5,
+      "sha256": "0573e44a1e965e9438ed917250e5a3fce72cf4a9564bd1f2ed934958c115cb0d",
+      "bytes": 74970
+    },
+    {
+      "file": "cell_365.npz",
+      "cell": 365,
+      "rows": 4087,
+      "center_ra_deg": 82.5,
+      "center_dec_deg": 65,
+      "cap_radius_deg": 12.5,
+      "sha256": "03ebe2e591e15913f581c4b24d47033c64fb5eb8e9bfc30efbb145fdbf2e7482",
+      "bytes": 84546
+    },
+    {
+      "file": "cell_366.npz",
+      "cell": 366,
+      "rows": 3615,
+      "center_ra_deg": 97.5,
+      "center_dec_deg": 65,
+      "cap_radius_deg": 12.5,
+      "sha256": "71422575f2d24b036bb9ec2b9e9c453cf1a5c7255c65fb461bd6dba6ff1c5f0d",
+      "bytes": 75771
+    },
+    {
+      "file": "cell_367.npz",
+      "cell": 367,
+      "rows": 3084,
+      "center_ra_deg": 112.5,
+      "center_dec_deg": 65,
+      "cap_radius_deg": 12.5,
+      "sha256": "bbf157faef85aa751bafbb43ecc043d7d4d0652495de42099e9c294ae6eb7140",
+      "bytes": 65413
+    },
+    {
+      "file": "cell_368.npz",
+      "cell": 368,
+      "rows": 2502,
+      "center_ra_deg": 127.5,
+      "center_dec_deg": 65,
+      "cap_radius_deg": 12.5,
+      "sha256": "cfe3fa270cb3db934c4ccf35387ea6164936e7f739eb3668e6fba7fbef180930",
+      "bytes": 53612
+    },
+    {
+      "file": "cell_369.npz",
+      "cell": 369,
+      "rows": 1981,
+      "center_ra_deg": 142.5,
+      "center_dec_deg": 65,
+      "cap_radius_deg": 12.5,
+      "sha256": "ebcfd2def4ed8b9e354c9a32f69d2d220075aec2a1242b2e7a45ae28d3182445",
+      "bytes": 42901
+    },
+    {
+      "file": "cell_370.npz",
+      "cell": 370,
+      "rows": 1959,
+      "center_ra_deg": 157.5,
+      "center_dec_deg": 65,
+      "cap_radius_deg": 12.5,
+      "sha256": "0255ae706f93a6adc2d12d9245cf53acaeb5fa62efd4b504def50fba6b1765a8",
+      "bytes": 42368
+    },
+    {
+      "file": "cell_371.npz",
+      "cell": 371,
+      "rows": 1872,
+      "center_ra_deg": 172.5,
+      "center_dec_deg": 65,
+      "cap_radius_deg": 12.5,
+      "sha256": "f736b2916834bbf5494b2a3ca3047cabace66068a0b17870c93818feee73d409",
+      "bytes": 40728
+    },
+    {
+      "file": "cell_372.npz",
+      "cell": 372,
+      "rows": 1711,
+      "center_ra_deg": 187.5,
+      "center_dec_deg": 65,
+      "cap_radius_deg": 12.5,
+      "sha256": "0d86dbc15ba0c731b9203f9b0b1df2a26d5503a376b3cdfd35945d47b1f3eb03",
+      "bytes": 37532
+    },
+    {
+      "file": "cell_373.npz",
+      "cell": 373,
+      "rows": 1755,
+      "center_ra_deg": 202.5,
+      "center_dec_deg": 65,
+      "cap_radius_deg": 12.5,
+      "sha256": "8ee0d7e86fb5765d1da58adb0b129a049e9e26cf13fe28bbf85827a5be525e8f",
+      "bytes": 38275
+    },
+    {
+      "file": "cell_374.npz",
+      "cell": 374,
+      "rows": 1959,
+      "center_ra_deg": 217.5,
+      "center_dec_deg": 65,
+      "cap_radius_deg": 12.5,
+      "sha256": "fae5b0f39b22ba7945a47de77d47f4d25dd01b9dd4d3b663bc752ca0ddf5baf4",
+      "bytes": 42599
+    },
+    {
+      "file": "cell_375.npz",
+      "cell": 375,
+      "rows": 2208,
+      "center_ra_deg": 232.5,
+      "center_dec_deg": 65,
+      "cap_radius_deg": 12.5,
+      "sha256": "6fd344f7deb049737be4e0c8e0c0bdf87d3a810bdd67d8d8067173964529dfa3",
+      "bytes": 47714
+    },
+    {
+      "file": "cell_376.npz",
+      "cell": 376,
+      "rows": 2374,
+      "center_ra_deg": 247.5,
+      "center_dec_deg": 65,
+      "cap_radius_deg": 12.5,
+      "sha256": "cd7cd390c910e8d58ca60908a6fb29478ef4949f0f67668b039127eb8b6d4428",
+      "bytes": 51114
+    },
+    {
+      "file": "cell_377.npz",
+      "cell": 377,
+      "rows": 3002,
+      "center_ra_deg": 262.5,
+      "center_dec_deg": 65,
+      "cap_radius_deg": 12.5,
+      "sha256": "7d8a439fff67603e42088856776eedb07e9aca89700b6e0fcc40fb983e41c7fa",
+      "bytes": 63701
+    },
+    {
+      "file": "cell_378.npz",
+      "cell": 378,
+      "rows": 3830,
+      "center_ra_deg": 277.5,
+      "center_dec_deg": 65,
+      "cap_radius_deg": 12.5,
+      "sha256": "e3d0374255c38bd5608bac148587778b8767f345120f0ba8f9e75157dee10ce3",
+      "bytes": 80524
+    },
+    {
+      "file": "cell_379.npz",
+      "cell": 379,
+      "rows": 5076,
+      "center_ra_deg": 292.5,
+      "center_dec_deg": 65,
+      "cap_radius_deg": 12.5,
+      "sha256": "fec18c323b23d6dd363bf5b2417f7fceafd3a794698aabe2ee28636cc8f6b0b8",
+      "bytes": 105143
+    },
+    {
+      "file": "cell_380.npz",
+      "cell": 380,
+      "rows": 4444,
+      "center_ra_deg": 307.5,
+      "center_dec_deg": 65,
+      "cap_radius_deg": 12.5,
+      "sha256": "b84004cedcf285b16111f0a10e57e3c82aca80c73a685437707a2be0ff415207",
+      "bytes": 92927
+    },
+    {
+      "file": "cell_381.npz",
+      "cell": 381,
+      "rows": 5120,
+      "center_ra_deg": 322.5,
+      "center_dec_deg": 65,
+      "cap_radius_deg": 12.5,
+      "sha256": "6d1e132f249612111fbf6e49d2fd700f5a209d86d32823ef77e374af4c83e8d3",
+      "bytes": 105631
+    },
+    {
+      "file": "cell_382.npz",
+      "cell": 382,
+      "rows": 4928,
+      "center_ra_deg": 337.5,
+      "center_dec_deg": 65,
+      "cap_radius_deg": 12.5,
+      "sha256": "9426302d6ae1f3ec4e475f987174eeb97389e5ab9f063d5d14d3cfe53f6aca92",
+      "bytes": 101164
+    },
+    {
+      "file": "cell_383.npz",
+      "cell": 383,
+      "rows": 5823,
+      "center_ra_deg": 352.5,
+      "center_dec_deg": 65,
+      "cap_radius_deg": 12.5,
+      "sha256": "f5636510eeeec8fbb0ba0cd402c14100099050b047bef2a3625762e8e3acd355",
+      "bytes": 118193
+    },
+    {
+      "file": "cell_384.npz",
+      "cell": 384,
+      "rows": 2680,
+      "center_ra_deg": 7.5,
+      "center_dec_deg": 75,
+      "cap_radius_deg": 12.5,
+      "sha256": "16db8c658e1e1c0324d8271a64c4f7107522041cc083de3d17ae1efc326d9da1",
+      "bytes": 56766
+    },
+    {
+      "file": "cell_385.npz",
+      "cell": 385,
+      "rows": 2483,
+      "center_ra_deg": 22.5,
+      "center_dec_deg": 75,
+      "cap_radius_deg": 12.5,
+      "sha256": "2158193e6f0725949b954dfd4b2dd7c55436086eccebebb812470359f94214f4",
+      "bytes": 52651
+    },
+    {
+      "file": "cell_386.npz",
+      "cell": 386,
+      "rows": 2119,
+      "center_ra_deg": 37.5,
+      "center_dec_deg": 75,
+      "cap_radius_deg": 12.5,
+      "sha256": "9cc66aa5ce5f4e76301d342d7274ee34783d0edfc9efa73b1ae7c55a91db79ef",
+      "bytes": 45642
+    },
+    {
+      "file": "cell_387.npz",
+      "cell": 387,
+      "rows": 2328,
+      "center_ra_deg": 52.5,
+      "center_dec_deg": 75,
+      "cap_radius_deg": 12.5,
+      "sha256": "0b98c9aa8851d4e57abc1c7d02bbc61cbd4a9cddf9220322efc6caf1ba1e0d86",
+      "bytes": 49917
+    },
+    {
+      "file": "cell_388.npz",
+      "cell": 388,
+      "rows": 2784,
+      "center_ra_deg": 67.5,
+      "center_dec_deg": 75,
+      "cap_radius_deg": 12.5,
+      "sha256": "8c52f0f1da32e848981677a15fa2373cb9dcccebb69264a1db61a322ddc0484f",
+      "bytes": 58547
+    },
+    {
+      "file": "cell_389.npz",
+      "cell": 389,
+      "rows": 2367,
+      "center_ra_deg": 82.5,
+      "center_dec_deg": 75,
+      "cap_radius_deg": 12.5,
+      "sha256": "5cb7b9a4f1a2e1678e776c2582b258101f131beb7614740bb8fd21412b9af2f3",
+      "bytes": 50731
+    },
+    {
+      "file": "cell_390.npz",
+      "cell": 390,
+      "rows": 1989,
+      "center_ra_deg": 97.5,
+      "center_dec_deg": 75,
+      "cap_radius_deg": 12.5,
+      "sha256": "ba30dc74ca0eafba31790b32c44d70b6fd8d48ada6a7ceb4a7900364606f31ce",
+      "bytes": 43499
+    },
+    {
+      "file": "cell_391.npz",
+      "cell": 391,
+      "rows": 2201,
+      "center_ra_deg": 112.5,
+      "center_dec_deg": 75,
+      "cap_radius_deg": 12.5,
+      "sha256": "589e27d3082806b3081df7d4143871aed0db18808e792b25cec7ab2193c7bdcf",
+      "bytes": 47779
+    },
+    {
+      "file": "cell_392.npz",
+      "cell": 392,
+      "rows": 1873,
+      "center_ra_deg": 127.5,
+      "center_dec_deg": 75,
+      "cap_radius_deg": 12.5,
+      "sha256": "214d5cc54554bd308b9cbc68123f4488096ccc274a0453ea3b8d4875cff7a23d",
+      "bytes": 41083
+    },
+    {
+      "file": "cell_393.npz",
+      "cell": 393,
+      "rows": 1574,
+      "center_ra_deg": 142.5,
+      "center_dec_deg": 75,
+      "cap_radius_deg": 12.5,
+      "sha256": "027189512b7de456103932037111f4722cb838f7f59fee8315d519833d277f1e",
+      "bytes": 34942
+    },
+    {
+      "file": "cell_394.npz",
+      "cell": 394,
+      "rows": 1362,
+      "center_ra_deg": 157.5,
+      "center_dec_deg": 75,
+      "cap_radius_deg": 12.5,
+      "sha256": "a12866c3df774a81ad5356c302fed65e3c9d4789d750a8ee94266d9698248e64",
+      "bytes": 30642
+    },
+    {
+      "file": "cell_395.npz",
+      "cell": 395,
+      "rows": 1414,
+      "center_ra_deg": 172.5,
+      "center_dec_deg": 75,
+      "cap_radius_deg": 12.5,
+      "sha256": "0680327d5564f0403ab6eb8e179d391380ca65eedf04f4d745a1e21e4dc698a2",
+      "bytes": 31715
+    },
+    {
+      "file": "cell_396.npz",
+      "cell": 396,
+      "rows": 1438,
+      "center_ra_deg": 187.5,
+      "center_dec_deg": 75,
+      "cap_radius_deg": 12.5,
+      "sha256": "3a7ed5c45069bad1bfdf82a4181d023ec725d995c08d289f8806aa34b4fa0a98",
+      "bytes": 32392
+    },
+    {
+      "file": "cell_397.npz",
+      "cell": 397,
+      "rows": 1379,
+      "center_ra_deg": 202.5,
+      "center_dec_deg": 75,
+      "cap_radius_deg": 12.5,
+      "sha256": "b966c9e67bfb4717c82e31f085e964d4da639ebb398011f7b162973fdfaa3f59",
+      "bytes": 30996
+    },
+    {
+      "file": "cell_398.npz",
+      "cell": 398,
+      "rows": 1523,
+      "center_ra_deg": 217.5,
+      "center_dec_deg": 75,
+      "cap_radius_deg": 12.5,
+      "sha256": "e5678da7474e83af8542568e874992cbcaa08fb94979bf711ba82ba87248aef9",
+      "bytes": 33888
+    },
+    {
+      "file": "cell_399.npz",
+      "cell": 399,
+      "rows": 1598,
+      "center_ra_deg": 232.5,
+      "center_dec_deg": 75,
+      "cap_radius_deg": 12.5,
+      "sha256": "15bdccb061f4758f6dbbd1c13bd475c5664184d64237d7743d2bfdbbc5d98e89",
+      "bytes": 35427
+    },
+    {
+      "file": "cell_400.npz",
+      "cell": 400,
+      "rows": 1766,
+      "center_ra_deg": 247.5,
+      "center_dec_deg": 75,
+      "cap_radius_deg": 12.5,
+      "sha256": "7e5725ebcb4be36a807cb06399dc33ef8b4b89e44ce3729ced9c6fc2bf58521a",
+      "bytes": 38677
+    },
+    {
+      "file": "cell_401.npz",
+      "cell": 401,
+      "rows": 1930,
+      "center_ra_deg": 262.5,
+      "center_dec_deg": 75,
+      "cap_radius_deg": 12.5,
+      "sha256": "22c1be654f3c9a01c3318db21357d51950bc678513ba1a9e405481e6517ad0ec",
+      "bytes": 42241
+    },
+    {
+      "file": "cell_402.npz",
+      "cell": 402,
+      "rows": 2157,
+      "center_ra_deg": 277.5,
+      "center_dec_deg": 75,
+      "cap_radius_deg": 12.5,
+      "sha256": "565de62f5d97b833a8306a94bd9f8136035f079e3d85470556620ca644c9881b",
+      "bytes": 47078
+    },
+    {
+      "file": "cell_403.npz",
+      "cell": 403,
+      "rows": 2244,
+      "center_ra_deg": 292.5,
+      "center_dec_deg": 75,
+      "cap_radius_deg": 12.5,
+      "sha256": "b58e38c2982eb1faf4e077582c432f16dfa5510fbe6c347f7a6ebab7bf650e8e",
+      "bytes": 49296
+    },
+    {
+      "file": "cell_404.npz",
+      "cell": 404,
+      "rows": 1921,
+      "center_ra_deg": 307.5,
+      "center_dec_deg": 75,
+      "cap_radius_deg": 12.5,
+      "sha256": "e8db2533baae7bdadb32a4c4f327621127ecc82bf1a29b3d79e02c9c35eecc21",
+      "bytes": 42563
+    },
+    {
+      "file": "cell_405.npz",
+      "cell": 405,
+      "rows": 1540,
+      "center_ra_deg": 322.5,
+      "center_dec_deg": 75,
+      "cap_radius_deg": 12.5,
+      "sha256": "6b399fc842be97485dda872b07e9ec9074fe25fbdd0373a7b927f4f41affc8fb",
+      "bytes": 34750
+    },
+    {
+      "file": "cell_406.npz",
+      "cell": 406,
+      "rows": 2467,
+      "center_ra_deg": 337.5,
+      "center_dec_deg": 75,
+      "cap_radius_deg": 12.5,
+      "sha256": "5134db1d9de76fda6bb4ae3b7bfb42dc11021023a250bd3e43fe6a40055cb4ec",
+      "bytes": 53004
+    },
+    {
+      "file": "cell_407.npz",
+      "cell": 407,
+      "rows": 2808,
+      "center_ra_deg": 352.5,
+      "center_dec_deg": 75,
+      "cap_radius_deg": 12.5,
+      "sha256": "6dc6319b6b8808e8a91acdb6df4d473f740eb9de05f9cf316fdef8ad46edce12",
+      "bytes": 59670
+    },
+    {
+      "file": "cell_408.npz",
+      "cell": 408,
+      "rows": 788,
+      "center_ra_deg": 7.5,
+      "center_dec_deg": 85,
+      "cap_radius_deg": 12.5,
+      "sha256": "d1b56379911445df8f381ecccb68f95dd9d0f578947e8481585578e78fced45c",
+      "bytes": 18968
+    },
+    {
+      "file": "cell_409.npz",
+      "cell": 409,
+      "rows": 807,
+      "center_ra_deg": 22.5,
+      "center_dec_deg": 85,
+      "cap_radius_deg": 12.5,
+      "sha256": "1cb4e14553ed16f006720418138578cc055529c0a4a3ffab485a4671dd1d5c23",
+      "bytes": 19335
+    },
+    {
+      "file": "cell_410.npz",
+      "cell": 410,
+      "rows": 655,
+      "center_ra_deg": 37.5,
+      "center_dec_deg": 85,
+      "cap_radius_deg": 12.5,
+      "sha256": "5a240bbca175af14106832cc6499990bab36c2ec3543e6f94c817cd8ee11bb12",
+      "bytes": 16294
+    },
+    {
+      "file": "cell_411.npz",
+      "cell": 411,
+      "rows": 736,
+      "center_ra_deg": 52.5,
+      "center_dec_deg": 85,
+      "cap_radius_deg": 12.5,
+      "sha256": "10fd6d6c753f0d72f440c88eefb627720232337d449bb323e6368677bb017b09",
+      "bytes": 17857
+    },
+    {
+      "file": "cell_412.npz",
+      "cell": 412,
+      "rows": 742,
+      "center_ra_deg": 67.5,
+      "center_dec_deg": 85,
+      "cap_radius_deg": 12.5,
+      "sha256": "224c100ac973c75056adfadc5c1089929fbeeb1c0074d8b52634ea227fcb91f4",
+      "bytes": 18026
+    },
+    {
+      "file": "cell_413.npz",
+      "cell": 413,
+      "rows": 736,
+      "center_ra_deg": 82.5,
+      "center_dec_deg": 85,
+      "cap_radius_deg": 12.5,
+      "sha256": "dfb490b390c63e79c3a8057960dc3e837b91ab41b508ca9519b971430a88064c",
+      "bytes": 18032
+    },
+    {
+      "file": "cell_414.npz",
+      "cell": 414,
+      "rows": 701,
+      "center_ra_deg": 97.5,
+      "center_dec_deg": 85,
+      "cap_radius_deg": 12.5,
+      "sha256": "262d25e79e0b5beb51c5fc967408f9d8d476a492b9c62d89fc6c6d652894169a",
+      "bytes": 17381
+    },
+    {
+      "file": "cell_415.npz",
+      "cell": 415,
+      "rows": 698,
+      "center_ra_deg": 112.5,
+      "center_dec_deg": 85,
+      "cap_radius_deg": 12.5,
+      "sha256": "474739665a7f0c5189b16a1f080231242022b59c7f7700a057e96d2a1cb72c10",
+      "bytes": 17429
+    },
+    {
+      "file": "cell_416.npz",
+      "cell": 416,
+      "rows": 641,
+      "center_ra_deg": 127.5,
+      "center_dec_deg": 85,
+      "cap_radius_deg": 12.5,
+      "sha256": "30e2c8dbbe9c305f8b9f14644d722c7a821256d4527a0f4d40ef3e7e05003936",
+      "bytes": 16084
+    },
+    {
+      "file": "cell_417.npz",
+      "cell": 417,
+      "rows": 626,
+      "center_ra_deg": 142.5,
+      "center_dec_deg": 85,
+      "cap_radius_deg": 12.5,
+      "sha256": "923b330b94b17393a3f252973d6f1b24321def2531cd761a51d7b376a8aa22cd",
+      "bytes": 15713
+    },
+    {
+      "file": "cell_418.npz",
+      "cell": 418,
+      "rows": 530,
+      "center_ra_deg": 157.5,
+      "center_dec_deg": 85,
+      "cap_radius_deg": 12.5,
+      "sha256": "9c02659dd29ed15fa78b5c0ba48c25592fecead81bc5076db72146731684c06b",
+      "bytes": 13701
+    },
+    {
+      "file": "cell_419.npz",
+      "cell": 419,
+      "rows": 483,
+      "center_ra_deg": 172.5,
+      "center_dec_deg": 85,
+      "cap_radius_deg": 12.5,
+      "sha256": "3d9a47069215a75b88221aa664dc93a8abfd73a9f1926c40d32ad5a3c8355419",
+      "bytes": 12716
+    },
+    {
+      "file": "cell_420.npz",
+      "cell": 420,
+      "rows": 453,
+      "center_ra_deg": 187.5,
+      "center_dec_deg": 85,
+      "cap_radius_deg": 12.5,
+      "sha256": "86a415cca1c95f10e7bb3853b5b056097a13bcce4c7474bbb2704c72fcf4e238",
+      "bytes": 12138
+    },
+    {
+      "file": "cell_421.npz",
+      "cell": 421,
+      "rows": 542,
+      "center_ra_deg": 202.5,
+      "center_dec_deg": 85,
+      "cap_radius_deg": 12.5,
+      "sha256": "8dc3d211e27082b1197adb3c073a473f6629b7b1e1d4267a62470d47aaf1daa6",
+      "bytes": 13976
+    },
+    {
+      "file": "cell_422.npz",
+      "cell": 422,
+      "rows": 565,
+      "center_ra_deg": 217.5,
+      "center_dec_deg": 85,
+      "cap_radius_deg": 12.5,
+      "sha256": "1180a41fa9d29b8810aeaa56f64537d5389b569e0966cbfe9187a84f3650a9f0",
+      "bytes": 14408
+    },
+    {
+      "file": "cell_423.npz",
+      "cell": 423,
+      "rows": 562,
+      "center_ra_deg": 232.5,
+      "center_dec_deg": 85,
+      "cap_radius_deg": 12.5,
+      "sha256": "39a524572cc7ebfe5e264b02619681eb5440fc043102dedec7297d9842896e9f",
+      "bytes": 14446
+    },
+    {
+      "file": "cell_424.npz",
+      "cell": 424,
+      "rows": 561,
+      "center_ra_deg": 247.5,
+      "center_dec_deg": 85,
+      "cap_radius_deg": 12.5,
+      "sha256": "e150746364535de6da5668ea5a836df73f269a50422b12213974928afb32904c",
+      "bytes": 14442
+    },
+    {
+      "file": "cell_425.npz",
+      "cell": 425,
+      "rows": 645,
+      "center_ra_deg": 262.5,
+      "center_dec_deg": 85,
+      "cap_radius_deg": 12.5,
+      "sha256": "c421387de9d5945753bf4da96a8cce1c3fa3922f7cf778ae917c5c99d22826a2",
+      "bytes": 16240
+    },
+    {
+      "file": "cell_426.npz",
+      "cell": 426,
+      "rows": 698,
+      "center_ra_deg": 277.5,
+      "center_dec_deg": 85,
+      "cap_radius_deg": 12.5,
+      "sha256": "110b73fc757765285107f3e71b7d31c8482aac3ded3bad098f05fba580e7f7ec",
+      "bytes": 17482
+    },
+    {
+      "file": "cell_427.npz",
+      "cell": 427,
+      "rows": 763,
+      "center_ra_deg": 292.5,
+      "center_dec_deg": 85,
+      "cap_radius_deg": 12.5,
+      "sha256": "3d1f69ca79a5ff91d31442ef2acc3bf56be008254f875e2ffb0d2d8dfc6983ee",
+      "bytes": 18756
+    },
+    {
+      "file": "cell_428.npz",
+      "cell": 428,
+      "rows": 666,
+      "center_ra_deg": 307.5,
+      "center_dec_deg": 85,
+      "cap_radius_deg": 12.5,
+      "sha256": "a61341d1a232c6383121abc17b96033daf279871e8ff9801a3b4b4c798e0615e",
+      "bytes": 16755
+    },
+    {
+      "file": "cell_429.npz",
+      "cell": 429,
+      "rows": 736,
+      "center_ra_deg": 322.5,
+      "center_dec_deg": 85,
+      "cap_radius_deg": 12.5,
+      "sha256": "6cdd2a87470d9eda06cc4e9cd09c47b4e8e806a436bfb924174bb4be3c977e54",
+      "bytes": 18098
+    },
+    {
+      "file": "cell_430.npz",
+      "cell": 430,
+      "rows": 628,
+      "center_ra_deg": 337.5,
+      "center_dec_deg": 85,
+      "cap_radius_deg": 12.5,
+      "sha256": "53bb625de876d122c99cf335e88e8f415f2cc3ae4cf714aeb99c370ac09fe4cb",
+      "bytes": 15784
+    },
+    {
+      "file": "cell_431.npz",
+      "cell": 431,
+      "rows": 756,
+      "center_ra_deg": 352.5,
+      "center_dec_deg": 85,
+      "cap_radius_deg": 12.5,
+      "sha256": "42c58b3c2def876664e9bb1d4118acbb519777d184fb36d9d16dc7b2b8f89365",
+      "bytes": 18402
+    }
+  ]
+}

@@ -1,5 +1,6 @@
-import { useDeferredValue, useEffect, useMemo, useState, type CSSProperties } from 'react'
-import { DEFAULT_SETTINGS, LAYER_LABELS, type AnalysisResult, type AnalysisSettings, type DetectedObject, type LayerKey } from '../types'
+import { useDeferredValue, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
+import { fetchObjectMedia, getCachedObjectMedia } from '../api'
+import { DEFAULT_SETTINGS, LAYER_LABELS, type AnalysisResult, type AnalysisSettings, type DetectedObject, type LayerKey, type ObjectMedia } from '../types'
 import { ChevronRightIcon, CrosshairIcon, MapIcon } from './Icons'
 
 interface ResultSidebarProps {
@@ -36,33 +37,75 @@ export function AnnotationSettings({ settings, onSettingsChange, settingsDirty, 
     <label className="workbench-field"><span>深空目录</span><select value={settings.catalogDepth} onChange={(event) => update('catalogDepth', event.target.value as AnalysisSettings['catalogDepth'])}><option value="bright">常用天体</option><option value="balanced">扩展目录</option><option value="deep">完整目录</option></select></label>
     <SettingRange label="恒星极限星等" value={settings.starMagnitudeLimit} min={3} max={16} step={.5} onChange={(value) => update('starMagnitudeLimit', value)} />
     {settingsDirty && onApplySettings && <button className="apply-settings-button" type="button" onClick={onApplySettings}>应用目录参数 · 重新解析</button>}
-    <label className="workbench-field"><span>标签密度</span><select value={settings.labelDensity} onChange={(event) => update('labelDensity', event.target.value as AnalysisSettings['labelDensity'])}><option value="sparse">稀疏</option><option value="balanced">平衡</option><option value="dense">密集</option></select></label>
+    <label className="workbench-field"><span>深空标注</span><select value={settings.labelDensity} onChange={(event) => update('labelDensity', event.target.value as AnalysisSettings['labelDensity'])}><option value="sparse">稀疏 · 最多 35</option><option value="balanced">平衡 · 最多 90</option><option value="dense">密集 · 最多 180</option></select></label>
+    <label className="workbench-field"><span>恒星标注</span><select value={settings.starLabelDensity} onChange={(event) => update('starLabelDensity', event.target.value as AnalysisSettings['starLabelDensity'])}><option value="sparse">少量 · 最多 20</option><option value="balanced">标准 · 最多 60</option><option value="dense">更多 · 最多 180</option></select></label>
     <SettingRange label="标注强度" value={Math.round(settings.annotationOpacity * 100)} min={10} max={100} suffix="%" onChange={(value) => update('annotationOpacity', value / 100)} />
     {settings.constellations.enabled && <SettingRange label="星座连线强度" value={settings.constellations.value} min={10} max={100} suffix="%" onChange={(value) => update('constellations', { ...settings.constellations, value })} />}
     <SettingRange label="线宽" value={settings.annotationLineWidth} min={.5} max={3} step={.25} suffix=" px" onChange={(value) => update('annotationLineWidth', value)} />
+    <SettingRange label="暗弱圈线倍率" value={settings.faintMarkerScale} min={.3} max={1} step={.05} suffix="×" onChange={(value) => update('faintMarkerScale', value)} />
     <SettingRange label="文字尺寸" value={settings.annotationFontSize} min={9} max={24} suffix=" px" onChange={(value) => update('annotationFontSize', value)} />
     <div className="workbench-field"><span>字体粗细</span><div className="segmented-control">{([{ value: 500, label: '常规' }, { value: 650, label: '中等' }, { value: 800, label: '加粗' }] as const).map((weight) => <button key={weight.value} type="button" aria-pressed={settings.fontWeight === weight.value} onClick={() => update('fontWeight', weight.value)}>{weight.label}</button>)}</div></div>
     <label className="workbench-field"><span>定位标记</span><select value={settings.markerStyle} onChange={(event) => update('markerStyle', event.target.value as AnalysisSettings['markerStyle'])}><option value="circle">空心圆 · 中心留空</option><option value="corners">四角框 · 中心留空</option></select></label>
     <div className="annotation-colors"><span>标注颜色</span><div>{LAYERS.map((layer) => <div className="workbench-color-row" key={layer}><label><input type="color" aria-label={`${LAYER_LABELS[layer]}颜色`} value={settings[COLOR_KEYS[layer]]} onChange={(event) => update(COLOR_KEYS[layer], event.target.value)} /><span>{LAYER_LABELS[layer]}</span></label><div className="compact-swatches">{COLOR_PRESETS.map((color) => <button key={color} type="button" title={color} aria-label={`${LAYER_LABELS[layer]} ${color}`} style={{ '--swatch-color': color } as CSSProperties} onClick={() => update(COLOR_KEYS[layer], color)} />)}</div></div>)}</div></div>
-    <label className="workbench-checkbox"><input type="checkbox" checked={settings.highContrast} onChange={(event) => update('highContrast', event.target.checked)} /><span>高对比描边</span></label>
+    <label className="workbench-checkbox"><input type="checkbox" checked={settings.highContrast} onChange={(event) => update('highContrast', event.target.checked)} /><span>文字对比描边</span></label>
     <label className="workbench-checkbox"><input type="checkbox" checked={settings.includeCatalogOnly} onChange={(event) => update('includeCatalogOnly', event.target.checked)} /><span>显示更多目录位置</span></label>
-    <p className="field-help">目录位置不等于照片中实际可见。暗星、暗星云可从天体目录逐个定位。</p>
+    <p className="field-help">恒星与深空天体独立控制数量。标注按星表坐标投影，目录位置不等于照片中实际可见。</p>
     <div className="export-summary"><h2>导出</h2><div className="export-format">原格式 · 原始像素</div>{result?.export ? <><p>{result.export.format} · {result.export.bitDepth} bit · {result.export.width} × {result.export.height}</p><p>{result.export.note}</p></> : <p>JPG / PNG / TIFF 保留像素尺寸与格式；RAW 显影后输出 16 位 TIFF。</p>}<p>标注会改变文件内容与体积，原始文件保留。</p></div>
   </section>
 }
 
+function useObjectMedia(object: DetectedObject, active: boolean) {
+  const [attempt, setAttempt] = useState(0)
+  const [state, setState] = useState<{ id: string; loading?: boolean; media?: ObjectMedia; error?: string }>({ id: object.id })
+  const bundled: ObjectMedia | undefined = object.thumbnail ? { ...object, thumbnail: object.thumbnail, note: object.mediaNote } : undefined
+  const media = bundled ?? getCachedObjectMedia(object.id) ?? (state.id === object.id ? state.media : undefined)
+  useEffect(() => {
+    if (!active || object.category !== 'deepSky' || object.thumbnail || getCachedObjectMedia(object.id)) return
+    let live = true
+    setState({ id: object.id, loading: true })
+    void fetchObjectMedia(object.id).then(
+      value => { if (live) setState({ id: object.id, media: value }) },
+      error => { if (live) setState({ id: object.id, error: error instanceof Error ? error.message : '配图暂不可用，可稍后重试。' }) },
+    )
+    return () => { live = false }
+  }, [object.id, object.category, object.thumbnail, active, attempt])
+  return { media, loading: !media && state.id === object.id && Boolean(state.loading), error: state.id === object.id ? state.error : undefined, retry: () => setAttempt(value => value + 1) }
+}
+
+function CatalogThumbnail({ object, onSelect }: { object: DetectedObject; onSelect: (object: DetectedObject) => void }) {
+  const buttonRef = useRef<HTMLButtonElement>(null)
+  const [visible, setVisible] = useState(false)
+  const { media, loading, error, retry } = useObjectMedia(object, visible)
+  useEffect(() => {
+    if (!buttonRef.current || object.thumbnail) return
+    if (typeof IntersectionObserver === 'undefined') { setVisible(true); return }
+    const observer = new IntersectionObserver(entries => {
+      if (entries.some(entry => entry.isIntersecting)) { setVisible(true); observer.disconnect() }
+    }, { rootMargin: '80px' })
+    observer.observe(buttonRef.current)
+    return () => observer.disconnect()
+  }, [object.id, object.thumbnail])
+  return <button ref={buttonRef} type="button" title={error ?? `查看 ${object.label} 配图`} aria-label={`查看 ${object.label} 配图`} onClick={() => { if (error) retry(); onSelect(object) }}>{media ? <img src={media.thumbnail} alt={`${object.label} ${media.mediaKind === 'survey' ? 'NASA 巡天图' : '配图'}`} loading="lazy" /> : <span className="catalog-image-placeholder">{loading ? <>正在<br />取图</> : error ? <>重试<br />配图</> : <>查找<br />配图</>}</span>}</button>
+}
+
 function ObjectDetail({ object }: { object: DetectedObject }) {
-  const sourceUrl = (() => { try { const url = new URL(object.sourceUrl ?? ''); return url.protocol === 'https:' && (url.hostname === 'nasa.gov' || url.hostname.endsWith('.nasa.gov')) ? url.href : undefined } catch { return undefined } })()
+  const { media, loading, error, retry } = useObjectMedia(object, true)
+  const sourceUrl = (() => { try { const url = new URL(media?.sourceUrl ?? object.sourceUrl ?? ''); return url.protocol === 'https:' && (url.hostname === 'nasa.gov' || url.hostname.endsWith('.nasa.gov')) ? url.href : undefined } catch { return undefined } })()
+  const mediaCaption = media?.mediaKind === 'survey' ? 'NASA 巡天档案 · DSS2' : media?.mediaKind === 'official' ? 'NASA 官方照片' : media?.mediaProvider ?? '天体资料图'
   return <article className="catalog-detail">
-    {object.thumbnail && <img src={object.thumbnail} alt={`${object.label} 天体资料图`} />}
-    <h3>{object.label}</h3>
-    <dl className="image-info-list"><div><dt>类型</dt><dd>{object.objectClassDetail ?? object.type ?? '恒星'}</dd></div><div><dt>星等</dt><dd>{object.magnitude?.toFixed(2) ?? '—'}</dd></div>{object.angularSize && <div><dt>角直径</dt><dd>{object.angularSize}</dd></div>}<div><dt>赤经 RA</dt><dd>{object.raDeg?.toFixed(6) ?? object.ra ?? '—'}°</dd></div><div><dt>赤纬 Dec</dt><dd>{object.decDeg?.toFixed(6) ?? object.dec ?? '—'}°</dd></div><div><dt>定位依据</dt><dd>{object.pixelDetected ? '像素匹配' : '星表坐标投影'}</dd></div></dl>
-    {object.description && <p>{object.description}</p>}{object.distance && <p>{object.distance}</p>}
-    {object.imageCredit && <small>图像：{object.imageCredit}</small>}{sourceUrl && <a href={sourceUrl} target="_blank" rel="noreferrer">NASA 原始资料</a>}
+    {media ? <figure><img src={media.thumbnail} alt={`${object.label} · ${mediaCaption}`} /><figcaption>{mediaCaption}</figcaption></figure> : object.category === 'deepSky' && <div className="catalog-media-status" role="status"><p>{loading ? '正在读取该天体的 NASA 配图…' : error ?? '正在查询天体配图'}</p>{error && <button type="button" className="quiet-button" onClick={retry}>重试配图</button>}</div>}
+    <div className="catalog-detail-heading"><h3>{object.label}</h3>{sourceUrl && <a href={sourceUrl} target="_blank" rel="noreferrer">NASA 原始资料</a>}</div>
+    <details key={object.id} className="catalog-detail-data"><summary>天体资料与坐标</summary>
+    <dl className="image-info-list"><div><dt>类型</dt><dd>{object.objectClassDetail ?? object.type ?? '恒星'}</dd></div><div><dt>星等{object.magnitudeBand ? ` (${object.magnitudeBand})` : ''}</dt><dd>{object.magnitude?.toFixed(2) ?? '—'}</dd></div>{object.angularSize && <div><dt>角直径</dt><dd>{object.angularSize}</dd></div>}<div><dt>赤经 RA</dt><dd>{object.raDeg?.toFixed(6) ?? object.ra ?? '—'}°</dd></div><div><dt>赤纬 Dec</dt><dd>{object.decDeg?.toFixed(6) ?? object.dec ?? '—'}°</dd></div><div><dt>定位依据</dt><dd>{object.pixelDetected ? '像素匹配' : '星表坐标投影'}</dd></div></dl>
+    {(object.description ?? media?.description) && <p>{object.description ?? media?.description}</p>}{object.distance && <p>{object.distance}</p>}
+    {media?.note && <small>{media.note}</small>}{media?.imageCredit && <small>图像：{media.imageCredit}</small>}
+    </details>
   </article>
 }
 
 function ObjectsView({ result, selectedId, onSelect }: Pick<ResultSidebarProps, 'result' | 'selectedId' | 'onSelect'>) {
+  const panelRef = useRef<HTMLElement>(null)
+  const detailRef = useRef<HTMLDivElement>(null)
   const [category, setCategory] = useState<LayerKey>('deepSky')
   const [search, setSearch] = useState('')
   const [magnitude, setMagnitude] = useState('')
@@ -78,21 +121,33 @@ function ObjectsView({ result, selectedId, onSelect }: Pick<ResultSidebarProps, 
   const pages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   const currentPage = Math.min(page, pages - 1)
   useEffect(() => setPage(0), [category, deferredSearch, magnitude, result.jobId])
-  useEffect(() => { if (selected) setCategory(selected.category) }, [selectedId])
-  return <section className="catalog-panel">
+  useEffect(() => {
+    const inspector = panelRef.current?.closest('.inspector-content')
+    if (inspector) inspector.scrollTop = 0
+  }, [category])
+  useEffect(() => {
+    if (!selected) return
+    setCategory(selected.category)
+    detailRef.current?.scrollIntoView?.({ block: 'nearest' })
+  }, [selectedId])
+  return <section ref={panelRef} className="catalog-panel">
+    {selected?.category === category && <div ref={detailRef}><ObjectDetail object={selected} /></div>}
     <div className="catalog-filters"><label className="catalog-search"><span className="visually-hidden">搜索天体目录</span><input type="search" placeholder="名称、编号、类型…" value={search} onChange={(event) => setSearch(event.target.value)} /></label><label className="catalog-magnitude"><span>星等 ≤</span><input type="number" min={-2} max={24} step={.5} value={magnitude} placeholder="不限" aria-label="筛选最大星等" onChange={(event) => setMagnitude(event.target.value)} /></label></div>
     <div className="catalog-categories" aria-label="目录分类">{LAYERS.map((layer) => <button type="button" key={layer} aria-pressed={category === layer} onClick={() => setCategory(layer)}>{LAYER_LABELS[layer]} <small>{counts[layer].toLocaleString()}</small></button>)}</div>
     <p className="catalog-caption">视场内目录位置 · {filtered.length.toLocaleString()} 项</p>
-    <div className="catalog-table-wrap"><table className="catalog-table"><thead><tr><th>名称 / 编号</th><th>类型</th><th>星等</th><th><span className="visually-hidden">定位</span></th></tr></thead><tbody>{filtered.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE).map((object) => <tr key={object.id} className={selectedId === object.id ? 'is-selected' : ''}><td><button type="button" title={object.label} onClick={() => onSelect(object)}>{object.label}</button></td><td title={object.type}>{object.type ?? '恒星'}</td><td>{object.magnitude?.toFixed(1) ?? '—'}</td><td><button className="locate-object" type="button" aria-label={`定位 ${object.label}`} onClick={() => onSelect(object)}><CrosshairIcon /></button></td></tr>)}</tbody></table>{!filtered.length && <p className="catalog-empty">没有符合条件的目录项</p>}</div>
+    <div className="catalog-table-wrap"><table className={`catalog-table${category === 'deepSky' ? ' catalog-table--images' : ''}`}><thead><tr>{category === 'deepSky' && <th><span className="visually-hidden">天体图片</span></th>}<th>名称 / 编号</th><th>类型</th><th>星等</th><th><span className="visually-hidden">定位</span></th></tr></thead><tbody>{filtered.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE).map((object) => <tr key={object.id} className={selectedId === object.id ? 'is-selected' : ''} onClick={event => { if (!(event.target as Element).closest('button')) onSelect(object) }}>{category === 'deepSky' && <td className="catalog-image-cell"><CatalogThumbnail object={object} onSelect={onSelect} /></td>}<td><button type="button" title={object.label} onClick={() => onSelect(object)}>{object.label}</button></td><td title={object.type}>{object.type ?? '恒星'}</td><td>{object.magnitude?.toFixed(1) ?? '—'}</td><td><button className="locate-object" type="button" aria-label={`定位 ${object.label}`} onClick={() => onSelect(object)}><CrosshairIcon /></button></td></tr>)}</tbody></table>{!filtered.length && <p className="catalog-empty">没有符合条件的目录项</p>}</div>
     <div className="catalog-pagination"><button type="button" onClick={() => setPage(Math.max(0, currentPage - 1))} disabled={currentPage === 0}>上一页</button><span>{currentPage + 1} / {pages}</span><button type="button" onClick={() => setPage(Math.min(pages - 1, currentPage + 1))} disabled={currentPage >= pages - 1}>下一页</button></div>
-    {selected && <ObjectDetail object={selected} />}
-    <p className="catalog-provenance">HYG · OpenNGC · Lynds · NASA<br />坐标匹配不代表目标已在照片中检出。</p>
+    <p className="catalog-provenance">HYG + Tycho-2 · OpenNGC · Lynds · NASA<br />坐标匹配不代表目标已在照片中检出。</p>
   </section>
 }
 
 function InfoView({ result }: { result: AnalysisResult }) {
   const { metadata, wcs } = result
   const fields: [string, string | number | undefined][] = [['文件名', metadata.filename], ['相机', metadata.camera], ['镜头', metadata.lens], ['拍摄参数', metadata.shootingParams], ['图像尺寸', `${metadata.width} × ${metadata.height}`], ['拍摄时间', metadata.capturedAt], ['中心坐标', wcs.centerCoordinates], ['视场', wcs.fieldOfView], ['匹配恒星', wcs.matchedStars], ['像素比例', wcs.pixelScale], ['旋转角', wcs.rotation], ['解算误差', wcs.rmsError]]
+  if (wcs.verification) {
+    const { matchedStars, heldOutStars, heldOutRmsePixels } = wcs.verification
+    fields.push(['全幅校验', matchedStars === undefined ? undefined : `${matchedStars} 星`], ['独立验证', heldOutStars === undefined ? undefined : `${heldOutStars} 星`], ['验证误差', heldOutRmsePixels === undefined ? undefined : `${heldOutRmsePixels.toFixed(2)} px`])
+  }
   return <section className="info-view"><div className="inspector-heading"><h2>照片与解算信息</h2></div><dl className="image-info-list">{fields.filter(([, value]) => value !== undefined).map(([label, value]) => <div key={label}><dt>{label}</dt><dd title={String(value)}>{value}</dd></div>)}</dl>{result.export && <div className="export-summary"><h2>原始输出</h2><p>{result.export.format} · {result.export.bitDepth} bit · {result.export.width} × {result.export.height}</p><p>{result.export.note}</p></div>}{result.originalDownloadUrl && <a className="original-download" href={result.originalDownloadUrl} download>下载未改动的原文件</a>}{result.warnings?.length ? <div className="analysis-warnings"><h2>解析提示</h2>{result.warnings.map((warning) => <p key={warning}>{warning}</p>)}</div> : null}</section>
 }
 

@@ -9,7 +9,9 @@ async function sourceModule(url) {
   if (modules.has(url.href)) return modules.get(url.href)
   const loading = (async () => {
     const { code } = await transformWithOxc(await readFile(url, 'utf8'), fileURLToPath(url))
-    const imports = [...code.matchAll(/\bfrom\s*['"]([^'"]+)['"]/g)]
+    // Oxc emits static imports on one line. Match declarations, not data such
+    // as the API normalizer's ['from', 'start'] field aliases.
+    const imports = [...code.matchAll(/^\s*(?:import|export)\s+[^\n]*?\bfrom\s*['"]([^'"]+)['"]/gm)]
     let compiled = code
     for (const match of imports.reverse()) {
       let resolved

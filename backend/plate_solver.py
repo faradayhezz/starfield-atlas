@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 import sys
 import threading
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from pathlib import Path
 from time import perf_counter
 from collections.abc import Callable
@@ -68,6 +68,7 @@ class PlateSolution:
     radial_reference_width: float
     rotation_matrix: list[list[float]]
     method: str = "tetra3-central-crop"
+    verification: dict[str, Any] | None = None
 
     def to_public_dict(self) -> dict[str, Any]:
         result = asdict(self)
@@ -298,6 +299,182 @@ def _proxy(image: Image.Image, max_side: int = 1800) -> tuple[Image.Image, float
     return image.resize(size, Image.Resampling.LANCZOS), scale
 
 
+def _blind_crop_specs(size: tuple[int, int]) -> list[tuple[tuple[int, int, int, int], None]]:
+    """Describe centred multi-scale probes without assuming camera EXIF.
+
+    A 32% rectilinear crop turns a roughly 70-degree phone field into about
+    25 degrees, inside the existing real Hipparcos pattern database. No camera
+    model or sky-coordinate hint is inferred from a filename or reference image.
+    """
+    width, height = size
+    specs = [((0, 0, width, height), None)]
+    seen: set[tuple[int, int, int, int]] = {specs[0][0]}
+    for fraction in (.32, .42, .68):
+        crop_width = min(width, height, round(width * fraction))
+        crop_height = min(crop_width, height)
+        # Matching parity keeps the optical centre exactly at the full-frame
+        # centre instead of silently shifting an odd-sized crop by half a pixel.
+        crop_width -= (width - crop_width) % 2
+        crop_height -= (height - crop_height) % 2
+        if min(crop_width, crop_height) < 32:
+            continue
+        left, top = (width - crop_width) // 2, (height - crop_height) // 2
+        box = (left, top, left + crop_width, top + crop_height)
+        if box not in seen:
+            specs.append((box, None))
+            seen.add(box)
+    return specs
+
+
+def _refine_wide_phone_solution(
+    image: Image.Image, initial: PlateSolution, solver: Any,
+    cancel_callback: Callable[[], None] | None = None,
+) -> PlateSolution | None:
+    """Validate a new small central probe with independent full-field anchors.
+
+    This path is only used for the added no-EXIF 32% probe. Existing successful
+    DSLR/hinted/full-frame paths keep their established projection unchanged.
+    One quarter of catalogue candidates never enter the refinement fit.
+    """
+    from scipy.optimize import least_squares
+    from scipy.spatial import cKDTree
+    from scipy.spatial.transform import Rotation
+
+    proxy, scale = _proxy(image)
+    try:
+        if cancel_callback:
+            cancel_callback()
+        observed = np.asarray(tetra3.get_centroids_from_image(
+            proxy, sigma=3, filtsize=25, bg_sub_mode="local_mean",
+            sigma_mode="global_median_abs", binary_open=False,
+            min_area=1, max_area=200, max_returned=300,
+        ), dtype=np.float64)
+        if len(observed) < 24:
+            return None
+        table = solver.star_table
+        ra, dec = np.degrees(table[:, 0]), np.degrees(table[:, 1])
+        with np.errstate(invalid="ignore", divide="ignore", over="ignore"):
+            x, y, front = initial.world_to_pixel(ra, dec)
+        margin = image.width * .02
+        possible = front & np.isfinite(x) & np.isfinite(y)
+        possible &= (x > -margin) & (x < image.width + margin) & (y > -margin) & (y < image.height + margin)
+        sky = sky_vectors(ra[possible], dec[possible])
+        if len(sky) < 32:
+            return None
+        width, height = proxy.width, proxy.height
+        center = np.array([height / 2, width / 2])
+        tree = cKDTree(observed)
+        rotation = initial.rotation
+        # Exactly change the normalization width of the same division model:
+        # r*(1-k*(2r/W)^2) / ((1-k)*f). Simply reusing crop k at full width
+        # would give a different camera and displace edge annotations.
+        k = initial.distortion * (image.width / initial.radial_reference_width) ** 2
+        if not -.12 < k < .12:
+            return None
+        focal = initial.focal_pixels * scale * (1 - initial.distortion) / (1 - k)
+        original_focal = focal
+        held_out = np.arange(len(sky)) % 4 == 0
+
+        def project(rot: np.ndarray, focal_px: float, distortion: float) -> np.ndarray:
+            camera = sky @ rot.T
+            projected = np.column_stack((center[0] - focal_px * camera[:, 2] / camera[:, 0],
+                                         center[1] - focal_px * camera[:, 1] / camera[:, 0]))
+            return _distort_points(projected, tuple(center), distortion, width)
+
+        def associate(projected: np.ndarray, radius: float) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+            distances, nearest = tree.query(projected)
+            _, reverse = cKDTree(projected).query(observed)
+            # Mutual nearest neighbours prevent counting an unresolved double
+            # or duplicate catalogue association as two independent anchors.
+            keep = (distances < radius) & (reverse[nearest] == np.arange(len(sky)))
+            return distances, nearest, keep
+
+        for iteration in range(12):
+            if cancel_callback:
+                cancel_callback()
+            distances, nearest, keep = associate(project(rotation, focal, k), 8 if iteration == 0 else 4)
+            fit_mask = keep & ~held_out
+            if int(fit_mask.sum()) < 18:
+                return None
+            fit_observed, fit_sky = observed[nearest[fit_mask]], sky[fit_mask]
+            starting_rotation, starting_focal = rotation, focal
+            relative = fit_observed - center
+            normalized_radius_sq = (2 * np.linalg.norm(relative, axis=1) / width) ** 2
+
+            def residual(parameters: np.ndarray) -> np.ndarray:
+                rot = Rotation.from_rotvec(parameters[:3]).as_matrix() @ starting_rotation
+                trial_focal = starting_focal * np.exp(parameters[3])
+                trial_k = parameters[4]
+                camera = fit_sky @ rot.T
+                predicted = np.column_stack((-trial_focal * camera[:, 2] / camera[:, 0],
+                                             -trial_focal * camera[:, 1] / camera[:, 0]))
+                undistorted = relative * (1 - trial_k * normalized_radius_sq)[:, None] / (1 - trial_k)
+                return (predicted - undistorted).ravel()
+
+            fit = least_squares(
+                residual, [0, 0, 0, 0, k],
+                bounds=([-.03, -.03, -.03, -.08, -.12], [.03, .03, .03, .08, .12]),
+                loss="soft_l1", f_scale=.7, max_nfev=80,
+            )
+            if not fit.success or not np.isfinite(fit.x).all():
+                return None
+            rotation = Rotation.from_rotvec(fit.x[:3]).as_matrix() @ starting_rotation
+            focal = starting_focal * math.exp(float(fit.x[3]))
+            new_k = float(fit.x[4])
+            settled = np.linalg.norm(fit.x[:4]) < 1e-7 and abs(new_k - k) < 1e-7
+            k = new_k
+            if settled:
+                break
+        if not .75 < focal / original_focal < 1.35:
+            return None
+        distances, nearest, keep = associate(project(rotation, focal, k), 2)
+        validation = keep & held_out
+        beyond_crop = np.max(np.abs(observed[nearest] - center), axis=1) > initial.radial_reference_width * scale / 2
+        if int(keep.sum()) < 32 or int(validation.sum()) < 8 or int((validation & beyond_crop).sum()) < 8:
+            return None
+        span = np.ptp(observed[nearest[keep]], axis=0) / np.array([height, width])
+        if np.min(span) < .65:
+            return None
+        image_rays = _image_vectors(observed[nearest], (height, width), math.degrees(2 * math.atan(width / (2 * focal))), k)
+        camera = sky @ rotation.T
+        angles = np.degrees(np.arctan2(np.linalg.norm(np.cross(image_rays, camera), axis=1),
+                                      np.sum(image_rays * camera, axis=1))) * 3600
+        angular_rmse = float(np.sqrt(np.mean(angles[keep] ** 2)))
+        validation_rmse = float(np.sqrt(np.mean(angles[validation] ** 2)))
+        if angular_rmse > 180 or validation_rmse > 180:
+            return None
+        focal_original = focal / scale
+        horizontal_fov = math.degrees(2 * math.atan(image.width / (2 * focal_original)))
+        # Vertical endpoints use the same full-width radial normalization.
+        vertical_radius = image.height / 2 * (1 - k * (image.height / image.width) ** 2) / (1 - k)
+        vertical_fov = math.degrees(2 * math.atan(vertical_radius / focal_original))
+        return replace(
+            initial,
+            center_ra_deg=math.degrees(math.atan2(rotation[0, 1], rotation[0, 0])) % 360,
+            center_dec_deg=math.degrees(math.asin(float(np.clip(rotation[0, 2], -1, 1)))),
+            roll_deg=math.degrees(math.atan2(rotation[1, 2], rotation[2, 2])) % 360,
+            horizontal_fov_deg=horizontal_fov, vertical_fov_deg=vertical_fov,
+            distortion=k, focal_pixels=focal_original, radial_reference_width=image.width,
+            principal_x=image.width / 2, principal_y=image.height / 2,
+            rotation_matrix=rotation.tolist(), rmse_arcsec=angular_rmse,
+            method="tetra3-wide-multiscale-verified",
+            verification={
+                "mode": "full-frame-holdout", "matchedStars": int(keep.sum()),
+                "heldOutStars": int(validation.sum()), "heldOutOutsideCrop": int((validation & beyond_crop).sum()),
+                "rmsePixels": float(np.sqrt(np.mean(distances[keep] ** 2))) / scale,
+                "heldOutRmsePixels": float(np.sqrt(np.mean(distances[validation] ** 2))) / scale,
+                "heldOutRmseArcsec": validation_rmse,
+                "spanFractionX": float(span[1]), "spanFractionY": float(span[0]),
+                "patternStars": initial.matches,
+                "patternProbability": initial.false_positive_probability,
+            },
+        )
+    except (ValueError, FloatingPointError, np.linalg.LinAlgError):
+        return None
+    finally:
+        proxy.close()
+
+
 def solve_plate(
     image: Image.Image,
     metadata: ImageMetadata,
@@ -328,18 +505,7 @@ def solve_plate(
         if full_fov_hint:
             crop_specs.append(_central_crop_spec(normalized.size, full_fov_hint))
         else:
-            # Keep only crop descriptions here.  Materializing all three crops
-            # at once costs hundreds of MiB for modern 40-60 MP photographs.
-            crop_specs.append(((0, 0, full_width, full_height), None))
-            seen_crop_widths: set[int] = set()
-            for fraction in (0.42, 0.68):
-                crop_width = min(full_width, full_height, round(full_width * fraction))
-                if crop_width in seen_crop_widths:
-                    continue
-                seen_crop_widths.add(crop_width)
-                left = (full_width - crop_width) // 2
-                top = (full_height - crop_width) // 2
-                crop_specs.append(((left, top, left + crop_width, top + crop_width), None))
+            crop_specs.extend(_blind_crop_specs(normalized.size))
 
         extraction_profiles = (
             {},
@@ -356,8 +522,15 @@ def solve_plate(
         solver = _get_solver()
         attempted: list[str] = []
         budget_exhausted = False
-
-        for box, crop_fov_hint in crop_specs:
+        # Try one fast extraction at each scale before spending the remaining
+        # budget on noisy-image fallbacks at an unsuitable full-frame scale.
+        attempts_by_scale = (
+            [(box, hint, range(len(extraction_profiles))) for box, hint in crop_specs]
+            if full_fov_hint else
+            [(box, hint, range(1)) for box, hint in crop_specs]
+            + [(box, hint, range(1, len(extraction_profiles))) for box, hint in crop_specs]
+        )
+        for box, crop_fov_hint, profile_indices in attempts_by_scale:
             if cancel_callback:
                 cancel_callback()
             full_frame = box == (0, 0, full_width, full_height)
@@ -365,7 +538,9 @@ def solve_plate(
             try:
                 proxy, scale = _proxy(cropped)
                 try:
-                    for profile_index, profile in enumerate(extraction_profiles, start=1):
+                    for profile_zero_index in profile_indices:
+                        profile_index = profile_zero_index + 1
+                        profile = extraction_profiles[profile_zero_index]
                         if cancel_callback:
                             cancel_callback()
                         remaining_ms = round(
@@ -384,7 +559,7 @@ def solve_plate(
                                     pattern_checking_stars=9,
                                     match_radius=0.018,
                                     match_threshold=1e-4,
-                                    solve_timeout=min(12_000, remaining_ms),
+                                    solve_timeout=min(4_000 if full_fov_hint is None and profile_zero_index == 0 else 12_000, remaining_ms),
                                     distortion=(-0.12, 0.12),
                                     return_matches=True,
                                     **profile,
@@ -420,7 +595,7 @@ def solve_plate(
                         camera_center = rotation @ sky_vectors([float(result["RA"])], [float(result["Dec"])])[0]
                         if not np.isfinite(camera_center).all():
                             continue
-                        return PlateSolution(
+                        candidate = PlateSolution(
                             center_ra_deg=float(result["RA"]),
                             center_dec_deg=float(result["Dec"]),
                             roll_deg=float(result["Roll"]),
@@ -445,6 +620,14 @@ def solve_plate(
                                 else "tetra3-central-crop"
                             ),
                         )
+                        new_wide_probe = full_fov_hint is None and crop_width_original <= full_width * .34 and horizontal_fov >= 45
+                        if new_wide_probe:
+                            refined = _refine_wide_phone_solution(normalized, candidate, solver, cancel_callback)
+                            if refined is None:
+                                continue
+                            candidate = refined
+                        candidate.solve_ms = (perf_counter() - started) * 1000
+                        return candidate
                 finally:
                     proxy.close()
             finally:

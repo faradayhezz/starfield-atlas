@@ -48,6 +48,8 @@ DEFAULT_SETTINGS: dict[str, Any] = {
     "starMagnitudeLimit": 12.0,
     "includeCatalogOnly": False,
     "catalogDepth": "deep",
+    "starLabelDensity": "balanced",
+    "faintMarkerScale": .6,
 }
 
 # A single native-frame operation at a time avoids concurrent 60 MP RAW buffers.
@@ -99,6 +101,7 @@ def normalize_settings(settings: dict[str, Any] | None = None) -> dict[str, Any]
         ("annotationFontSize", 8.0, 24.0), ("starMagnitudeLimit", 1.0, 16.0),
         ("dsoThreshold", 0., 100.), ("starThreshold", 0., 100.),
         ("constellationStrength", 0., 100.),
+        ("faintMarkerScale", .3, 1.),
     ):
         try:
             value = float(options[key])
@@ -107,6 +110,7 @@ def normalize_settings(settings: dict[str, Any] | None = None) -> dict[str, Any]
             options[key] = DEFAULT_SETTINGS[key]
     for key, allowed in (("markerStyle", {"circle", "corners"}),
                          ("labelDensity", {"sparse", "balanced", "dense"}),
+                         ("starLabelDensity", {"sparse", "balanced", "dense"}),
                          ("catalogDepth", {"bright", "balanced", "deep"})):
         if options.get(key) not in allowed:
             options[key] = DEFAULT_SETTINGS[key]
@@ -142,6 +146,8 @@ def _render_options(options: dict[str, Any]) -> dict[str, Any]:
         "annotation_line_width": options["annotationLineWidth"], "annotation_font_size": options["annotationFontSize"],
         "marker_style": options["markerStyle"], "label_density": options["labelDensity"],
         "include_catalog_only": options["includeCatalogOnly"],
+        "star_label_density": options["starLabelDensity"],
+        "faint_marker_scale": options["faintMarkerScale"],
     }
 
 
@@ -374,7 +380,7 @@ def _analyze_image(
         if solution.rmse_arcsec > 60:
             warnings.append("画面存在短星轨或压缩噪声，标注采用星轨中心并保留目录位置属性。")
         warnings.append(
-            "天体清单来自 HYG、OpenNGC 与 Lynds 暗星云目录的坐标投影；落在视场内不等于已从照片检测到该暗天体。默认只显示少量推荐标注，可在目录中查看更暗的条目。"
+            "天体清单来自 HYG、AT-HYG/Tycho-2、OpenNGC 与 Lynds 目录的坐标投影；落在视场内不等于已从照片检测到该暗天体。恒星与深空标注各有独立数量，可在目录中查看更暗的条目。"
         )
         if options["catalogDepth"] != "deep":
             limit = 10 if options["catalogDepth"] == "bright" else 15

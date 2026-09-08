@@ -12,6 +12,7 @@ import numpy as np
 
 from .deep_sky_media import media_for
 from .plate_solver import PlateSolution
+from .stellar_index import indexed_stars_in_frame, stellar_index_manifest
 
 
 DATA_DIR = Path(__file__).resolve().parent / "data"
@@ -359,6 +360,8 @@ def _star_label(star: dict[str, Any]) -> str:
         return name
     for key, prefix in (("hr", "HR"), ("hip", "HIP"), ("hd", "HD"), ("gl", "Gl"), ("hyg", "HYG")):
         if value := _text(star.get(key)):
+            if key == "gl" and value.lower().startswith(("gl", "gj")):
+                return value
             return f"{prefix} {value}"
     return "恒星"
 
@@ -391,8 +394,6 @@ def bright_stars_in_frame(
         (camera_cosine >= math.cos(math.radians(min(89.9, diagonal_radius_deg + 1.5))))
         & (mag <= max_mag)
     )
-    if not len(indices):
-        return []
     x, y, in_front = solution.world_to_pixel(ra[indices], dec[indices])
     inside = in_front & np.isfinite(x) & np.isfinite(y)
     inside &= (x >= 0) & (x < solution.image_width) & (y >= 0) & (y < solution.image_height)
@@ -429,7 +430,8 @@ def bright_stars_in_frame(
                 "hyg": _text(star.get("hyg")),
             }
         )
-    result.sort(key=lambda item: (float(item["magnitude"]), str(item["label"])))
+    result.extend(indexed_stars_in_frame(solution, max_mag, min(89.9, diagonal_radius_deg + 1.5)))
+    result.sort(key=lambda item: (float(item["magnitude"]), str(item["id"])))
     max_labels = 3 + round(sensitivity * 0.12)
     for item in result[:max_labels]:
         item["defaultVisible"] = True
@@ -443,16 +445,24 @@ def catalog_summary() -> dict[str, Any]:
     stars = load_stars()
     deep_sky = load_deep_sky_catalog()
     magnitudes = [float(star["mag"]) for star in stars]
+    extension = stellar_index_manifest()
+    extension_count = int(extension["rows"]) if extension else 0
+    magnitude_min = min(magnitudes) if magnitudes else None
+    magnitude_max = max(magnitudes) if magnitudes else None
+    if extension and magnitude_min is not None:
+        magnitude_min = min(magnitude_min, float(extension["magnitude_min"]))
+        magnitude_max = max(magnitude_max, float(extension["magnitude_max"]))
     return {
-        "stars": len(stars), "deepSky": len(deep_sky),
+        "stars": len(stars) + extension_count, "deepSky": len(deep_sky),
+        "hygStars": len(stars), "supplementalStars": extension_count,
         "darkNebulae": sum(item.object_type == "DrkN" for item in deep_sky),
         "historicalStellarEntries": sum(item.object_type in {"*", "**"} for item in deep_sky),
-        "faintStars": sum(mag > 7 for mag in magnitudes),
-        "starMagnitudeRange": [min(magnitudes), max(magnitudes)] if magnitudes else None,
+        "faintStars": sum(mag > 7 for mag in magnitudes) + (int(extension["faint_stars_gt_7"]) if extension else 0),
+        "starMagnitudeRange": [magnitude_min, magnitude_max] if magnitudes else None,
         "defaultStarMagnitudeLimit": 12.0,
-        "starMagnitudeCompleteness": "Not complete to the faintest catalogue magnitude",
+        "starMagnitudeCompleteness": extension["magnitude_completeness"] if extension else "Not complete to the faintest catalogue magnitude",
         "evidence": "catalog_position", "pixelDetection": False,
-        "sources": ["HYG v4.1", "OpenNGC v20260501", "Lynds LDN / CDS VII/7A"],
+        "sources": ["HYG v4.1", "OpenNGC v20260501", "Lynds LDN / CDS VII/7A"] + (["AT-HYG v3.2 / Tycho-2"] if extension else []),
     }
 
 

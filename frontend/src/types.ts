@@ -13,6 +13,7 @@ export interface AnalysisSettings {
   constellations: LayerSetting
   catalogDepth: 'bright' | 'balanced' | 'deep'
   labelDensity: 'sparse' | 'balanced' | 'dense'
+  starLabelDensity: 'sparse' | 'balanced' | 'dense'
   deepSkyColor: string
   brightStarColor: string
   constellationColor: string
@@ -20,6 +21,7 @@ export interface AnalysisSettings {
   highContrast: boolean
   annotationOpacity: number
   annotationLineWidth: number
+  faintMarkerScale: number
   annotationFontSize: number
   markerStyle: 'circle' | 'corners'
   starMagnitudeLimit: number
@@ -59,6 +61,21 @@ export interface WcsSummary {
   rollDeg?: number
   frameCorners?: SkyCoordinate[]
   frameBoundary?: SkyCoordinate[]
+  verification?: WcsVerification
+}
+
+export interface WcsVerification {
+  mode?: string
+  matchedStars?: number
+  heldOutStars?: number
+  heldOutOutsideCrop?: number
+  rmsePixels?: number
+  heldOutRmsePixels?: number
+  heldOutRmseArcsec?: number
+  spanFractionX?: number
+  spanFractionY?: number
+  patternStars?: number
+  patternProbability?: number
 }
 
 export interface SkyCoordinate {
@@ -83,6 +100,7 @@ export interface DetectedObject {
   titleEn?: string
   distance?: string
   magnitude?: number
+  magnitudeBand?: string
   angularSize?: string
   ra?: string
   dec?: string
@@ -99,6 +117,7 @@ export interface DetectedObject {
   radius?: number
   labelX?: number
   labelY?: number
+  leaderLine?: Point[]
   lines?: Point[][]
   protectedPoints?: Point[]
   thumbnail?: string
@@ -109,7 +128,22 @@ export interface DetectedObject {
   nasaId?: string
   mediaProvider?: string
   mediaUsageUrl?: string
+  mediaKind?: 'official' | 'survey'
+  mediaNote?: string
   raw?: unknown
+}
+
+export interface ObjectMedia {
+  thumbnail: string
+  thumbnailWidth?: number
+  thumbnailHeight?: number
+  sourceUrl?: string
+  imageCredit?: string
+  mediaProvider?: string
+  mediaUsageUrl?: string
+  mediaKind?: 'official' | 'survey'
+  note?: string
+  description?: string
 }
 
 export interface AnalysisResult {
@@ -269,6 +303,7 @@ export const DEFAULT_SETTINGS: AnalysisSettings = {
   constellations: { enabled: false, value: 55 },
   catalogDepth: 'deep',
   labelDensity: 'sparse',
+  starLabelDensity: 'balanced',
   deepSkyColor: '#69BE7A',
   brightStarColor: '#D4B953',
   constellationColor: '#A391BF',
@@ -276,6 +311,7 @@ export const DEFAULT_SETTINGS: AnalysisSettings = {
   highContrast: false,
   annotationOpacity: .85,
   annotationLineWidth: 1.25,
+  faintMarkerScale: .6,
   annotationFontSize: 18,
   markerStyle: 'circle',
   starMagnitudeLimit: 12,

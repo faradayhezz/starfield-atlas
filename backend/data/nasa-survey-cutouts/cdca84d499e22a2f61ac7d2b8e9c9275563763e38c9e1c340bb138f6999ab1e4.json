@@ -1,0 +1,15 @@
+{
+  "catalogId": "NGC6312",
+  "raDeg": 257.700667,
+  "decDeg": 42.287694,
+  "survey": "DSS2 Red",
+  "sourceUrl": "https://skyview.gsfc.nasa.gov/current/cgi/runquery.pl?Position=257.7006670%2C42.2876940&Survey=DSS2+Red&Coordinates=J2000&Projection=Tan&Pixels=384&Size=0.080000&Return=JPEG",
+  "docsUrl": "https://skyview.gsfc.nasa.gov/current/docs/batchpage.html",
+  "thumbnailFile": "skyview-ngc6312-d9e8970fb6170936.webp",
+  "thumbnailSha256": "d9e8970fb61709363d6f49b2e0eb3bf9e87eb7a7fe1e0498e91eb7daeef4e940",
+  "thumbnailWidth": 384,
+  "thumbnailHeight": 384,
+  "imageCredit": "Digitized Sky Survey / STScI / Palomar Observatory / AAO; delivered by NASA GSFC SkyView",
+  "note": "NASA SkyView / DSS2 巡天图，以该天体的公开目录坐标为中心；不是哈勃特写，暗弱目标可能无法在此巡天深度下分辨。",
+  "generatedAt": "2026-09-08T15:37:36+00:00"
+}

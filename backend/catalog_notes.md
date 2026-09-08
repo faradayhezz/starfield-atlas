@@ -133,6 +133,38 @@ labels; `evidence: catalog_position` and `pixelDetected: false` explicitly state
 that these are catalogue overlays, not image-level detections. The historical
 `expectedVisible` field remains a display recommendation for API compatibility.
 
+## AT-HYG / Tycho-2 extension
+
+`data/athyg_v32` adds **2,433,199** genuine Tycho stars, producing a combined
+inventory of **2,552,824** stars with the existing HYG catalogue. The complete
+AT-HYG v3.2 upstream stream contains 2,552,165 rows: the Sun and 118,965 explicit
+HYG duplicate IDs are excluded. Existing HYG names and IDs remain unchanged.
+No proximity-based merge is used, so close but distinct Tycho components stay
+separate.
+
+The extension uses the author snapshot at commit
+`650346e2bc57f664eb411bc5f44ffd94b8006af2`, licensed CC BY-SA 4.0. All extension
+positions are J2000.0, and all extension magnitudes are Tycho **VT**, retained
+as a different band from the HYG **V** magnitudes. Position and proper motion
+metadata retain their source meanings; these are not fabricated Gaia stars.
+
+The 432 local RA/Dec shards occupy 49,837,728 compressed bytes. A frame query
+opens only intersecting spherical cells, filters magnitude and exact projected
+frame boundaries, and caches at most eight numeric shards. There is no
+inventory-count cap. Photo annotation density is controlled independently by
+the renderer; finding a catalogue position is not a photometric detection.
+
+The faintest extension entry is VT 15.193, but completeness is only about 90%
+at V 11.5 according to the
+[NASA Tycho-2 reference](https://heasarc.gsfc.nasa.gov/w3browse/all/tycho2.html).
+The magnitude slider therefore filters available records, and does not promise
+a complete inventory at every magnitude.
+
+`scripts/download_tycho_catalog.py` rebuilds the extension from two SHA-256
+pinned author downloads. `data/athyg_v32/manifest.json` contains row counts,
+all source URLs and hashes, per-shard hashes, quantization details, and source
+attribution. See `data/LICENSES/ATHYG-CC-BY-SA-4.0.md` for the data licence.
+
 ## Lynds dark nebulae
 
 `lynds_dark_nebulae.csv` adds all **1,791** entries of CDS VII/7A, Lynds (1962):

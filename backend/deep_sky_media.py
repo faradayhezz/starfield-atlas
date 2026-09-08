@@ -74,16 +74,31 @@ def load_nasa_deep_sky() -> dict[str, dict[str, Any]]:
             "nasaId": _text(raw.get("nasaId")),
             "mediaProvider": "NASA",
             "mediaUsageUrl": usage_url,
+            "mediaKind": "official",
+            "note": "NASA 官方资料图；不同望远镜与波段的外观可能不同于当前照片。",
         }
     return output
 
 
 def media_for(catalog_id: str) -> dict[str, Any]:
-    return {
+    official = {
         key: value
         for key, value in load_nasa_deep_sky().get(catalog_id, {}).items()
         if value is not None
     }
+    if official:
+        return official
+    from .nasa_survey_media import cached_survey_media
+    return cached_survey_media(catalog_id)
+
+
+def fetch_object_media(catalog_id: str) -> dict[str, Any]:
+    """Prefer curated NASA images, otherwise retrieve the exact catalog field."""
+    from .nasa_survey_media import catalog_object, fetch_survey_media
+    item = catalog_object(catalog_id)
+    if cached := media_for(item.name):
+        return cached
+    return fetch_survey_media(item.name)
 
 
 def resolve_media_file(filename: str) -> Path | None:
@@ -92,6 +107,9 @@ def resolve_media_file(filename: str) -> Path | None:
     decoded = urllib.parse.unquote(filename)
     if Path(decoded).name != decoded or not SAFE_IMAGE_NAME.fullmatch(decoded):
         return None
+    if decoded.startswith("skyview-"):
+        from .nasa_survey_media import resolve_survey_file
+        return resolve_survey_file(decoded)
     candidate = (IMAGE_DIR / decoded).resolve()
     try:
         candidate.relative_to(IMAGE_DIR.resolve())

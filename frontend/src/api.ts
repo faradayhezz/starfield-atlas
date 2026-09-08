@@ -4,6 +4,7 @@ import type {
   DetectedObject,
   ImageMetadata,
   NativeExportMetadata,
+  ObjectMedia,
   LayerKey,
   Point,
   SkyCoordinate,
@@ -142,6 +143,7 @@ const normalizeObject = (value: unknown, index: number, fallback: LayerKey): Det
     titleEn: stringAt(value, ['titleEn', 'title_en', 'english_name']),
     distance: stringAt(value, ['distance', 'distance_text']),
     magnitude,
+    magnitudeBand: stringAt(value, ['magnitudeBand', 'magnitude_band']),
     angularSize,
     ra: stringAt(value, ['ra_text', 'ra', 'raDeg', 'ra_deg', 'right_ascension']),
     dec: stringAt(value, ['dec_text', 'dec', 'decDeg', 'dec_deg', 'declination']),
@@ -167,6 +169,8 @@ const normalizeObject = (value: unknown, index: number, fallback: LayerKey): Det
     nasaId: stringAt(value, ['nasaId', 'nasa_id']),
     mediaProvider: stringAt(value, ['mediaProvider', 'media_provider']),
     mediaUsageUrl: stringAt(value, ['mediaUsageUrl', 'media_usage_url']),
+    mediaKind: stringAt(value, ['mediaKind', 'media_kind']) as DetectedObject['mediaKind'],
+    mediaNote: stringAt(value, ['mediaNote', 'note']),
     raw: value,
   }
 }
@@ -251,6 +255,7 @@ const normalizeWcs = (root: Record<string, unknown>): WcsSummary => {
   const rmsError = numberAt(wcs, ['rmse_arcsec', 'rms_error', 'rmsError', 'residual'])
   const centerRaDeg = numberAt(wcs, ['center_ra_deg', 'centerRaDeg'])
   const centerDecDeg = numberAt(wcs, ['center_dec_deg', 'centerDecDeg'])
+  const verification = isRecord(wcs.verification) ? wcs.verification : undefined
   return {
     matchedStars,
     catalogStars,
@@ -267,6 +272,19 @@ const normalizeWcs = (root: Record<string, unknown>): WcsSummary => {
     rollDeg: rotation,
     frameCorners: normalizeSkyCoordinates(valueAt(wcs, ['frame_corners_radec', 'frameCorners', 'corners'])),
     frameBoundary: normalizeSkyCoordinates(valueAt(wcs, ['frame_boundary_radec', 'frameBoundary', 'footprint'])),
+    verification: verification ? {
+      mode: stringAt(verification, ['mode']),
+      matchedStars: numberAt(verification, ['matchedStars']),
+      heldOutStars: numberAt(verification, ['heldOutStars']),
+      heldOutOutsideCrop: numberAt(verification, ['heldOutOutsideCrop']),
+      rmsePixels: numberAt(verification, ['rmsePixels']),
+      heldOutRmsePixels: numberAt(verification, ['heldOutRmsePixels']),
+      heldOutRmseArcsec: numberAt(verification, ['heldOutRmseArcsec']),
+      spanFractionX: numberAt(verification, ['spanFractionX']),
+      spanFractionY: numberAt(verification, ['spanFractionY']),
+      patternStars: numberAt(verification, ['patternStars']),
+      patternProbability: numberAt(verification, ['patternProbability']),
+    } : undefined,
   }
 }
 
@@ -347,6 +365,48 @@ const parseError = async (response: Response): Promise<string> => {
   return `请求失败（${response.status} ${response.statusText}）`
 }
 
+const objectMediaCache = new Map<string, ObjectMedia>()
+const objectMediaRequests = new Map<string, Promise<ObjectMedia>>()
+const objectMediaQueue: Array<() => void> = []
+let activeObjectMediaRequests = 0
+
+export const getCachedObjectMedia = (id: string): ObjectMedia | undefined => objectMediaCache.get(id)
+
+/** Share visible-row/detail requests and keep archive traffic bounded. */
+export function fetchObjectMedia(id: string): Promise<ObjectMedia> {
+  const cached = objectMediaCache.get(id)
+  if (cached) return Promise.resolve(cached)
+  const existing = objectMediaRequests.get(id)
+  if (existing) return existing
+  const request = new Promise<ObjectMedia>((resolve, reject) => {
+    const run = async () => {
+      activeObjectMediaRequests++
+      const controller = new AbortController()
+      const timeout = setTimeout(() => controller.abort(), 25_000)
+      try {
+        const response = await fetch(`/api/objects/${encodeURIComponent(id)}/media`, { signal: controller.signal, headers: { Accept: 'application/json' } })
+        if (!response.ok) throw new Error(await parseError(response))
+        const payload: unknown = await response.json()
+        if (!isRecord(payload) || typeof payload.thumbnail !== 'string' || !payload.thumbnail) throw new Error('暂未找到该天体的配图。')
+        const media = payload as unknown as ObjectMedia
+        objectMediaCache.set(id, media)
+        resolve(media)
+      } catch (error) {
+        reject(controller.signal.aborted ? new Error('配图读取超时，可稍后重试。') : error)
+      } finally {
+        clearTimeout(timeout)
+        activeObjectMediaRequests--
+        objectMediaQueue.shift()?.()
+      }
+    }
+    if (activeObjectMediaRequests < 3) void run()
+    else objectMediaQueue.push(() => { void run() })
+  })
+  objectMediaRequests.set(id, request)
+  void request.then(() => objectMediaRequests.delete(id), () => objectMediaRequests.delete(id))
+  return request
+}
+
 export interface AnalysisTaskProgressResponse {
   status: string
   stage: string
@@ -401,6 +461,7 @@ export async function analyzePhoto(file: File, settings: AnalysisSettings, reque
     constellationStrength: String(settings.constellations.value),
     catalogDepth: settings.catalogDepth,
     labelDensity: settings.labelDensity,
+    starLabelDensity: settings.starLabelDensity,
     deepSkyColor: settings.deepSkyColor,
     brightStarColor: settings.brightStarColor,
     constellationColor: settings.constellationColor,
@@ -408,6 +469,7 @@ export async function analyzePhoto(file: File, settings: AnalysisSettings, reque
     highContrast: String(settings.highContrast),
     annotationOpacity: String(settings.annotationOpacity),
     annotationLineWidth: String(settings.annotationLineWidth),
+    faintMarkerScale: String(settings.faintMarkerScale),
     annotationFontSize: String(settings.annotationFontSize),
     markerStyle: settings.markerStyle,
     starMagnitudeLimit: String(settings.starMagnitudeLimit),

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import gzip
 import hashlib
 import json
 import mimetypes
@@ -39,6 +40,27 @@ UPLOAD_IDLE_TIMEOUT_SECONDS = 15.0
 CLIENT_CLOSED_REQUEST = 499
 REQUEST_ID_PATTERN = re.compile(r"[0-9a-f]{32}")
 TASK_REGISTRY = AnalysisTaskRegistry()
+JSON_GZIP_THRESHOLD = 256 * 1024
+
+
+def _accepts_gzip(value: str | None) -> bool:
+    """Honor explicit gzip exclusions even when a wildcard is accepted."""
+    encodings: dict[str, float] = {}
+    for entry in (value or "").split(","):
+        pieces = [piece.strip().lower() for piece in entry.split(";")]
+        name = pieces[0]
+        if name not in {"gzip", "*"}:
+            continue
+        quality = 1.0
+        for parameter in pieces[1:]:
+            key, separator, raw = parameter.partition("=")
+            if separator and key.strip() == "q":
+                try:
+                    quality = float(raw.strip())
+                except ValueError:
+                    quality = 0.0
+        encodings[name] = quality if 0 <= quality <= 1 else 0.0
+    return encodings.get("gzip", encodings.get("*", 0.0)) > 0
 
 
 def _bool(value: str | None, fallback: bool) -> bool:
@@ -132,6 +154,9 @@ class SkyHandler(BaseHTTPRequestHandler):
             return
         if parsed.path.startswith("/api/deep-sky-media/"):
             self._serve_deep_sky_media(parsed.path)
+            return
+        if parsed.path.startswith("/api/objects/") and parsed.path.endswith("/media"):
+            self._serve_object_media(parsed.path)
             return
         if parsed.path.startswith("/api/artifacts/"):
             self._serve_artifact(parsed.path, attachment=False)
@@ -229,6 +254,8 @@ class SkyHandler(BaseHTTPRequestHandler):
             "starMagnitudeLimit": _one(query, "starMagnitudeLimit") or DEFAULT_SETTINGS["starMagnitudeLimit"],
             "includeCatalogOnly": _bool(_one(query, "includeCatalogOnly"), False),
             "catalogDepth": _one(query, "catalogDepth") or DEFAULT_SETTINGS["catalogDepth"],
+            "starLabelDensity": _one(query, "starLabelDensity") or DEFAULT_SETTINGS["starLabelDensity"],
+            "faintMarkerScale": _one(query, "faintMarkerScale") or DEFAULT_SETTINGS["faintMarkerScale"],
         }
         registry = self._task_registry()
         try:
@@ -638,6 +665,21 @@ class SkyHandler(BaseHTTPRequestHandler):
             while chunk := handle.read(1024 * 1024):
                 self.wfile.write(chunk)
 
+    def _serve_object_media(self, path: str) -> None:
+        from .deep_sky_media import fetch_object_media
+        from .nasa_survey_media import MediaUnavailableError, UnknownCatalogObjectError
+        parts = path.strip("/").split("/")
+        if len(parts) != 4 or parts[:2] != ["api", "objects"] or parts[3] != "media":
+            self._json({"error": "未知的深空天体目录编号"}, HTTPStatus.NOT_FOUND)
+            return
+        try:
+            result = fetch_object_media(urllib.parse.unquote(parts[2]))
+            self._json(result)
+        except UnknownCatalogObjectError as exc:
+            self._json({"error": str(exc)}, HTTPStatus.NOT_FOUND)
+        except (MediaUnavailableError, OSError) as exc:
+            self._json({"error": str(exc)}, HTTPStatus.SERVICE_UNAVAILABLE)
+
     def _serve_frontend(self, path: str) -> None:
         requested = path.lstrip("/") or "index.html"
         candidate = (FRONTEND_DIST / requested).resolve()
@@ -666,11 +708,17 @@ class SkyHandler(BaseHTTPRequestHandler):
         self.wfile.write(content)
 
     def _json(self, payload: dict[str, Any], status: int | HTTPStatus = HTTPStatus.OK) -> None:
-        data = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+        data = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+        compressed = len(data) >= JSON_GZIP_THRESHOLD and _accepts_gzip(self.headers.get("Accept-Encoding"))
+        if compressed:
+            data = gzip.compress(data, compresslevel=1, mtime=0)
         try:
             self.send_response(status)
             self.send_header("Content-Type", "application/json; charset=utf-8")
             self.send_header("Content-Length", str(len(data)))
+            self.send_header("Vary", "Accept-Encoding")
+            if compressed:
+                self.send_header("Content-Encoding", "gzip")
             self.send_header("Cache-Control", "no-store")
             self.end_headers()
             self.wfile.write(data)

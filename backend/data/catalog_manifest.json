@@ -107,6 +107,24 @@
       "common_name_zh_filled": 2253,
       "notes": "Apparent V magnitudes; catalogue is not complete to its faintest magnitude. Chinese names joined by exact HIP from the existing attributed bright-star catalogue. Coordinates retained at HYG epoch/equinox J2000; proper motions retained as metadata, not propagated without observation epoch."
     },
+    "athyg_tycho_extension": {
+      "file": "athyg_v32/manifest.json",
+      "dataset": "AT-HYG v3.2 / Tycho-2 indexed stellar extension",
+      "source_url": "https://github.com/astronexus/ATHYG-Database/tree/650346e2bc57f664eb411bc5f44ffd94b8006af2",
+      "upstream_commit": "650346e2bc57f664eb411bc5f44ffd94b8006af2",
+      "license": "CC-BY-SA-4.0",
+      "sha256": "5dd514658f66c8959d516307c1bdd75551f67c685761370be0f2ab9830e87592",
+      "rows": 2433199,
+      "combined_stars_with_hyg": 2552824,
+      "spatial_cells": 432,
+      "compressed_bytes": 49837728,
+      "epoch_equinox": "ICRS / J2000.0",
+      "magnitude_band": "VT",
+      "magnitude_min": 4.143,
+      "magnitude_max": 15.193,
+      "selection": "Complete AT-HYG v3.2 extension after removing the Sun and 118965 author-provided exact HYG duplicate IDs; no magnitude or sky-area cut.",
+      "notes": "Original HYG entries and Chinese names remain intact. Tycho VT and HYG V remain explicitly distinguished. Distinct TYC components are not proximity-merged. Tycho-2 is approximately 90% complete to V=11.5, not to the faintest catalogue magnitude."
+    },
     "lynds_dark_nebulae": {
       "file": "lynds_dark_nebulae.csv",
       "dataset": "Lynds' Catalogue of Dark Nebulae (LDN), CDS VII/7A",

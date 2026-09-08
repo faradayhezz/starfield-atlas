@@ -8,11 +8,12 @@ import json
 import numpy as np
 
 from backend.catalog import (
-    DATA_DIR, _star_identifier, bright_stars_in_frame, catalog_summary,
+    DATA_DIR, _star_identifier, _star_label, bright_stars_in_frame, catalog_summary,
     deep_sky_in_frame, load_bright_stars, load_dark_nebulae,
     load_deep_sky_catalog, load_openngc, load_stars,
 )
 from backend.plate_solver import PlateSolution
+from backend.stellar_index import candidate_cells, indexed_stars_in_frame, stellar_index_manifest, _load_cell
 
 
 def _test_solution() -> PlateSolution:
@@ -115,7 +116,8 @@ class CatalogTests(unittest.TestCase):
         self.assertFalse(any(item.object_type in {"NonEx", "Dup"} for item in combined))
         summary = catalog_summary()
         self.assertEqual(summary["deepSky"], len(combined))
-        self.assertEqual(summary["stars"], len(load_stars()))
+        self.assertEqual(summary["stars"], len(load_stars()) + 2433199)
+        self.assertEqual(summary["supplementalStars"], 2433199)
         self.assertEqual(summary["darkNebulae"], 1793)
         self.assertEqual(summary["pixelDetection"], False)
 
@@ -145,6 +147,62 @@ class CatalogTests(unittest.TestCase):
             self.assertEqual(digest, entry["sha256"])
             with path.open(encoding="utf-8", newline="") as handle:
                 self.assertEqual(sum(1 for _ in csv.DictReader(handle)), entry["rows"])
+
+    def test_gliese_label_does_not_repeat_an_existing_prefix(self) -> None:
+        self.assertEqual(_star_label({"gl": "Gl 635B"}), "Gl 635B")
+        self.assertEqual(_star_label({"gl": "GJ 1001"}), "GJ 1001")
+        self.assertEqual(_star_label({"gl": "635B"}), "Gl 635B")
+
+    def test_tycho_shards_have_verified_unique_source_identities(self) -> None:
+        manifest = stellar_index_manifest()
+        self.assertIsNotNone(manifest)
+        self.assertEqual(manifest["combined_stars"], 2552824)
+        self.assertEqual(manifest["source_counts"]["exact_hyg_duplicates_excluded"], 118965)
+        self.assertEqual(len(manifest["shards"]), 432)
+        athyg_ids, tyc_ids = [], []
+        existing_hip = np.asarray([int(star["hip"]) for star in load_stars() if star.get("hip")], dtype=np.uint32)
+        rows = 0
+        for shard in manifest["shards"]:
+            path = DATA_DIR / "athyg_v32" / shard["file"]
+            with path.open("rb") as handle:
+                self.assertEqual(hashlib.file_digest(handle, "sha256").hexdigest(), shard["sha256"])
+            values = _load_cell(str(path))
+            self.assertEqual(len(values["athyg"]), shard["rows"])
+            self.assertTrue(np.all(values["band"] == 1))
+            self.assertFalse(np.any(np.isin(values["hip"], existing_hip)))
+            self.assertTrue(np.all(values["ra_q"].astype(float) < 360e7))
+            self.assertTrue(np.all(np.abs(values["dec_q"].astype(float)) <= 90e7))
+            rows += shard["rows"]
+            athyg_ids.append(values["athyg"])
+            tyc_ids.append(values["tyc"])
+        self.assertEqual(rows, 2433199)
+        self.assertEqual(len(np.unique(np.concatenate(athyg_ids))), rows)
+        self.assertEqual(len(np.unique(np.concatenate(tyc_ids))), rows)
+        self.assertLessEqual(_load_cell.cache_info().currsize, 8)
+
+    def test_tycho_frame_has_more_real_stars_and_explicit_vt_band(self) -> None:
+        solution = _test_solution()
+        candidates = list(indexed_stars_in_frame(solution, 12, 36))
+        self.assertGreater(len(candidates), 10000)
+        self.assertTrue(all(item["id"].startswith("star-tyc-") for item in candidates))
+        self.assertTrue(all(item["magnitudeBand"] == "VT" for item in candidates))
+        self.assertTrue(all(item["pixelDetected"] is False for item in candidates))
+        self.assertTrue(all(item["magnitude"] <= 12 for item in candidates))
+        self.assertTrue(all(0 <= item["x"] < 1200 and 0 <= item["y"] < 800 for item in candidates))
+        self.assertTrue(any(item["raDeg"] > 350 for item in candidates))
+        self.assertTrue(any(item["raDeg"] < 10 for item in candidates))
+        self.assertFalse(any(90 < item["raDeg"] < 270 for item in candidates))
+
+    def test_tycho_cell_query_preserves_ra_wrap_and_both_poles(self) -> None:
+        seam = candidate_cells(np.asarray([1.0, 0, 0]), 0.1)
+        self.assertTrue(any(cell["cell"] % 24 == 0 for cell in seam))
+        self.assertTrue(any(cell["cell"] % 24 == 23 for cell in seam))
+        north = candidate_cells(np.asarray([0.0, 0, 1]), 0.1)
+        south = candidate_cells(np.asarray([0.0, 0, -1]), 0.1)
+        self.assertTrue(all(cell["center_dec_deg"] > 0 for cell in north))
+        self.assertTrue(all(cell["center_dec_deg"] < 0 for cell in south))
+        self.assertEqual({cell["cell"] % 24 for cell in north}, set(range(24)))
+        self.assertEqual({cell["cell"] % 24 for cell in south}, set(range(24)))
 
 
 if __name__ == "__main__":
