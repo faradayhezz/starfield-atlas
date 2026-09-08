@@ -145,7 +145,7 @@ def read_file_metadata(path: Path) -> ImageMetadata:
     try:
         with Image.open(path) as image:
             metadata = read_metadata(image)
-        if path.suffix.lower() in {".jpg", ".jpeg", ".png", ".tif", ".tiff"}:
+        if path.suffix.lower() in {".jpg", ".jpeg", ".mpo", ".png", ".tif", ".tiff"}:
             metadata.source_bytes = path.stat().st_size
             return metadata
     except (OSError, ValueError):

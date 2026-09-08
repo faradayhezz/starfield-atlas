@@ -8,7 +8,9 @@ Local-first plate solving, faint-star and deep-sky catalogues, native-resolution
 
 [English](#english) · [简体中文](#简体中文) · [日本語](#日本語)
 
-![Version](https://img.shields.io/badge/version-1.2.0-66d17a)
+[v1.2.1 import fixes](docs/RELEASE_NOTES_1.2.1.md): clears stuck drag hints and supports camera MPO/JPEG photos. 拖放遮挡与相机多图 JPEG 导入已修复。ドラッグ案内の残留と MPO/JPEG の読み込みを修正。
+
+![Version](https://img.shields.io/badge/version-1.2.1-66d17a)
 ![Platform](https://img.shields.io/badge/platform-Windows%20x64-4da3ff)
 ![Processing](https://img.shields.io/badge/photo%20processing-local--first-66d17a)
 ![Validation](https://img.shields.io/badge/validation-real%20photos%20%2B%20regressions-66d17a)
@@ -168,7 +170,7 @@ See [NASA source and usage notes](backend/data/nasa-deep-sky/SOURCES.md).
 #### Windows portable edition
 
 1. Open the [latest release](https://github.com/faradayhezz/starfield-atlas/releases/latest).
-2. Download <code>Starfield-Atlas-Windows-x64-v1.2.0.zip</code>.
+2. Download <code>Starfield-Atlas-Windows-x64-v1.2.1.zip</code>.
 3. Extract the complete ZIP.
 4. Run <code>星图寻迹.exe</code>.
 
@@ -385,7 +387,7 @@ NASA 详情包只使用从 <code>nasa.gov</code> 官方来源下载的真实观�
 #### Windows 便携版
 
 1. 打开[最新版本页面](https://github.com/faradayhezz/starfield-atlas/releases/latest)。
-2. 下载 <code>Starfield-Atlas-Windows-x64-v1.2.0.zip</code>。
+2. 下载 <code>Starfield-Atlas-Windows-x64-v1.2.1.zip</code>。
 3. 完整解压 ZIP。
 4. 双击 <code>星图寻迹.exe</code>。
 
@@ -593,7 +595,7 @@ NASA 詳細パックは <code>nasa.gov</code> の公式ソースから取得し�
 #### Windows ポータブル版
 
 1. [最新リリース](https://github.com/faradayhezz/starfield-atlas/releases/latest)を開きます。
-2. <code>Starfield-Atlas-Windows-x64-v1.2.0.zip</code> をダウンロードします。
+2. <code>Starfield-Atlas-Windows-x64-v1.2.1.zip</code> をダウンロードします。
 3. ZIP 全体を展開します。
 4. <code>星图寻迹.exe</code> を実行します。
 

@@ -6,7 +6,10 @@ $ErrorActionPreference = "Stop"
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $buildVenv = Join-Path $projectRoot ".build-venv"
 $releaseRoot = Join-Path $projectRoot "release"
-$releaseVersion = "1.2.0"
+$releaseVersion = (Get-Content -LiteralPath (Join-Path $projectRoot "frontend\package.json") -Raw | ConvertFrom-Json).version
+if ($releaseVersion -notmatch '^\d+\.\d+\.\d+$') {
+    throw "发布版本号必须为 x.y.z。"
+}
 $portableRoot = Join-Path $releaseRoot "星图寻迹-Windows-x64-v$releaseVersion"
 $pyInstallerWork = Join-Path ([System.IO.Path]::GetTempPath()) "starfield-atlas-pyi-work"
 $pyInstallerDist = Join-Path ([System.IO.Path]::GetTempPath()) "starfield-atlas-pyi-dist"

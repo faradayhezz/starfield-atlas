@@ -193,7 +193,7 @@ class SkyHandler(BaseHTTPRequestHandler):
         suffix = Path(filename).suffix.lower()
         if suffix not in ALLOWED_SUFFIXES:
             self._json(
-                {"status": "error", "error": "支持 JPG、PNG、TIFF 及常见相机 RAW（ARW、CR2/CR3、NEF、DNG 等）"},
+                {"status": "error", "error": "支持 JPG（含 MPO 多图照片）、PNG、TIFF 及常见相机 RAW（ARW、CR2/CR3、NEF、DNG 等）"},
                 HTTPStatus.UNSUPPORTED_MEDIA_TYPE,
             )
             return

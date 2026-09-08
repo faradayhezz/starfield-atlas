@@ -118,6 +118,77 @@ class NativeImageTests(unittest.TestCase):
             np.testing.assert_array_equal(native.pixels, np.rot90(pixels, -1))
             native.close()
 
+    def test_camera_mpo_with_jpeg_filename_decodes_primary_and_exports_jpeg(self) -> None:
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            source, target = root / "camera.jpg", root / "annotated.jpg"
+            exif = Image.Exif()
+            exif[274] = 6
+            exif[271] = "Test camera"
+            profile = ImageCms.ImageCmsProfile(ImageCms.createProfile("sRGB")).tobytes()
+            primary = Image.new("RGB", (64, 48), (110, 60, 30))
+            auxiliary = Image.new("RGB", (16, 12), (5, 230, 20))
+            primary.save(source, "MPO", save_all=True, append_images=[auxiliary], exif=exif, icc_profile=profile)
+            primary.close()
+            auxiliary.close()
+            original_hash = hashlib.sha256(source.read_bytes()).hexdigest()
+            with Image.open(source) as image:
+                self.assertEqual(image.format, "MPO")
+                self.assertEqual(image.n_frames, 2)
+                expected = np.rot90(np.array(image), -1)
+            native = load_native(source)
+            self.assertEqual(native.size, (48, 64))
+            self.assertEqual(native.metadata.format, "MPO")
+            self.assertEqual(native.metadata.camera_make, "Test camera")
+            self.assertEqual(native.output_format, "JPEG")
+            self.assertEqual(native.extension, ".jpg")
+            self.assertEqual(native.metadata.bit_depth, 8)
+            self.assertEqual(native.info["multipart_frames"], 2)
+            self.assertIn("主图", native.export_info()["note"])
+            np.testing.assert_array_equal(native.pixels, expected)
+            save_native(native, native.pixels, target)
+            with Image.open(target) as image:
+                self.assertEqual(image.format, "JPEG")
+                self.assertEqual(image.size, (48, 64))
+                self.assertEqual(getattr(image, "n_frames", 1), 1)
+                self.assertEqual(image.getexif()[274], 1)
+                self.assertEqual(image.getexif()[271], "Test camera")
+                self.assertEqual(image.info["icc_profile"], profile)
+                self.assertNotIn("mp", image.info)
+                self.assertNotIn("mpoffset", image.info)
+            self.assertEqual(hashlib.sha256(source.read_bytes()).hexdigest(), original_hash)
+            native.close()
+            mpo_source = root / "camera.mpo"
+            mpo_source.write_bytes(source.read_bytes())
+            native_mpo = load_native(mpo_source)
+            self.assertEqual(native_mpo.extension, ".jpg")
+            self.assertEqual(native_mpo.size, (48, 64))
+            self.assertEqual(native_mpo.metadata.format, "MPO")
+            np.testing.assert_array_equal(native_mpo.pixels, expected)
+            native_mpo.close()
+
+    def test_png_with_jpeg_filename_exports_actual_container_without_losing_16bit(self) -> None:
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            source, target = root / "shared.jpg", root / "annotated.png"
+            pixels = np.arange(48 * 64 * 3, dtype=np.uint16).reshape(48, 64, 3) * 7
+            source.write_bytes(imagecodecs.png_encode(pixels))
+            native = load_native(source)
+            self.assertEqual(native.output_format, "PNG")
+            self.assertEqual(native.extension, ".png")
+            self.assertEqual(native.metadata.format, "PNG")
+            save_native(native, native.pixels, target)
+            np.testing.assert_array_equal(imagecodecs.png_decode(target.read_bytes()), pixels)
+            native.close()
+
+    def test_unsupported_content_reports_actual_format_instead_of_filename(self) -> None:
+        with TemporaryDirectory() as directory:
+            source = Path(directory) / "shared.jpg"
+            with Image.new("RGB", (16, 12)) as image:
+                image.save(source, "BMP")
+            with self.assertRaisesRegex(ValueError, "实际格式为 BMP"):
+                load_native(source)
+
     def test_inverted_grayscale_tiff_preserves_visual_brightness(self) -> None:
         with TemporaryDirectory() as directory:
             path = Path(directory) / "white-is-zero.tiff"

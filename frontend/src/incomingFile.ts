@@ -1,5 +1,5 @@
 export const RAW_IMAGE_EXTENSIONS = ['arw', 'cr2', 'cr3', 'nef', 'nrw', 'dng', 'raf', 'orf', 'rw2', 'pef', 'srw', 'raw', 'sr2', 'srf', '3fr', 'fff', 'iiq', 'rwl', 'mos', 'mrw', 'kdc', 'dcr', 'erf', 'mef', 'mdc', 'x3f'] as const
-export const SUPPORTED_IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'tif', 'tiff', ...RAW_IMAGE_EXTENSIONS] as const
+export const SUPPORTED_IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'mpo', 'png', 'tif', 'tiff', ...RAW_IMAGE_EXTENSIONS] as const
 export const IMAGE_FILE_ACCEPT = SUPPORTED_IMAGE_EXTENSIONS.map((extension) => `.${extension}`).join(',')
 export const canPreviewImageFile = (file: File): boolean => /\.(jpe?g|png)$/i.test(file.name)
 

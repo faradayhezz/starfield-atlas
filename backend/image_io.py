@@ -20,7 +20,7 @@ RAW_SUFFIXES = {
     ".pef", ".srw", ".raw", ".sr2", ".srf", ".3fr", ".fff", ".iiq", ".rwl",
     ".mos", ".mrw", ".kdc", ".dcr", ".erf", ".mef", ".mdc", ".x3f",
 }
-RASTER_SUFFIXES = {".jpg", ".jpeg", ".png", ".tif", ".tiff"}
+RASTER_SUFFIXES = {".jpg", ".jpeg", ".mpo", ".png", ".tif", ".tiff"}
 ALLOWED_SUFFIXES = RASTER_SUFFIXES | RAW_SUFFIXES
 MAX_IMAGE_PIXELS = 180_000_000
 
@@ -58,6 +58,8 @@ class NativeImage:
             note = "RAW 原件保持不变；标注输出为全分辨率 16 位 TIFF，不能写回相机传感器 RAW 格式。"
         elif self.output_format == "JPEG":
             note = "保留原始像素尺寸和 JPEG 格式；添加标注需要重新编码，文件字节大小会改变。"
+        if self.info.get("mpo_primary"):
+            note += "该照片包含多图 JPEG（MPO）数据，标注使用全分辨率主图并输出单张 JPEG；原始多图文件保持不变。"
         if self.info.get("miniswhite_normalized"):
             note += "白为零的灰度 TIFF 已按同位深转换为等效 RGB 亮度。"
         return {
@@ -135,13 +137,23 @@ def load_native(path: Path, check_cancelled: Callable[[], None] = lambda: None) 
                 pixels = imagecodecs.png_decode(path.read_bytes())
                 info["png_color_chunks"] = _png_color_chunks(path)
                 output_format, extension = "PNG", ".png"
-            elif actual_format == "JPEG":
+            elif actual_format in {"JPEG", "MPO"}:
+                # Some camera JPEGs include an MPF index and an additional
+                # image. Pillow then reports MPO even with a .jpg filename.
+                # Frame zero is the full primary photograph, not a preview.
+                if actual_format == "MPO":
+                    image.seek(0)
+                    info["mpo_primary"] = True
+                    info["multipart_frames"] = image.n_frames
                 image.load()
                 pixels = np.asarray(image.convert("RGB") if image.mode not in {"RGB", "L"} else image).copy()
                 output_format = "JPEG"
                 extension = suffix if suffix in {".jpg", ".jpeg"} else ".jpg"
             else:
-                raise ValueError("文件内容与支持的 JPG、PNG、TIFF 或相机 RAW 格式不符")
+                raise ValueError(
+                    f"检测到照片实际格式为 {actual_format or '未知'}，当前不支持该格式；"
+                    "请将照片转换为 JPG、PNG、TIFF，或使用原始相机 RAW 文件（仅修改扩展名无效）"
+                )
         pixels = orient_pixels(pixels, metadata.orientation)
     check_cancelled()
     if pixels.ndim not in {2, 3} or (pixels.ndim == 3 and pixels.shape[2] not in {1, 2, 3, 4}):

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { analyzePhoto, cancelAnalysis, exportAnnotatedPhoto, getAnalysisProgress, type AnalysisTaskProgressResponse } from './api'
 import { downloadBlob, exportResultJson, getImageDimensions, sourceToBlob } from './export'
+import { installFileDropHandlers } from './fileDrop'
 import {
   firstSupportedFileFromTransfer,
   hasSupportedImageExtension,
@@ -98,7 +99,7 @@ function App() {
   const analysisTimeoutRef = useRef<number | undefined>(undefined)
   const requestIdRef = useRef<string | undefined>(undefined)
   const abortMessageRef = useRef<string | undefined>(undefined)
-  const dragDepthRef = useRef(0)
+  const dragControlRef = useRef<ReturnType<typeof installFileDropHandlers> | undefined>(undefined)
   const previewRef = useRef<string | undefined>(undefined)
   const [file, setFile] = useState<File>()
   const [previewUrl, setPreviewUrl] = useState<string>()
@@ -128,7 +129,10 @@ function App() {
     return () => window.clearTimeout(timer)
   }, [notice])
 
-  const openPicker = () => inputRef.current?.click()
+  const openPicker = () => {
+    dragControlRef.current?.reset()
+    inputRef.current?.click()
+  }
 
   const stopProgressPolling = () => {
     if (progressPollRef.current) window.clearTimeout(progressPollRef.current)
@@ -165,6 +169,7 @@ function App() {
   }
 
   const runAnalysis = async (nextFile: File, nextPreview?: string) => {
+    dragControlRef.current?.reset()
     const previousRequest = requestIdRef.current
     abortRef.current?.abort()
     if (previousRequest) void cancelAnalysis(previousRequest).catch(() => undefined)
@@ -227,6 +232,7 @@ function App() {
       if (requestIdRef.current !== activeRequest) return
       setError(caught instanceof Error ? caught.message : '识别过程中出现未知错误，请稍后重试。')
     } finally {
+      dragControlRef.current?.reset()
       if (requestIdRef.current === activeRequest) {
         requestIdRef.current = undefined
         abortRef.current = undefined
@@ -238,8 +244,9 @@ function App() {
   }
 
   const chooseFile = async (incomingFile: File) => {
-    if (progress) {
-      setNotice('请先取消当前识别，再拖入另一张照片。')
+    dragControlRef.current?.reset()
+    if (progress || exporting) {
+      setNotice('请先结束当前解析或导出，再传入另一张照片。')
       return
     }
     try {
@@ -268,6 +275,7 @@ function App() {
   }
 
   const cancelCurrentAnalysis = () => {
+    dragControlRef.current?.reset()
     const activeRequest = requestIdRef.current
     if (!activeRequest) return
     const message = '识别已取消，原照片仍保留，可直接重新尝试。'
@@ -280,75 +288,50 @@ function App() {
     setError(message)
   }
 
+  const importStateRef = useRef({ progress, exporting, chooseFile })
+  importStateRef.current = { progress, exporting, chooseFile }
+
   useEffect(() => {
-    const onDragEnter = (event: DragEvent) => {
-      event.preventDefault()
-      if (!transferCarriesFiles(event.dataTransfer)) return
-      dragDepthRef.current += 1
-      if (!progress) setExternalDragging(true)
-    }
-    const onDragOver = (event: DragEvent) => {
-      event.preventDefault()
-      if (event.dataTransfer && transferCarriesFiles(event.dataTransfer)) event.dataTransfer.dropEffect = 'copy'
-    }
-    const onDragLeave = (event: DragEvent) => {
-      event.preventDefault()
-      dragDepthRef.current = Math.max(0, dragDepthRef.current - 1)
-      if (dragDepthRef.current === 0) setExternalDragging(false)
-    }
-    const resetDragState = () => {
-      dragDepthRef.current = 0
-      setExternalDragging(false)
-    }
-    const onDrop = async (event: DragEvent) => {
-      event.preventDefault()
-      dragDepthRef.current = 0
-      setExternalDragging(false)
-      if (progress) {
-        setNotice('请先取消当前识别，再拖入另一张照片。')
+    const receiveFiles = async (data: DataTransfer | null) => {
+      dragControlRef.current?.reset()
+      const current = importStateRef.current
+      if (current.progress || current.exporting) {
+        setNotice('请先结束当前解析或导出，再传入另一张照片。')
         return
       }
       try {
-        const candidate = await firstSupportedFileFromTransfer(event.dataTransfer)
-        if (candidate) {
-          await chooseFile(candidate)
-          return
-        }
-        setError(INCOMING_FILE_UNSUPPORTED_ERROR)
-      } catch (caught) {
-        setError(caught instanceof Error ? caught.message : INCOMING_FILE_READ_ERROR)
-      }
-    }
-    const onPaste = async (event: ClipboardEvent) => {
-      if (!transferCarriesFiles(event.clipboardData)) return
-      event.preventDefault()
-      if (progress) {
-        setNotice('请先取消当前识别，再粘贴另一张照片。')
-        return
-      }
-      try {
-        const candidate = await firstSupportedFileFromTransfer(event.clipboardData)
-        if (candidate) await chooseFile(candidate)
+        // This function snapshots File references before its first await.
+        const candidate = await firstSupportedFileFromTransfer(data)
+        if (candidate) await importStateRef.current.chooseFile(candidate)
         else setError(INCOMING_FILE_UNSUPPORTED_ERROR)
       } catch (caught) {
         setError(caught instanceof Error ? caught.message : INCOMING_FILE_READ_ERROR)
+      } finally {
+        dragControlRef.current?.reset()
       }
     }
-    window.addEventListener('dragenter', onDragEnter)
-    window.addEventListener('dragover', onDragOver)
-    window.addEventListener('dragleave', onDragLeave)
-    window.addEventListener('dragend', resetDragState)
-    window.addEventListener('drop', onDrop)
+    const controls = installFileDropHandlers(window, {
+      onActiveChange: setExternalDragging,
+      canDrop: () => !importStateRef.current.progress && !importStateRef.current.exporting,
+      onDrop: (data) => { void receiveFiles(data) },
+    })
+    dragControlRef.current = controls
+    const onPaste = (event: ClipboardEvent) => {
+      if (!transferCarriesFiles(event.clipboardData)) return
+      event.preventDefault()
+      void receiveFiles(event.clipboardData)
+    }
     window.addEventListener('paste', onPaste)
     return () => {
-      window.removeEventListener('dragenter', onDragEnter)
-      window.removeEventListener('dragover', onDragOver)
-      window.removeEventListener('dragleave', onDragLeave)
-      window.removeEventListener('dragend', resetDragState)
-      window.removeEventListener('drop', onDrop)
+      controls.dispose()
+      if (dragControlRef.current === controls) dragControlRef.current = undefined
       window.removeEventListener('paste', onPaste)
     }
-  }, [progress, settings])
+  }, [])
+
+  useEffect(() => {
+    if (progress || error || exporting) dragControlRef.current?.reset()
+  }, [progress, error, exporting])
 
   const hasCoordinateOverlay = Boolean(result?.objects.some((object) =>
     (object.x !== undefined && object.y !== undefined) || object.lines?.length,
@@ -459,9 +442,10 @@ function App() {
           event.target.value = ''
         }}
       />
-      {externalDragging && (
+      {externalDragging && !progress && !exporting && (
         <div className="external-drop-overlay" role="status" aria-live="polite">
           <div className="external-drop-overlay__card">
+            <button className="dismiss-drop-hint" type="button" onClick={() => dragControlRef.current?.reset()} aria-label="关闭拖入提示"><CloseIcon /></button>
             <strong>松开即可识别这张照片</strong>
             <span>支持从资源管理器、微信临时文件直接拖入</span>
             <small>微信虚拟附件也可复制后按 Ctrl+V 粘贴</small>
