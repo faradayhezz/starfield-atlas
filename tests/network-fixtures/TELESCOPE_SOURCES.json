@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "downloadedOn": "2026-09-10",
+  "usageGuidelines": "https://www.nasa.gov/nasa-brand-center/images-and-media/",
+  "images": [
+    {
+      "id": "hubble-westerlund2",
+      "file": "nasa_hubble_westerlund2.jpg",
+      "title": "Hubble — Westerlund 2 and Gum 29",
+      "sourcePage": "https://science.nasa.gov/asset/hubble/westerlund-2-2/",
+      "downloadUrl": "https://assets.science.nasa.gov/content/dam/science/missions/hubble/nebulae/emission/STScI-01EVT1KSRW3VWN9E7SQ25NFR98.png/jcr:content/renditions/2000x960.jpg",
+      "credit": "NASA, ESA, A. Nota (ESA/STScI), and the Westerlund 2 Science Team",
+      "releaseDate": "2015-04-23",
+      "width": 2000,
+      "height": 960,
+      "bytes": 772226,
+      "sha256": "9896df7191a6056ca5b0b5f2f694dbc9ab8580702ca156181eaf3b9e30f32160",
+      "variant": "Official 2000 x 960 JPEG display rendition, downloaded unchanged; not raw telescope exposures or a full-resolution master",
+      "expectedCurrentSolverOutcome": "rejected_no_reliable_solution"
+    },
+    {
+      "id": "webb-cosmic-cliffs",
+      "file": "nasa_webb_cosmic_cliffs.png",
+      "title": "Webb — Cosmic Cliffs in NGC 3324 (NIRCam)",
+      "sourcePage": "https://science.nasa.gov/asset/webb/cosmic-cliffs-in-the-carina-nebula-nircam-image/",
+      "downloadUrl": "https://assets.science.nasa.gov/content/dam/science/missions/webb/science/2022/07/STScI-01GA6KKWG229B16K4Q38CH3BXS.png/jcr:content/renditions/2000x1158.png",
+      "credit": "NASA, ESA, CSA, STScI",
+      "releaseDate": "2022-07-12",
+      "width": 2000,
+      "height": 1158,
+      "bytes": 3493524,
+      "sha256": "9e691dbd7ba25c0eb9c62ce7ebfadbbd8b008a97ff58576608290eab51adbf24",
+      "publishedWidthArcmin": 7.3,
+      "variant": "Official 2000 x 1158 PNG display rendition, downloaded unchanged; not the 14575 x 8441 master or raw telescope exposures",
+      "expectedCurrentSolverOutcome": "rejected_no_reliable_solution"
+    }
+  ]
+}

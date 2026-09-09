@@ -75,6 +75,15 @@ The top workbench screenshots show v1.3.0 and real sky photographs. The sky-view
 
 ## English
 
+### Hubble & Webb — real telescope test inputs
+
+| Hubble · Westerlund 2 | Webb · Cosmic Cliffs (NGC 3324) |
+|---|---|
+| ![Official Hubble test input, not a solved annotation](tests/network-fixtures/nasa_hubble_westerlund2.jpg) | ![Official Webb NIRCam test input, not a solved annotation](tests/network-fixtures/nasa_webb_cosmic_cliffs.png) |
+| NASA, ESA, A. Nota (ESA/STScI), and the Westerlund 2 Science Team | NASA, ESA, CSA, STScI |
+
+These are **real observation composites downloaded from NASA**, not AI images or application screenshots. They are official display-size test inputs, not full-resolution masters. Both decode correctly, but **neither produced a reliable blind solution with the current wide-field solver**. No invented annotations are shown. Webb's published field is only 7.3 arcminutes wide; the bundled pattern database targets roughly 10°–30°. [Measured outcomes, source pages and reproducible test](docs/HUBBLE_WEBB_TESTS.md).
+
 ### Turn a real sky photograph into a navigable star chart
 
 Starfield Atlas is a Windows desktop application that accepts JPG, PNG, TIFF and supported camera RAW files, blind-solves their celestial coordinates from star geometry, projects local astronomical catalogues back onto the original pixels, and exports a full-resolution annotated image and structured JSON inventory.
@@ -301,6 +310,15 @@ Important third-party terms include:
 
 ## 简体中文
 
+### 哈勃与韦伯：真实观测测试图
+
+| 哈勃 · Westerlund 2 星团 | 韦伯 · NGC 3324“宇宙悬崖” |
+|---|---|
+| ![哈勃真实测试输入，不是解算标注结果](tests/network-fixtures/nasa_hubble_westerlund2.jpg) | ![韦伯真实测试输入，不是解算标注结果](tests/network-fixtures/nasa_webb_cosmic_cliffs.png) |
+| NASA、ESA、A. Nota（ESA/STScI）及 Westerlund 2 科学团队 | NASA、ESA、CSA、STScI |
+
+这两张来自 NASA 的**真实观测合成图**已纳入可复跑测试，不是 AI 生成图，也不是软件成功识别截图。下载的是官方显示版，并非最高分辨率母版。实测均能正常解码，但**当前宽场解算器未得到可靠天球解**，因此不展示虚构标注。韦伯此图宽度仅 7.3 角分，而内置盲解索引主要覆盖约 10°–30°。详见[实测结果、原始来源及复跑方法](docs/HUBBLE_WEBB_TESTS.md#简体中文)。
+
 ### 把真实星空照片变成可以探索的星图
 
 “星图寻迹”是一款本地优先的 Windows 星空照片识别应用。支持 JPG、PNG、TIFF 和受支持的相机 RAW，根据星点几何进行盲星图解算，把离线天体目录投影回原始照片，并导出全分辨率标注图和结构化 JSON 天体清单。
@@ -514,6 +532,15 @@ RAW 按有效成像区域全分辨率显影，标注后保存为 16 位 TIFF。�
 ---
 
 ## 日本語
+
+### ハッブルとウェッブ：実観測テスト画像
+
+| Hubble · Westerlund 2 | Webb · Cosmic Cliffs（NGC 3324） |
+|---|---|
+| ![ハッブルの実入力画像、解析成功例ではありません](tests/network-fixtures/nasa_hubble_westerlund2.jpg) | ![ウェッブの実入力画像、解析成功例ではありません](tests/network-fixtures/nasa_webb_cosmic_cliffs.png) |
+| NASA, ESA, A. Nota (ESA/STScI), and the Westerlund 2 Science Team | NASA, ESA, CSA, STScI |
+
+NASA の**実観測合成画像**を再現可能なテストとして収録しました。AI 生成画像やアプリの成功画面ではなく、公式の表示用画像です（最高解像度マスターではありません）。両方ともデコードできましたが、**現行の広角用ソルバーでは信頼できる解が得られませんでした**。架空の注釈は掲載しません。Webb 画像の横幅は 7.3 分角で、内蔵パターン索引の約 10°〜30°とは異なります。[測定結果・出典・再実行手順](docs/HUBBLE_WEBB_TESTS.md#日本語)。
 
 ### 実際の星空写真を、探索できる星図へ
 

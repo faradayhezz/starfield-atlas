@@ -120,6 +120,27 @@ and the [SkyView data-use FAQ](https://skyview.gsfc.nasa.gov/current/help/faq.ht
 
 ## Public real-sky photographs and README images
 
+### Hubble and Webb telescope test inputs
+
+- `tests/network-fixtures/nasa_hubble_westerlund2.jpg`: Hubble Westerlund 2
+  and Gum 29, credit NASA, ESA, A. Nota (ESA/STScI), and the Westerlund 2
+  Science Team. [Official source](https://science.nasa.gov/asset/hubble/westerlund-2-2/).
+- `tests/network-fixtures/nasa_webb_cosmic_cliffs.png`: Webb NIRCam Cosmic
+  Cliffs in NGC 3324, credit NASA, ESA, CSA, STScI.
+  [Official source](https://science.nasa.gov/asset/webb/cosmic-cliffs-in-the-carina-nebula-nircam-image/).
+
+These files are unchanged official display renditions, used as factual testing
+and educational documentation under the
+[NASA Images and Media Usage Guidelines](https://www.nasa.gov/nasa-brand-center/images-and-media/).
+They retain the individual source credits and are not relicensed under GPL.
+No NASA, ESA, CSA, STScI or science-team endorsement is implied. Source URLs,
+download variants and SHA-256 hashes are in
+[`TELESCOPE_SOURCES.json`](tests/network-fixtures/TELESCOPE_SOURCES.json);
+[test results](docs/HUBBLE_WEBB_TESTS.md) distinguish import success from
+failed blind solving. Neither image has application annotations added.
+
+### Wide-field photographs
+
 The repository deliberately excludes private user photographs and a local test
 image whose redistribution permission was not confirmed.
 
